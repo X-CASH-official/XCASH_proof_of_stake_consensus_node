@@ -62,13 +62,32 @@ Then use the make file to build the binary file
 ## Setting up the xcashd and xcash-wallet-RPC
 
 First you will need to run xcashd in the background. Navigate to the folder that contains the xcash binaries, then run  
-`screen -dmS ./xcashd`
+`./xcashd`
 
 Next you need to run a xcash-wallet-rpc. Depending on if this is the consensus node or the consensus backup node, you will need to the run the wallet that contains the public address in the [Proof of stake](https://github.com/X-CASH-official/Proof_of_stake) for the CONSENSUS_NODE_PUBLIC_ADDRESS or CONSENSUS_BACKUP_NODE_PUBLIC_ADDRESS
 
+To run the rpc wallet you can run  
+`./xcash-wallet-rpc --wallet-file NAME_OF_WALLET_FILE --password WALLET_FILE_PASSWORD --rpc-bind-port 18285 --confirm-external-bind --daemon-port 18281 --disable-rpc-login --trusted-daemon`
+
+Just replace NAME_OF_WALLET_FILE with the name of your wallet file and WALLET_FILE_PASSWORD with the password of that wallet file. Make sure to use port 18285 as this is the port that is used in the program.
+
+We suggest you use the screen command to run the program in the background, this way you can still maintenance the server. To do this run  
+`screen -dmS Daemon ./xcashd`
+
+You can also run the RPC wallet this way as well  
+`screen -dmS RPC-Wallet ./xcash-wallet-rpc --wallet-file NAME_OF_WALLET_FILE --password WALLET_FILE_PASSWORD --rpc-bind-port 18285 --confirm-external-bind --daemon-port 18281 --disable-rpc-login --trusted-daemon`
+
+To bring the screen from the bacground process to the active process run  
+`screen -x NAME_OF_BACKGROUNDS_SCREEN`
+
+Where NAME_OF_BACKGROUNDS_SCREEN would be Daemon or RPC-Wallet in the above examples.
+
+To exit a screen if it is the active process, you can press Control + C. To exit a screen that is a background process you can run  
+`screen -XS NAME_OF_BACKGROUNDS_SCREEN quit`
 
 
-## Running X-CASH Proof of stake test
+
+## Running X-CASH Proof of stake - consensus node test
 It is recomeneded to run the X-CASH Proof of stake test before you run the main program. The test will ensure that your system is compatbile, and that you have setup your system correctly.
 
 To run the X-CASH Proof of stake test, Navigate to the folder that contains the binary, then run  
@@ -82,3 +101,14 @@ The test will return the number of passed and failed test on the bottom of the c
 
 Then you will need to run the xcash_proof_of_stake_consensus_node. Navigate to the folder that contains the binary, then run  
 `./xcash_proof_of_stake_consensus_node`
+
+We suggest you use the screen command to run the program in the background, this way you can still maintenance the server. To do this run  
+`screen -dmS xcash_proof_of_stake_consensus_node ./xcash_proof_of_stake_consensus_node`
+
+To bring the screen from the bacground process to the active process run  
+`screen -x NAME_OF_BACKGROUNDS_SCREEN`
+
+Where NAME_OF_BACKGROUNDS_SCREEN would be xcash_proof_of_stake_consensus_node in the above example.
+
+To exit a screen if it is the active process, you can press Control + C. To exit a screen that is a background process you can run  
+`screen -XS NAME_OF_BACKGROUNDS_SCREEN quit`
