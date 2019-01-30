@@ -27,7 +27,19 @@ The following table summarizes the tools and libraries required to build.
 | pkg-config                                   | any           | `pkg-config`              | 
 | OpenSSL      		                       | any           | `libssl-dev`              |
 | Git      		                       | any           | `git`                     |
+| MongoDB                                      | 4.0.3         |  install from binaries    |
 | MongoDB C Driver (includes BSON libary)      | 1.13.1        |  build from source        |
+
+
+
+### Installing MongoDB from binaries
+
+Visit [https://www.mongodb.com/download-center/community](https://www.mongodb.com/download-center/community)
+
+Then choose your OS, and make sure the version is the current version and the package is server. Then click on All version binaries. Now find the current version to download. You do not want the debug symbols or the rc version, just the regular current version.
+
+Once you have downloaded the file move the file to a location where you want to keep the binaries, then run this set of commands  
+`tar -xf mongodb-linux-x86_64-*.tgz && rm mongodb-linux-x86_64-*.tgz && sudo mkdir -p /data/db && sudo chmod 770 /data/db && sudo chown $USER /data/db`
 
 
 
@@ -56,6 +68,12 @@ After cloning the repository, navigate to the folder
 
 Then use the make file to build the binary file  
 `make clean ; make`
+
+
+
+## Running MongoDB
+To run MongoDB you will need to navigate to the folder you downloaded the binaries to, and in the bin folder run mongod by running  
+`./mongod`
 
 
 
