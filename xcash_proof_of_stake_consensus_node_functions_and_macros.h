@@ -145,7 +145,7 @@ int get_previous_block_hash(char *result, const int MESSAGE_SETTINGS);
 int sign_data(char *message, const int HTTP_SETTINGS);
 int verify_data(const char* MESSAGE, const int HTTP_SETTINGS, const int VERIFY_CURRENT_ROUND_PART_SETTINGS, const int VERIFY_CURRENT_ROUND_PART_BACKUP_NODE_SETTINGS);
 int read_file(char *result, const char* FILE_NAME);
-int write_file(const char* data, const char* FILE_NAME);
+int write_file(const char* DATA, const char* FILE_NAME);
 int create_server(const int MESSAGE_SETTINGS);
 // database functions
 int create_database_connection();
@@ -164,6 +164,10 @@ int server_received_data_xcash_proof_of_stake_test_data(const int CLIENT_SOCKET,
 int server_receive_data_socket_consensus_node_to_node(const int CLIENT_SOCKET, pthread_t thread_id, char* message);
 int create_server(const int MESSAGE_SETTINGS);
 // thread functions
+void* read_file_thread(void* parameters);
+void* write_file_thread(void* parameters);
+int thread_settings(pthread_t thread_id);
+// server thread functions
 void* total_connection_time_thread(void* parameters);
 void* mainnode_timeout_thread(void* parameters);
 
@@ -174,6 +178,23 @@ Global Structures
 */
 
 
+
+ // Thread functions
+ struct read_file_thread_parameters {
+    char* result; // The data read from the file
+    const char* FILE_NAME; // The file name
+};
+
+ struct write_file_thread_parameters {
+    const char* DATA; // The data to write to the file
+    const char* FILE_NAME; // The file name
+};
+
+
+
+
+
+ // Server thread functions
  struct total_connection_time_thread_parameters {
     pid_t process_id; // Holds the forked process ID that the client is connected to
     char* client_address; // Holds the IP address of the client
@@ -188,6 +209,7 @@ Global Structures
     const char* current_round_part; // The current round part (1-4).
     const char* current_round_part_backup_node; // The current main node in the current round part (0-5)
 };
+
 
 
 /*

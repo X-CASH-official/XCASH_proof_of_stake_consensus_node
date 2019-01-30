@@ -1444,19 +1444,19 @@ int read_file(char *result, const char* FILE_NAME)
 Name: write_file
 Description: Writes data to a file
 Parameters:
-  data = The data to write to the file
+  DATA = The data to write to the file
   file_name - The file name
 Return: 0 if an error has occured, 1 if successfull
 -----------------------------------------------------------------------------------------------------------
 */
 
-int write_file(const char* data, const char* FILE_NAME)
+int write_file(const char* DATA, const char* FILE_NAME)
 {
   // Variables
   FILE* file;
   
   file = fopen(FILE_NAME,"w");
-  fprintf(file,"%s",data);
+  fprintf(file,"%s",DATA);
   fclose(file);
   return 1;   
 }
@@ -1493,7 +1493,7 @@ int create_database_connection()
   {
     return 0;
   }
-  database_client = mongoc_client_new_from_uri (uri);
+  database_client = mongoc_client_new_from_uri(uri);
   if (!database_client)
   {
     return 0;
@@ -2176,6 +2176,69 @@ Thread functions
 -----------------------------------------------------------------------------------------------------------
 */
 
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
+Name: read_file_thread
+Description: Reads a file on a separate thread
+Return: NULL
+-----------------------------------------------------------------------------------------------------------
+*/
+
+void* read_file_thread(void* parameters)
+{
+  struct read_file_thread_parameters* data = parameters;
+  int settings = read_file(data->result, data->FILE_NAME);
+  pthread_exit((void *)(intptr_t)settings);
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
+Name: write_file_thread
+Description: Writes a file on a separate thread
+Return: NULL
+-----------------------------------------------------------------------------------------------------------
+*/
+
+void* write_file_thread(void* parameters)
+{
+  struct write_file_thread_parameters* data = parameters;
+  int settings = write_file(data->DATA, data->FILE_NAME);
+  pthread_exit((void *)(intptr_t)settings);
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
+Name: thread_settings
+Description: Waits for a thread to return a value, and returns the value from the thread
+Parameters:
+   thread_id - The thread id of the thread
+Return: The value that the thread returned
+-----------------------------------------------------------------------------------------------------------
+*/
+
+int thread_settings(pthread_t thread_id)
+{
+  void* thread_settings;
+  pthread_join(thread_id, &thread_settings);
+  int settings = (intptr_t)thread_settings;
+  return settings;
+}
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
+Server Thread functions
+-----------------------------------------------------------------------------------------------------------
+*/
+
+
+
 /*
 -----------------------------------------------------------------------------------------------------------
 Name: total_connection_time_thread
@@ -2271,6 +2334,36 @@ void* mainnode_timeout_thread(void* parameters)
   kill((intptr_t)data->process_id, SIGTERM);
   return NULL;
 }
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
+Name: total_connection_time_thread
+Description: Closes the forked process after a certain connection timeout
+Parameters:
+  parameters - A pointer to the total_connection_time_thread_parameters struct
+  struct total_connection_time_thread_parameters
+    process_id - The process id of the forked process
+    client_address - The client's IP address for the forked process
+    port - The client's connected port for the forked process
+    data_received - 1 if data was received in the timeout time, otherwise 0
+Return: NULL
+-----------------------------------------------------------------------------------------------------------
+*/
+
+/*void* write_file_thread(void* parameters)
+{ 
+  // Variables
+  FILE* file;
+
+  struct write_file_thread_parameters* data = parameters;
+  
+  file = fopen(data->FILE_NAME,"w");
+  fprintf(file,"%s",data->DATA);
+  fclose(file); 
+  return NULL;
+}*/
 
 
 
