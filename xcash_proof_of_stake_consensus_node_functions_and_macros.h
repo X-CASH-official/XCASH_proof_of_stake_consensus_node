@@ -149,16 +149,16 @@ int write_file(const char* DATA, const char* FILE_NAME);
 int create_server(const int MESSAGE_SETTINGS);
 // database functions
 int create_database_connection();
-int insert_document_into_collection_array(const char* DATABASE, const char* COLLECTION, char** field_name_array, char** field_data_array, const size_t DATA_COUNT);
-int insert_document_into_collection_json(const char* DATABASE, const char* COLLECTION, const char* DATA);
-int read_document_from_collection(const char* DATABASE, const char* COLLECTION, const char* DATA, char *result);
-int read_document_field_from_collection(const char* DATABASE, const char* COLLECTION, const char* DATA, const char* FIELD_NAME, char *result);
-int update_document_from_collection(const char* DATABASE, const char* COLLECTION, const char* DATA, const char* FIELD_NAME_AND_DATA);
-int update_all_documents_from_collection(const char* DATABASE, const char* COLLECTION, const char* DATA);
-int delete_document_from_collection(const char* DATABASE, const char* COLLECTION, const char* DATA);
-int delete_collection_from_database(const char* DATABASE, const char* COLLECTION);
-int count_documents_in_collection(const char* DATABASE, const char* COLLECTION, const char* DATA);
-int count_all_documents_in_collection(const char* DATABASE, const char* COLLECTION);
+int insert_document_into_collection_array(const char* DATABASE, const char* COLLECTION, char** field_name_array, char** field_data_array, const size_t DATA_COUNT, const int THREAD_SETTINGS);
+int insert_document_into_collection_json(const char* DATABASE, const char* COLLECTION, const char* DATA, const int THREAD_SETTINGS);
+int read_document_from_collection(const char* DATABASE, const char* COLLECTION, const char* DATA, char *result, const int THREAD_SETTINGS);
+int read_document_field_from_collection(const char* DATABASE, const char* COLLECTION, const char* DATA, const char* FIELD_NAME, char *result, const int THREAD_SETTINGS);
+int update_document_from_collection(const char* DATABASE, const char* COLLECTION, const char* DATA, const char* FIELD_NAME_AND_DATA, const int THREAD_SETTINGS);
+int update_all_documents_from_collection(const char* DATABASE, const char* COLLECTION, const char* DATA, const int THREAD_SETTINGS);
+int delete_document_from_collection(const char* DATABASE, const char* COLLECTION, const char* DATA, const int THREAD_SETTINGS);
+int delete_collection_from_database(const char* DATABASE, const char* COLLECTION, const int THREAD_SETTINGS);
+int count_documents_in_collection(const char* DATABASE, const char* COLLECTION, const char* DATA, const int THREAD_SETTINGS);
+int count_all_documents_in_collection(const char* DATABASE, const char* COLLECTION, const int THREAD_SETTINGS);
 // server functions
 int server_received_data_xcash_proof_of_stake_test_data(const int CLIENT_SOCKET, char* message);
 int server_receive_data_socket_consensus_node_to_node(const int CLIENT_SOCKET, pthread_t thread_id, char* message);
@@ -166,6 +166,7 @@ int create_server(const int MESSAGE_SETTINGS);
 // thread functions
 void* read_file_thread(void* parameters);
 void* write_file_thread(void* parameters);
+void* insert_document_into_collection_json_thread(void* parameters);
 int thread_settings(pthread_t thread_id);
 // server thread functions
 void* total_connection_time_thread(void* parameters);
@@ -188,6 +189,12 @@ Global Structures
  struct write_file_thread_parameters {
     const char* DATA; // The data to write to the file
     const char* FILE_NAME; // The file name
+};
+
+struct insert_document_into_collection_json_thread_parameters {
+    const char* DATABASE; // The data to write to the file
+    const char* COLLECTION; // The file name
+    const char* DATA; // The json data to insert into the collection
 };
 
 
@@ -220,6 +227,7 @@ Global Variables
 
 // database
 mongoc_client_t* database_client;
+mongoc_client_pool_t* database_client_thread_pool;
 
 char* xcash_wallet_public_address; // Holds your wallets public address
 char* nodes_public_address_list; // The list of the enabled nodes public address (100 of them) (node1|node2|)

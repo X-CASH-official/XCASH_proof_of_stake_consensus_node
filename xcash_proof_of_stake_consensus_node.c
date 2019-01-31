@@ -41,6 +41,35 @@ int main(int parameters_count, char* parameters[])
   // initialize the database connection
   mongoc_init();
 
+  // create a connection to the database
+  if (create_database_connection() == 0)
+  {
+    color_print("Could not create a connection for the database\n","red");
+    mongoc_cleanup();
+    exit(0);
+  }
+
+  // create a pool of connections for the database
+  mongoc_uri_t* uri_thread_pool;
+  bson_error_t error;
+  uri_thread_pool = mongoc_uri_new_with_error(DATABASE_CONNECTION, &error);
+  if (!uri_thread_pool)
+  {
+    color_print("Could not create a pool of connections for the database\n","red");
+    mongoc_client_destroy(database_client);
+    mongoc_cleanup();
+    exit(0);
+  }
+  database_client_thread_pool = mongoc_client_pool_new(uri_thread_pool);
+  if (!database_client_thread_pool)
+  {
+    color_print("Could not create a thread pool for the database\n","red");
+    mongoc_client_destroy(database_client);
+    mongoc_cleanup();
+    exit(0);
+  }
+  
+
   // set the current_round_part and current_round_part_backup_node to an empty string, this way the node will start at the begining of a round
   memcpy(current_round_part,"",1); 
   memcpy(current_round_part_backup_node,"",1);
@@ -54,7 +83,7 @@ int main(int parameters_count, char* parameters[])
   // set the server_message
   memcpy(server_message,"CONSENSUS_NODE_TO_NODES_MAIN_NODE_PUBLIC_ADDRESS",48);
 
-  // get the wallets public address
+ /* // get the wallets public address
   printf("Getting the public address\n\n");
   if (get_public_address(0) == 1)
   {  
@@ -68,9 +97,11 @@ int main(int parameters_count, char* parameters[])
   {
     color_print("Could not get the wallets public address\n","red");
     mongoc_client_destroy(database_client);
+    mongoc_client_pool_destroy(database_client_thread_pool);
+    mongoc_uri_destroy(uri_thread_pool);
     mongoc_cleanup();
     exit(0);
-  }
+  }*/
   
   // check if the program needs to run the test
   if (parameters_count == 2)
@@ -85,6 +116,8 @@ int main(int parameters_count, char* parameters[])
       printf(INVALID_PARAMETERS_ERROR_MESSAGE);
     }
     mongoc_client_destroy(database_client);
+    mongoc_client_pool_destroy(database_client_thread_pool);
+    mongoc_uri_destroy(uri_thread_pool);
     mongoc_cleanup();
     exit(0);
   }
@@ -94,9 +127,15 @@ int main(int parameters_count, char* parameters[])
   {
     color_print("Could not start the server","red");
     mongoc_client_destroy(database_client);
+    mongoc_client_pool_destroy(database_client_thread_pool);
+    mongoc_uri_destroy(uri_thread_pool);
     mongoc_cleanup();
     exit(0);
   }
 
+  mongoc_client_destroy(database_client);
+  mongoc_client_pool_destroy(database_client_thread_pool);
+  mongoc_uri_destroy(uri_thread_pool);
+  mongoc_cleanup();
   return 0;   
 }

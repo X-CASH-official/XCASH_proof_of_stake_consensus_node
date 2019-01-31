@@ -5226,6 +5226,9 @@ Return: The number of passed database test
 
 int database_test()
 {   
+  // Variables
+  pthread_t thread_id;
+
   // define macros
   #define DATABASE_TEST 11
   #define DATA_COUNT 5
@@ -5249,19 +5252,6 @@ int database_test()
 
   // run the test
 
-  // create a connection to the database
-  if (create_database_connection() == 0)
-  {
-    color_print("FAILED! Test for creating a connection to the database","red");
-  }
-  else
-  {
-    color_print("PASSED! Test for creating a connection to the database","green");
-    count_test++;
-  }
-  
-  if (count_test == 1)
-  {
   // initialize the arrays
   for (count = 0; count < DATA_COUNT; count++)
   {
@@ -5277,7 +5267,7 @@ int database_test()
   }
 
   // insert a document into the collection using arrays
-  if (insert_document_into_collection_array("XCASH_PROOF_OF_STAKE","nodes",data,settings,DATA_COUNT) == 0)
+  if (insert_document_into_collection_array("XCASH_PROOF_OF_STAKE","nodes",data,settings,DATA_COUNT,0) == 0)
   {
     color_print("FAILED! Test for inserting a document into a collection using an array","red");
   }
@@ -5296,7 +5286,7 @@ int database_test()
   pointer_reset(settings);
   
   // insert a document into the collection using json data
-  if (insert_document_into_collection_json("XCASH_PROOF_OF_STAKE","nodes",MESSAGE) == 0)
+  if (insert_document_into_collection_json("XCASH_PROOF_OF_STAKE","nodes",MESSAGE,0) == 0)
   {
     color_print("FAILED! Test for inserting a document into a collection using json data","red");
   }
@@ -5306,8 +5296,21 @@ int database_test()
     count_test++;
   }
 
+  // insert a document into the collection using json data on a separate thread
+  struct insert_document_into_collection_json_thread_parameters insert_document_into_collection_json_thread_parameters = {"XCASH_PROOF_OF_STAKE","nodes",MESSAGE};
+  pthread_create(&thread_id, NULL, &insert_document_into_collection_json_thread,(void *)&insert_document_into_collection_json_thread_parameters);
+  if (thread_settings(thread_id) == 0)
+  {
+    color_print("FAILED! Test for inserting a document into a collection using json data on a separate thread","red");
+  }
+  else
+  {
+    color_print("PASSED! Test for inserting a document into a collection using json data on a separate thread","green");
+    count_test++;
+  }
+
   // update a document in the collection
-  if (update_document_from_collection("XCASH_PROOF_OF_STAKE","nodes",MESSAGE,MESSAGE_SETTINGS) == 0)
+  if (update_document_from_collection("XCASH_PROOF_OF_STAKE","nodes",MESSAGE,MESSAGE_SETTINGS,0) == 0)
   {
     color_print("FAILED! Test for updating a document in a collection","red");
   }
@@ -5319,7 +5322,7 @@ int database_test()
 
   // read a document in the collection
   memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
-  if (read_document_from_collection("XCASH_PROOF_OF_STAKE","nodes",MESSAGE_SETTINGS,data_test) == 1)
+  if (read_document_from_collection("XCASH_PROOF_OF_STAKE","nodes",MESSAGE_SETTINGS,data_test,0) == 1)
   {
     if (strstr(data_test,"XCASH_PROOF_OF_STAKE_DATA") != NULL)
     {
@@ -5338,7 +5341,7 @@ int database_test()
 
   // read a document in the collection and parse a field
   memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
-  if (read_document_field_from_collection("XCASH_PROOF_OF_STAKE","nodes",MESSAGE_SETTINGS,"message_settings",data_test) == 1)
+  if (read_document_field_from_collection("XCASH_PROOF_OF_STAKE","nodes",MESSAGE_SETTINGS,"message_settings",data_test,0) == 1)
   {
     if (strncmp(data_test,"XCASH_PROOF_OF_STAKE_DATA",BUFFER_SIZE) == 0)
     {
@@ -5356,7 +5359,7 @@ int database_test()
   }
 
   // update all document in the collection
-  if (update_all_documents_from_collection("XCASH_PROOF_OF_STAKE","nodes",MESSAGE) == 0)
+  if (update_all_documents_from_collection("XCASH_PROOF_OF_STAKE","nodes",MESSAGE,0) == 0)
   {
     color_print("FAILED! Test for updating all documents in a collection","red");
   }
@@ -5367,8 +5370,8 @@ int database_test()
   }
 
   // count how many documents have "message_settings":"XCASH_PROOF_OF_STAKE_TEST_DATA" in the collection
-  const int count1 = count_documents_in_collection("XCASH_PROOF_OF_STAKE","nodes",MESSAGE);
-  const int count2 = count_all_documents_in_collection("XCASH_PROOF_OF_STAKE","nodes");
+  const int count1 = count_documents_in_collection("XCASH_PROOF_OF_STAKE","nodes",MESSAGE,0);
+  const int count2 = count_all_documents_in_collection("XCASH_PROOF_OF_STAKE","nodes",0);
   if ((count1 == count2) && (count1 != -1 || count2 != -1))
   {
     color_print("PASSED! Test for counting documents in a collection that match a specific field name and field","green");
@@ -5382,7 +5385,7 @@ int database_test()
   }
 
   // delete a document from the collection
-  if (delete_document_from_collection("XCASH_PROOF_OF_STAKE","nodes",MESSAGE) == 0)
+  if (delete_document_from_collection("XCASH_PROOF_OF_STAKE","nodes",MESSAGE,0) == 0)
   {
     color_print("FAILED! Test for deleting a document from a collection","red");
   }
@@ -5393,7 +5396,7 @@ int database_test()
   }
 
   // delete a collection from the database
-  if (delete_collection_from_database("XCASH_PROOF_OF_STAKE","nodes") == 0)
+  if (delete_collection_from_database("XCASH_PROOF_OF_STAKE","nodes",0) == 0)
   {
     color_print("FAILED! Test for deleting a collection from a database","red");
   }
@@ -5401,7 +5404,6 @@ int database_test()
   {
     color_print("PASSED! Test for deleting a collection from a database","green");
     count_test++;
-  }
   }
   
 
@@ -5634,8 +5636,8 @@ void test()
   //xcash_proof_of_stake_total_passed_test += random_string_test();
   //xcash_proof_of_stake_total_passed_test += string_replace_test(); 
   //xcash_proof_of_stake_total_passed_test += send_wallet_http_request_test(); 
-  xcash_proof_of_stake_total_passed_test += read_and_write_file_test(); 
-  //xcash_proof_of_stake_total_passed_test += database_test(); 
+  //xcash_proof_of_stake_total_passed_test += read_and_write_file_test(); 
+  xcash_proof_of_stake_total_passed_test += database_test(); 
   //xcash_proof_of_stake_total_passed_test += send_and_receive_data_socket_test();
   
 

@@ -1496,13 +1496,16 @@ int create_database_connection()
   database_client = mongoc_client_new_from_uri(uri);
   if (!database_client)
   {
+    mongoc_uri_destroy(uri);
     return 0;
   }
   command = BCON_NEW("ping", BCON_INT32(1));
   if (!mongoc_client_command_simple(database_client, "admin", command, NULL, &reply, &error))
   {
+    mongoc_uri_destroy(uri);
     return 0;
   }
+  mongoc_uri_destroy(uri);
   return 1;
 }
 
@@ -1522,7 +1525,7 @@ Return: 0 if an error has occured, 1 if successfull
 -----------------------------------------------------------------------------------------------------------
 */
 
-int insert_document_into_collection_array(const char* DATABASE, const char* COLLECTION, char** field_name_array, char** field_data_array, const size_t DATA_COUNT)
+int insert_document_into_collection_array(const char* DATABASE, const char* COLLECTION, char** field_name_array, char** field_data_array, const size_t DATA_COUNT, const int THREAD_SETTINGS)
 {
   // Variables
   mongoc_collection_t* collection;
@@ -1532,7 +1535,7 @@ int insert_document_into_collection_array(const char* DATABASE, const char* COLL
   size_t count;
 
   // set the collection
-  collection = mongoc_client_get_collection(database_client, DATABASE, COLLECTION);
+  collection = mongoc_client_get_collection(database_client, DATABASE, COLLECTION);  
 
   document = bson_new();
   bson_oid_init(&oid, NULL);
@@ -1548,7 +1551,7 @@ int insert_document_into_collection_array(const char* DATABASE, const char* COLL
     mongoc_collection_destroy(collection);
     return 0;
   }
-
+  
   bson_destroy(document);
   mongoc_collection_destroy(collection);
   return 1;
@@ -1563,21 +1566,36 @@ Description: Inserts a document into the collection in the database from json da
 Parameters:
   DATABASE - The database name
   COLLECTION - The collection name
-  DATA - The json data
+  DATA - The json data to insert into the collection
 Return: 0 if an error has occured, 1 if successfull
 -----------------------------------------------------------------------------------------------------------
 */
 
-int insert_document_into_collection_json(const char* DATABASE, const char* COLLECTION, const char* DATA)
+int insert_document_into_collection_json(const char* DATABASE, const char* COLLECTION, const char* DATA, const int THREAD_SETTINGS)
 {
   // Variables
+  mongoc_client_t* database_client_thread;
   mongoc_collection_t* collection;
   bson_error_t error;
   bson_oid_t oid;
   bson_t* document;
 
-  // set the collection
-  collection = mongoc_client_get_collection(database_client, DATABASE, COLLECTION);
+  // check if we need to create a database connection, or use the global database connection
+  if (THREAD_SETTINGS == 0)
+  {
+    // set the collection
+    collection = mongoc_client_get_collection(database_client, DATABASE, COLLECTION);
+  }
+  else
+  {
+    database_client_thread = mongoc_client_pool_pop(database_client_thread_pool);
+    if (!database_client_thread)
+    {
+      return 0;
+    }
+    // set the collection
+    collection = mongoc_client_get_collection(database_client_thread, DATABASE, COLLECTION);
+  }
 
   document = bson_new();
   BSON_APPEND_OID(document, "_id", &oid);
@@ -1594,6 +1612,11 @@ int insert_document_into_collection_json(const char* DATABASE, const char* COLLE
     bson_destroy(document);
     mongoc_collection_destroy(collection);
     return 0;
+  }
+
+  if (THREAD_SETTINGS == 1)
+  {
+    mongoc_client_pool_push(database_client_thread_pool, database_client_thread);
   }
 
   bson_destroy(document);
@@ -1616,12 +1639,13 @@ Return: 0 if an error has occured, 1 if successfull
 -----------------------------------------------------------------------------------------------------------
 */
 
-int read_document_from_collection(const char* DATABASE, const char* COLLECTION, const char* DATA, char *result)
+int read_document_from_collection(const char* DATABASE, const char* COLLECTION, const char* DATA, char *result, const int THREAD_SETTINGS)
 {
   // Constants
   const bson_t* current_document;
 
   // Variables
+  mongoc_client_t* database_client_thread;
   mongoc_collection_t* collection;
   mongoc_cursor_t* document_settings;
   bson_error_t error;
@@ -1669,12 +1693,13 @@ Return: 0 if an error has occured, 1 if successfull
 -----------------------------------------------------------------------------------------------------------
 */
 
-int read_document_field_from_collection(const char* DATABASE, const char* COLLECTION, const char* DATA, const char* FIELD_NAME, char *result)
+int read_document_field_from_collection(const char* DATABASE, const char* COLLECTION, const char* DATA, const char* FIELD_NAME, char *result, const int THREAD_SETTINGS)
 {
   // Constants
   const bson_t* current_document;
 
   // Variables
+  mongoc_client_t* database_client_thread;
   mongoc_collection_t* collection;
   mongoc_cursor_t* document_settings;
   bson_error_t error;
@@ -1745,9 +1770,10 @@ Return: 0 if an error has occured, 1 if successfull
 -----------------------------------------------------------------------------------------------------------
 */
 
-int update_document_from_collection(const char* DATABASE, const char* COLLECTION, const char* DATA, const char* FIELD_NAME_AND_DATA)
+int update_document_from_collection(const char* DATABASE, const char* COLLECTION, const char* DATA, const char* FIELD_NAME_AND_DATA, const int THREAD_SETTINGS)
 {
   // Variables
+  mongoc_client_t* database_client_thread;
   mongoc_collection_t* collection;
   bson_error_t error;
   bson_t* update = NULL;
@@ -1810,9 +1836,10 @@ Return: 0 if an error has occured, 1 if successfull
 -----------------------------------------------------------------------------------------------------------
 */
 
-int update_all_documents_from_collection(const char* DATABASE, const char* COLLECTION, const char* DATA)
+int update_all_documents_from_collection(const char* DATABASE, const char* COLLECTION, const char* DATA, const int THREAD_SETTINGS)
 {
   // Variables
+  mongoc_client_t* database_client_thread;
   mongoc_collection_t* collection;
   bson_error_t error;
   bson_t* update = NULL;
@@ -1877,9 +1904,10 @@ Return: 0 if an error has occured, 1 if successfull
 -----------------------------------------------------------------------------------------------------------
 */
 
-int delete_document_from_collection(const char* DATABASE, const char* COLLECTION, const char* DATA)
+int delete_document_from_collection(const char* DATABASE, const char* COLLECTION, const char* DATA, const int THREAD_SETTINGS)
 {
   // Variables
+  mongoc_client_t* database_client_thread;
   mongoc_collection_t* collection;
   bson_error_t error;
   bson_t* document;
@@ -1920,9 +1948,10 @@ Return: 0 if an error has occured, 1 if successfull
 -----------------------------------------------------------------------------------------------------------
 */
 
-int delete_collection_from_database(const char* DATABASE, const char* COLLECTION)
+int delete_collection_from_database(const char* DATABASE, const char* COLLECTION, const int THREAD_SETTINGS)
 {
    // Variables
+  mongoc_client_t* database_client_thread;
   mongoc_collection_t* collection;
   bson_error_t error;
 
@@ -1953,9 +1982,10 @@ Return: -1 if an error has occured, otherwise the amount of documents that match
 -----------------------------------------------------------------------------------------------------------
 */
 
-int count_documents_in_collection(const char* DATABASE, const char* COLLECTION, const char* DATA)
+int count_documents_in_collection(const char* DATABASE, const char* COLLECTION, const char* DATA, const int THREAD_SETTINGS)
 {
   // Variables
+  mongoc_client_t* database_client_thread;
   mongoc_collection_t* collection;
   bson_error_t error;
   bson_t* document;
@@ -1997,9 +2027,10 @@ Return: -1 if an error has occured, otherwise the amount of documents in the col
 -----------------------------------------------------------------------------------------------------------
 */
 
-int count_all_documents_in_collection(const char* DATABASE, const char* COLLECTION)
+int count_all_documents_in_collection(const char* DATABASE, const char* COLLECTION, const int THREAD_SETTINGS)
 {
   // Variables
+  mongoc_client_t* database_client_thread;
   mongoc_collection_t* collection;
   bson_error_t error;
   bson_t* document;
@@ -2214,6 +2245,23 @@ void* write_file_thread(void* parameters)
 
 /*
 -----------------------------------------------------------------------------------------------------------
+Name: insert_document_into_collection_json_thread
+Description: Inserts a document into the collection in the database from json data on a separate thread
+Return: NULL
+-----------------------------------------------------------------------------------------------------------
+*/
+
+void* insert_document_into_collection_json_thread(void* parameters)
+{
+  struct insert_document_into_collection_json_thread_parameters* data = parameters;
+  int settings = insert_document_into_collection_json(data->DATABASE, data->COLLECTION, data->DATA ,1);
+  pthread_exit((void *)(intptr_t)settings);
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
 Name: thread_settings
 Description: Waits for a thread to return a value, and returns the value from the thread
 Parameters:
@@ -2334,36 +2382,6 @@ void* mainnode_timeout_thread(void* parameters)
   kill((intptr_t)data->process_id, SIGTERM);
   return NULL;
 }
-
-
-
-/*
------------------------------------------------------------------------------------------------------------
-Name: total_connection_time_thread
-Description: Closes the forked process after a certain connection timeout
-Parameters:
-  parameters - A pointer to the total_connection_time_thread_parameters struct
-  struct total_connection_time_thread_parameters
-    process_id - The process id of the forked process
-    client_address - The client's IP address for the forked process
-    port - The client's connected port for the forked process
-    data_received - 1 if data was received in the timeout time, otherwise 0
-Return: NULL
------------------------------------------------------------------------------------------------------------
-*/
-
-/*void* write_file_thread(void* parameters)
-{ 
-  // Variables
-  FILE* file;
-
-  struct write_file_thread_parameters* data = parameters;
-  
-  file = fopen(data->FILE_NAME,"w");
-  fprintf(file,"%s",data->DATA);
-  fclose(file); 
-  return NULL;
-}*/
 
 
 
