@@ -5230,7 +5230,7 @@ int database_test()
   pthread_t thread_id;
 
   // define macros
-  #define DATABASE_TEST 11
+  #define DATABASE_TEST 19
   #define DATA_COUNT 5
   #define MESSAGE "{\"message_settings\": \"XCASH_PROOF_OF_STAKE_TEST_DATA\"}"
   #define MESSAGE_SETTINGS "{\"message_settings\": \"XCASH_PROOF_OF_STAKE_DATA\"}"
@@ -5267,7 +5267,7 @@ int database_test()
   }
 
   // insert a document into the collection using arrays
-  if (insert_document_into_collection_array("XCASH_PROOF_OF_STAKE","nodes",data,settings,DATA_COUNT,0) == 0)
+  if (insert_document_into_collection_array("XCASH_PROOF_OF_STAKE","nodes",data,settings,DATA_COUNT) == 0)
   {
     color_print("FAILED! Test for inserting a document into a collection using an array","red");
   }
@@ -5294,6 +5294,17 @@ int database_test()
   {
     color_print("PASSED! Test for inserting a document into a collection using json data","green");
     count_test++;
+  }  
+
+  // update a document in the collection
+  if (update_document_from_collection("XCASH_PROOF_OF_STAKE","nodes",MESSAGE,MESSAGE_SETTINGS,0) == 0)
+  {
+    color_print("FAILED! Test for updating a document in a collection","red");
+  }
+  else
+  {
+    color_print("PASSED! Test for updating a document in a collection","green");
+    count_test++;
   }
 
   // insert a document into the collection using json data on a separate thread
@@ -5309,14 +5320,16 @@ int database_test()
     count_test++;
   }
 
-  // update a document in the collection
-  if (update_document_from_collection("XCASH_PROOF_OF_STAKE","nodes",MESSAGE,MESSAGE_SETTINGS,0) == 0)
+  // update a document in the collection on a separate thread
+  struct update_document_from_collection_thread_parameters update_document_from_collection_thread_parameters = {"XCASH_PROOF_OF_STAKE","nodes",MESSAGE,MESSAGE_SETTINGS};
+  pthread_create(&thread_id, NULL, &update_document_from_collection_thread,(void *)&update_document_from_collection_thread_parameters);
+  if (thread_settings(thread_id) == 0)
   {
-    color_print("FAILED! Test for updating a document in a collection","red");
+    color_print("FAILED! Test for updating a document in a collection on a separate thread","red");
   }
   else
   {
-    color_print("PASSED! Test for updating a document in a collection","green");
+    color_print("PASSED! Test for updating a document in a collection on a separate thread","green");
     count_test++;
   }
 
@@ -5339,6 +5352,27 @@ int database_test()
     color_print("FAILED! Test for reading a document from a collection","red");
   }
 
+  // read a document in the collection on a separate thread
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
+  struct read_document_from_collection_thread_parameters read_document_from_collection_thread_parameters = {"XCASH_PROOF_OF_STAKE","nodes",MESSAGE_SETTINGS,data_test};
+  pthread_create(&thread_id, NULL, &read_document_from_collection_thread,(void *)&read_document_from_collection_thread_parameters);
+  if (thread_settings(thread_id) == 1)
+  {
+    if (strstr(data_test,"XCASH_PROOF_OF_STAKE_DATA") != NULL)
+    {
+      color_print("PASSED! Test for reading a document on a separate thread","green");
+      count_test++;
+    }
+    else
+    {
+      color_print("FAILED! Test for reading a document on a separate thread","red");
+    }    
+  }
+  else
+  {
+    color_print("FAILED! Test for reading a document on a separate thread","red");
+  }
+
   // read a document in the collection and parse a field
   memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (read_document_field_from_collection("XCASH_PROOF_OF_STAKE","nodes",MESSAGE_SETTINGS,"message_settings",data_test,0) == 1)
@@ -5358,6 +5392,27 @@ int database_test()
     color_print("FAILED! Test for reading a document from a collection and parsing a field","red");
   }
 
+  // read a document in the collection and parse a field on a separate thread
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
+  struct read_document_field_from_collection_thread_parameters read_document_field_from_collection_thread_parameters = {"XCASH_PROOF_OF_STAKE","nodes",MESSAGE_SETTINGS,"message_settings",data_test};
+  pthread_create(&thread_id, NULL, &read_document_field_from_collection_thread,(void *)&read_document_field_from_collection_thread_parameters);
+  if (thread_settings(thread_id) == 1)
+  {
+    if (strncmp(data_test,"XCASH_PROOF_OF_STAKE_DATA",BUFFER_SIZE) == 0)
+    {
+      color_print("PASSED! Test for reading a document from a collection and parsing a field on a separate thread","green");
+      count_test++;
+    }
+    else
+    {
+      color_print("FAILED! Test for reading a document from a collection and parsing a field on a separate thread","red");
+    }    
+  }
+  else
+  {
+    color_print("FAILED! Test for reading a document from a collection and parsing a field on a separate thread","red");
+  }
+
   // update all document in the collection
   if (update_all_documents_from_collection("XCASH_PROOF_OF_STAKE","nodes",MESSAGE,0) == 0)
   {
@@ -5369,9 +5424,22 @@ int database_test()
     count_test++;
   }
 
+  // update all document in the collection on a separate thread
+  struct update_all_documents_from_collection_thread_parameters update_all_documents_from_collection_thread_parameters = {"XCASH_PROOF_OF_STAKE","nodes",MESSAGE};
+  pthread_create(&thread_id, NULL, &update_all_documents_from_collection_thread,(void *)&update_all_documents_from_collection_thread_parameters);
+  if (thread_settings(thread_id) == 0)
+  {
+    color_print("FAILED! Test for updating all documents in a collection on a separate thread","red");
+  }
+  else
+  {
+    color_print("PASSED! Test for updating all documents in a collection on a separate thread","green");
+    count_test++;
+  }
+
   // count how many documents have "message_settings":"XCASH_PROOF_OF_STAKE_TEST_DATA" in the collection
-  const int count1 = count_documents_in_collection("XCASH_PROOF_OF_STAKE","nodes",MESSAGE,0);
-  const int count2 = count_all_documents_in_collection("XCASH_PROOF_OF_STAKE","nodes",0);
+  int count1 = count_documents_in_collection("XCASH_PROOF_OF_STAKE","nodes",MESSAGE,0);
+  int count2 = count_all_documents_in_collection("XCASH_PROOF_OF_STAKE","nodes",0);
   if ((count1 == count2) && (count1 != -1 || count2 != -1))
   {
     color_print("PASSED! Test for counting documents in a collection that match a specific field name and field","green");
@@ -5382,6 +5450,25 @@ int database_test()
   {
      color_print("FAILED! Test for counting documents in a collection that match a specific field name and field","red");
      color_print("FAILED! Test for counting all documents in a collection","red");
+  }
+
+  // count how many documents have "message_settings":"XCASH_PROOF_OF_STAKE_TEST_DATA" in the collection on a separate thread
+  struct count_documents_in_collection_thread_parameters count_documents_in_collection_thread_parameters = {"XCASH_PROOF_OF_STAKE","nodes",MESSAGE};
+  pthread_create(&thread_id, NULL, &count_documents_in_collection_thread,(void *)&count_documents_in_collection_thread_parameters);
+  count1 = thread_settings(thread_id);
+  struct count_all_documents_in_collection_thread_parameters count_all_documents_in_collection_thread_parameters = {"XCASH_PROOF_OF_STAKE","nodes"};
+  pthread_create(&thread_id, NULL, &count_all_documents_in_collection_thread,(void *)&count_all_documents_in_collection_thread_parameters);
+  count2 = thread_settings(thread_id);
+  if ((count1 == count2) && (count1 != -1 || count2 != -1))
+  {
+    color_print("PASSED! Test for counting documents in a collection that match a specific field name and field on a separate thread","green");
+    color_print("PASSED! Test for counting all documents in a collection on a separate thread","green");
+    count_test+= 2;   
+  }
+  else
+  {
+     color_print("FAILED! Test for counting documents in a collection that match a specific field name and field on a separate thread","red");
+     color_print("FAILED! Test for counting all documents in a collection on a separate thread","red");
   }
 
   // delete a document from the collection
@@ -5395,6 +5482,26 @@ int database_test()
     count_test++;
   }
 
+  // delete a document from the collection on a separate thread
+  if (insert_document_into_collection_json("XCASH_PROOF_OF_STAKE","nodes",MESSAGE,0) == 0)
+  {
+    color_print("FAILED! Test for deleting a document from a collection on a separate thread","red");
+  }
+  else
+  {
+    struct delete_document_from_collection_thread_parameters delete_document_from_collection_thread_parameters = {"XCASH_PROOF_OF_STAKE","nodes",MESSAGE};
+    pthread_create(&thread_id, NULL, &delete_document_from_collection_thread,(void *)&delete_document_from_collection_thread_parameters);
+    if (thread_settings(thread_id) == 0)
+    {
+      color_print("FAILED! Test for deleting a document from a collection on a separate thread","red");
+    }
+    else
+    {
+      color_print("PASSED! Test for deleting a document from a collection on a separate thread","green");
+      count_test++;
+    }
+  }  
+
   // delete a collection from the database
   if (delete_collection_from_database("XCASH_PROOF_OF_STAKE","nodes",0) == 0)
   {
@@ -5405,7 +5512,26 @@ int database_test()
     color_print("PASSED! Test for deleting a collection from a database","green");
     count_test++;
   }
-  
+
+  // delete a collection from the database on a separate thread
+  if (insert_document_into_collection_json("XCASH_PROOF_OF_STAKE","nodes",MESSAGE,0) == 0)
+  {
+    color_print("FAILED! Test for deleting a collection from a database on a separate thread","red");
+  }
+  else
+  {
+    struct delete_collection_from_database_thread_parameters delete_collection_from_database_thread_parameters = {"XCASH_PROOF_OF_STAKE","nodes"};
+    pthread_create(&thread_id, NULL, &delete_collection_from_database_thread,(void *)&delete_collection_from_database_thread_parameters);
+    if (thread_settings(thread_id) == 0)
+    {
+      color_print("FAILED! Test for deleting a collection from a database on a separate thread","red");
+    }
+    else
+    {
+      color_print("PASSED! Test for deleting a collection from a database on a separate thread","green");
+      count_test++;
+    }  
+  }
 
   // write the end test message
   if (count_test == DATABASE_TEST)
@@ -5620,7 +5746,7 @@ void test()
   int xcash_proof_of_stake_total_passed_test = 0;
 
   // define macros
-  #define XCASH_PROOF_OF_STAKE_TOTAL_TEST 259
+  #define XCASH_PROOF_OF_STAKE_TOTAL_TEST 267
 
   // write the test message
   printf("Starting Test\n\n");
@@ -5631,14 +5757,14 @@ void test()
   data_test = (char*)calloc(BUFFER_SIZE,sizeof(char));
 
   // run the tests
-  //xcash_proof_of_stake_total_passed_test += append_string_test();
-  //xcash_proof_of_stake_total_passed_test += parse_json_data_test();
-  //xcash_proof_of_stake_total_passed_test += random_string_test();
-  //xcash_proof_of_stake_total_passed_test += string_replace_test(); 
-  //xcash_proof_of_stake_total_passed_test += send_wallet_http_request_test(); 
-  //xcash_proof_of_stake_total_passed_test += read_and_write_file_test(); 
+  xcash_proof_of_stake_total_passed_test += append_string_test();
+  xcash_proof_of_stake_total_passed_test += parse_json_data_test();
+  xcash_proof_of_stake_total_passed_test += random_string_test();
+  xcash_proof_of_stake_total_passed_test += string_replace_test(); 
+  xcash_proof_of_stake_total_passed_test += send_wallet_http_request_test(); 
+  xcash_proof_of_stake_total_passed_test += read_and_write_file_test(); 
   xcash_proof_of_stake_total_passed_test += database_test(); 
-  //xcash_proof_of_stake_total_passed_test += send_and_receive_data_socket_test();
+  xcash_proof_of_stake_total_passed_test += send_and_receive_data_socket_test();
   
 
 

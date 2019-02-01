@@ -149,7 +149,7 @@ int write_file(const char* DATA, const char* FILE_NAME);
 int create_server(const int MESSAGE_SETTINGS);
 // database functions
 int create_database_connection();
-int insert_document_into_collection_array(const char* DATABASE, const char* COLLECTION, char** field_name_array, char** field_data_array, const size_t DATA_COUNT, const int THREAD_SETTINGS);
+int insert_document_into_collection_array(const char* DATABASE, const char* COLLECTION, char** field_name_array, char** field_data_array, const size_t DATA_COUNT);
 int insert_document_into_collection_json(const char* DATABASE, const char* COLLECTION, const char* DATA, const int THREAD_SETTINGS);
 int read_document_from_collection(const char* DATABASE, const char* COLLECTION, const char* DATA, char *result, const int THREAD_SETTINGS);
 int read_document_field_from_collection(const char* DATABASE, const char* COLLECTION, const char* DATA, const char* FIELD_NAME, char *result, const int THREAD_SETTINGS);
@@ -167,6 +167,14 @@ int create_server(const int MESSAGE_SETTINGS);
 void* read_file_thread(void* parameters);
 void* write_file_thread(void* parameters);
 void* insert_document_into_collection_json_thread(void* parameters);
+void* read_document_from_collection_thread(void* parameters);
+void* read_document_field_from_collection_thread(void* parameters);
+void* update_document_from_collection_thread(void* parameters);
+void* update_all_documents_from_collection_thread(void* parameters);
+void* delete_document_from_collection_thread(void* parameters);
+void* delete_collection_from_database_thread(void* parameters);
+void* count_documents_in_collection_thread(void* parameters);
+void* count_all_documents_in_collection_thread(void* parameters);
 int thread_settings(pthread_t thread_id);
 // server thread functions
 void* total_connection_time_thread(void* parameters);
@@ -192,12 +200,60 @@ Global Structures
 };
 
 struct insert_document_into_collection_json_thread_parameters {
-    const char* DATABASE; // The data to write to the file
-    const char* COLLECTION; // The file name
+    const char* DATABASE; // The database name
+    const char* COLLECTION; // The collection name
     const char* DATA; // The json data to insert into the collection
 };
 
+struct read_document_from_collection_thread_parameters {
+    const char* DATABASE; // The database name
+    const char* COLLECTION; // The collection name
+    const char* DATA; // The json data to use to search the collection for
+    char *result; // The document read from the collection
+};
 
+struct read_document_field_from_collection_thread_parameters {
+    const char* DATABASE; // The database name
+    const char* COLLECTION; // The collection name
+    const char* DATA; // The json data to use to search the collection for
+    const char* FIELD_NAME; // The field of the document data to read
+    char *result; // The document data read from the collection
+};
+
+struct update_document_from_collection_thread_parameters {
+    const char* DATABASE; // The database name
+    const char* COLLECTION; // The collection name
+    const char* DATA; // The json data to use to search the collection for
+    const char* FIELD_NAME_AND_DATA; // The json data to use to update the document
+};
+
+struct update_all_documents_from_collection_thread_parameters {
+    const char* DATABASE; // The database name
+    const char* COLLECTION; // The collection name
+    const char* DATA; // The json data to use to update the documents
+};
+
+struct delete_document_from_collection_thread_parameters {
+    const char* DATABASE; // The database name
+    const char* COLLECTION; // The collection name
+    const char* DATA; // The json data to use to delete the document
+};
+
+struct delete_collection_from_database_thread_parameters {
+    const char* DATABASE; // The database name
+    const char* COLLECTION; // The collection name
+};
+
+struct count_documents_in_collection_thread_parameters {
+    const char* DATABASE; // The database name
+    const char* COLLECTION; // The collection name
+    const char* DATA; // The json data to use to search the collection for
+};
+
+struct count_all_documents_in_collection_thread_parameters {
+    const char* DATABASE; // The database name
+    const char* COLLECTION; // The collection name
+};
 
 
 

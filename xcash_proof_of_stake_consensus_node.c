@@ -65,6 +65,7 @@ int main(int parameters_count, char* parameters[])
   {
     color_print("Could not create a thread pool for the database\n","red");
     mongoc_client_destroy(database_client);
+    mongoc_uri_destroy(uri_thread_pool);
     mongoc_cleanup();
     exit(0);
   }
@@ -83,7 +84,7 @@ int main(int parameters_count, char* parameters[])
   // set the server_message
   memcpy(server_message,"CONSENSUS_NODE_TO_NODES_MAIN_NODE_PUBLIC_ADDRESS",48);
 
- /* // get the wallets public address
+  // get the wallets public address
   printf("Getting the public address\n\n");
   if (get_public_address(0) == 1)
   {  
@@ -101,7 +102,7 @@ int main(int parameters_count, char* parameters[])
     mongoc_uri_destroy(uri_thread_pool);
     mongoc_cleanup();
     exit(0);
-  }*/
+  }
   
   // check if the program needs to run the test
   if (parameters_count == 2)

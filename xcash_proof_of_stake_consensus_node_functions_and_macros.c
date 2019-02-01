@@ -1525,7 +1525,7 @@ Return: 0 if an error has occured, 1 if successfull
 -----------------------------------------------------------------------------------------------------------
 */
 
-int insert_document_into_collection_array(const char* DATABASE, const char* COLLECTION, char** field_name_array, char** field_data_array, const size_t DATA_COUNT, const int THREAD_SETTINGS)
+int insert_document_into_collection_array(const char* DATABASE, const char* COLLECTION, char** field_name_array, char** field_data_array, const size_t DATA_COUNT)
 {
   // Variables
   mongoc_collection_t* collection;
@@ -1567,6 +1567,7 @@ Parameters:
   DATABASE - The database name
   COLLECTION - The collection name
   DATA - The json data to insert into the collection
+  THREAD_SETTINGS - 1 to use a separate thread, otherwise 0
 Return: 0 if an error has occured, 1 if successfull
 -----------------------------------------------------------------------------------------------------------
 */
@@ -1635,6 +1636,7 @@ Parameters:
   COLLECTION - The collection name
   DATA - The json data to use to search the collection for
   result - The document read from the collection
+  THREAD_SETTINGS - 1 to use a separate thread, otherwise 0
 Return: 0 if an error has occured, 1 if successfull
 -----------------------------------------------------------------------------------------------------------
 */
@@ -1652,8 +1654,22 @@ int read_document_from_collection(const char* DATABASE, const char* COLLECTION, 
   bson_t* document = NULL;  
   char* message;
 
-  // set the collection
-  collection = mongoc_client_get_collection(database_client, DATABASE, COLLECTION);
+   // check if we need to create a database connection, or use the global database connection
+  if (THREAD_SETTINGS == 0)
+  {
+    // set the collection
+    collection = mongoc_client_get_collection(database_client, DATABASE, COLLECTION);
+  }
+  else
+  {
+    database_client_thread = mongoc_client_pool_pop(database_client_thread_pool);
+    if (!database_client_thread)
+    {
+      return 0;
+    }
+    // set the collection
+    collection = mongoc_client_get_collection(database_client_thread, DATABASE, COLLECTION);
+  }
   
   document = bson_new_from_json((const uint8_t *)DATA, -1, &error);
   if (!document)
@@ -1669,6 +1685,11 @@ int read_document_from_collection(const char* DATABASE, const char* COLLECTION, 
     message = bson_as_canonical_extended_json(current_document, NULL);
     memcpy(result,message,strnlen(message,BUFFER_SIZE));
     bson_free(message);
+  }
+
+  if (THREAD_SETTINGS == 1)
+  {
+    mongoc_client_pool_push(database_client_thread_pool, database_client_thread);
   }
   
   bson_destroy(document);
@@ -1689,6 +1710,7 @@ Parameters:
   DATA - The json data to use to search the collection for
   FIELD_NAME - The field of the document data to read
   result - The document data read from the collection
+  THREAD_SETTINGS - 1 to use a separate thread, otherwise 0
 Return: 0 if an error has occured, 1 if successfull
 -----------------------------------------------------------------------------------------------------------
 */
@@ -1717,8 +1739,22 @@ int read_document_field_from_collection(const char* DATABASE, const char* COLLEC
   free(settings); \
   settings = NULL; 
 
-  // set the collection
-  collection = mongoc_client_get_collection(database_client, DATABASE, COLLECTION);
+   // check if we need to create a database connection, or use the global database connection
+  if (THREAD_SETTINGS == 0)
+  {
+    // set the collection
+    collection = mongoc_client_get_collection(database_client, DATABASE, COLLECTION);
+  }
+  else
+  {
+    database_client_thread = mongoc_client_pool_pop(database_client_thread_pool);
+    if (!database_client_thread)
+    {
+      return 0;
+    }
+    // set the collection
+    collection = mongoc_client_get_collection(database_client_thread, DATABASE, COLLECTION);
+  }
   
   document = bson_new_from_json((const uint8_t *)DATA, -1, &error);
   if (!document)
@@ -1746,6 +1782,11 @@ int read_document_field_from_collection(const char* DATABASE, const char* COLLEC
   message_copy1 = strstr(data2,settings) + strnlen(settings,BUFFER_SIZE);
   message_copy2 = strstr(message_copy1,"\"");
   memcpy(result,message_copy1,message_copy2 - message_copy1);
+
+  if (THREAD_SETTINGS == 1)
+  {
+    mongoc_client_pool_push(database_client_thread_pool, database_client_thread);
+  }
   
   bson_destroy(document);
   mongoc_cursor_destroy(document_settings);
@@ -1766,6 +1807,7 @@ Parameters:
   COLLECTION - The collection name
   DATA - The json data to use to search the collection for
   FIELD_NAME_AND_DATA - The json data to use to update the document
+  THREAD_SETTINGS - 1 to use a separate thread, otherwise 0
 Return: 0 if an error has occured, 1 if successfull
 -----------------------------------------------------------------------------------------------------------
 */
@@ -1780,8 +1822,22 @@ int update_document_from_collection(const char* DATABASE, const char* COLLECTION
   bson_t* update_settings = NULL;
   char* data2 = (char*)calloc(BUFFER_SIZE,sizeof(char));
 
-  // set the collection
-  collection = mongoc_client_get_collection(database_client, DATABASE, COLLECTION);
+   // check if we need to create a database connection, or use the global database connection
+  if (THREAD_SETTINGS == 0)
+  {
+    // set the collection
+    collection = mongoc_client_get_collection(database_client, DATABASE, COLLECTION);
+  }
+  else
+  {
+    database_client_thread = mongoc_client_pool_pop(database_client_thread_pool);
+    if (!database_client_thread)
+    {
+      return 0;
+    }
+    // set the collection
+    collection = mongoc_client_get_collection(database_client_thread, DATABASE, COLLECTION);
+  }
   
   update = bson_new_from_json((const uint8_t *)DATA, -1, &error);
   if (!update)
@@ -1816,6 +1872,11 @@ int update_document_from_collection(const char* DATABASE, const char* COLLECTION
     return 0;
   }
 
+  if (THREAD_SETTINGS == 1)
+  {
+    mongoc_client_pool_push(database_client_thread_pool, database_client_thread);
+  }
+
   pointer_reset(data2);
   bson_destroy(update);
   bson_destroy(update_settings);
@@ -1832,6 +1893,7 @@ Parameters:
   DATABASE - The database name
   COLLECTION - The collection name
   DATA - The json data to use to update the documents
+  THREAD_SETTINGS - 1 to use a separate thread, otherwise 0
 Return: 0 if an error has occured, 1 if successfull
 -----------------------------------------------------------------------------------------------------------
 */
@@ -1846,8 +1908,22 @@ int update_all_documents_from_collection(const char* DATABASE, const char* COLLE
   bson_t* update_settings = NULL;
   char* data2 = (char*)calloc(BUFFER_SIZE,sizeof(char));
 
-  // set the collection
-  collection = mongoc_client_get_collection(database_client, DATABASE, COLLECTION);
+   // check if we need to create a database connection, or use the global database connection
+  if (THREAD_SETTINGS == 0)
+  {
+    // set the collection
+    collection = mongoc_client_get_collection(database_client, DATABASE, COLLECTION);
+  }
+  else
+  {
+    database_client_thread = mongoc_client_pool_pop(database_client_thread_pool);
+    if (!database_client_thread)
+    {
+      return 0;
+    }
+    // set the collection
+    collection = mongoc_client_get_collection(database_client_thread, DATABASE, COLLECTION);
+  }
   
   // set the document to empty so it will get each document in the collection  
   update = bson_new();
@@ -1883,6 +1959,11 @@ int update_all_documents_from_collection(const char* DATABASE, const char* COLLE
     return 0;
   }
 
+  if (THREAD_SETTINGS == 1)
+  {
+    mongoc_client_pool_push(database_client_thread_pool, database_client_thread);
+  }
+
   pointer_reset(data2);
   bson_destroy(update);
   bson_destroy(update_settings);
@@ -1900,6 +1981,7 @@ Parameters:
   DATABASE - The database name
   COLLECTION - The collection name
   DATA - The json data to use to delete the document
+  THREAD_SETTINGS - 1 to use a separate thread, otherwise 0
 Return: 0 if an error has occured, 1 if successfull
 -----------------------------------------------------------------------------------------------------------
 */
@@ -1912,8 +1994,22 @@ int delete_document_from_collection(const char* DATABASE, const char* COLLECTION
   bson_error_t error;
   bson_t* document;
 
-  // set the collection
-  collection = mongoc_client_get_collection(database_client, DATABASE, COLLECTION);
+   // check if we need to create a database connection, or use the global database connection
+  if (THREAD_SETTINGS == 0)
+  {
+    // set the collection
+    collection = mongoc_client_get_collection(database_client, DATABASE, COLLECTION);
+  }
+  else
+  {
+    database_client_thread = mongoc_client_pool_pop(database_client_thread_pool);
+    if (!database_client_thread)
+    {
+      return 0;
+    }
+    // set the collection
+    collection = mongoc_client_get_collection(database_client_thread, DATABASE, COLLECTION);
+  }
 
   document = bson_new_from_json((const uint8_t *)DATA, -1, &error);
   if (!document)
@@ -1930,6 +2026,11 @@ int delete_document_from_collection(const char* DATABASE, const char* COLLECTION
     return 0;
   }
 
+  if (THREAD_SETTINGS == 1)
+  {
+    mongoc_client_pool_push(database_client_thread_pool, database_client_thread);
+  }
+
   bson_destroy(document);
   mongoc_collection_destroy(collection);
   return 1;
@@ -1944,6 +2045,7 @@ Description: Deletes a collection from the database
 Parameters:
   DATABASE - The database name
   COLLECTION - The collection name
+  THREAD_SETTINGS - 1 to use a separate thread, otherwise 0
 Return: 0 if an error has occured, 1 if successfull
 -----------------------------------------------------------------------------------------------------------
 */
@@ -1955,13 +2057,32 @@ int delete_collection_from_database(const char* DATABASE, const char* COLLECTION
   mongoc_collection_t* collection;
   bson_error_t error;
 
-  // set the collection
-  collection = mongoc_client_get_collection(database_client, DATABASE, COLLECTION);
+   // check if we need to create a database connection, or use the global database connection
+  if (THREAD_SETTINGS == 0)
+  {
+    // set the collection
+    collection = mongoc_client_get_collection(database_client, DATABASE, COLLECTION);
+  }
+  else
+  {
+    database_client_thread = mongoc_client_pool_pop(database_client_thread_pool);
+    if (!database_client_thread)
+    {
+      return 0;
+    }
+    // set the collection
+    collection = mongoc_client_get_collection(database_client_thread, DATABASE, COLLECTION);
+  }
    
   if (!mongoc_collection_drop(collection, &error))
   {    
     mongoc_collection_destroy(collection);
     return 0;
+  }
+
+  if (THREAD_SETTINGS == 1)
+  {
+    mongoc_client_pool_push(database_client_thread_pool, database_client_thread);
   }
 
   mongoc_collection_destroy(collection);
@@ -1978,6 +2099,7 @@ Parameters:
   DATABASE - The database name
   COLLECTION - The collection name
   DATA - The json data to use to search the collection for
+  THREAD_SETTINGS - 1 to use a separate thread, otherwise 0
 Return: -1 if an error has occured, otherwise the amount of documents that match a specific field name and field in the collection
 -----------------------------------------------------------------------------------------------------------
 */
@@ -1990,8 +2112,22 @@ int count_documents_in_collection(const char* DATABASE, const char* COLLECTION, 
   bson_error_t error;
   bson_t* document;
 
-  // set the collection
-  collection = mongoc_client_get_collection(database_client, DATABASE, COLLECTION);
+   // check if we need to create a database connection, or use the global database connection
+  if (THREAD_SETTINGS == 0)
+  {
+    // set the collection
+    collection = mongoc_client_get_collection(database_client, DATABASE, COLLECTION);
+  }
+  else
+  {
+    database_client_thread = mongoc_client_pool_pop(database_client_thread_pool);
+    if (!database_client_thread)
+    {
+      return 0;
+    }
+    // set the collection
+    collection = mongoc_client_get_collection(database_client_thread, DATABASE, COLLECTION);
+  }
 
   document = bson_new_from_json((const uint8_t *)DATA, -1, &error);
   if (!document)
@@ -2009,6 +2145,11 @@ int count_documents_in_collection(const char* DATABASE, const char* COLLECTION, 
     return -1;
   }
 
+  if (THREAD_SETTINGS == 1)
+  {
+    mongoc_client_pool_push(database_client_thread_pool, database_client_thread);
+  }
+
   bson_destroy(document);
   mongoc_collection_destroy(collection);
   return count;
@@ -2023,6 +2164,7 @@ Description: Counts all the documents in the collection
 Parameters:
   DATABASE - The database name
   COLLECTION - The collection name
+  THREAD_SETTINGS - 1 to use a separate thread, otherwise 0
 Return: -1 if an error has occured, otherwise the amount of documents in the collection
 -----------------------------------------------------------------------------------------------------------
 */
@@ -2035,8 +2177,22 @@ int count_all_documents_in_collection(const char* DATABASE, const char* COLLECTI
   bson_error_t error;
   bson_t* document;
 
-  // set the collection
-  collection = mongoc_client_get_collection(database_client, DATABASE, COLLECTION);
+   // check if we need to create a database connection, or use the global database connection
+  if (THREAD_SETTINGS == 0)
+  {
+    // set the collection
+    collection = mongoc_client_get_collection(database_client, DATABASE, COLLECTION);
+  }
+  else
+  {
+    database_client_thread = mongoc_client_pool_pop(database_client_thread_pool);
+    if (!database_client_thread)
+    {
+      return 0;
+    }
+    // set the collection
+    collection = mongoc_client_get_collection(database_client_thread, DATABASE, COLLECTION);
+  }
 
   document = bson_new();
   if (!document)
@@ -2052,6 +2208,11 @@ int count_all_documents_in_collection(const char* DATABASE, const char* COLLECTI
     bson_destroy(document);
     mongoc_collection_destroy(collection);
     return -1;
+  }
+
+  if (THREAD_SETTINGS == 1)
+  {
+    mongoc_client_pool_push(database_client_thread_pool, database_client_thread);
   }
 
   bson_destroy(document);
@@ -2213,7 +2374,12 @@ Thread functions
 -----------------------------------------------------------------------------------------------------------
 Name: read_file_thread
 Description: Reads a file on a separate thread
-Return: NULL
+Parameters:
+  parameters - A pointer to the read_file_thread_parameters struct
+  struct read_file_thread_parameters
+    result - The data read from the file
+    FILE_NAME - The file name
+Return: 0 if an error has occured, 1 if successfull
 -----------------------------------------------------------------------------------------------------------
 */
 
@@ -2230,7 +2396,12 @@ void* read_file_thread(void* parameters)
 -----------------------------------------------------------------------------------------------------------
 Name: write_file_thread
 Description: Writes a file on a separate thread
-Return: NULL
+Parameters:
+  parameters - A pointer to the write_file_thread_parameters struct
+  struct write_file_thread_parameters
+    DATA - The data to write to the file
+    FILE_NAME - The file name
+Return: 0 if an error has occured, 1 if successfull
 -----------------------------------------------------------------------------------------------------------
 */
 
@@ -2247,6 +2418,12 @@ void* write_file_thread(void* parameters)
 -----------------------------------------------------------------------------------------------------------
 Name: insert_document_into_collection_json_thread
 Description: Inserts a document into the collection in the database from json data on a separate thread
+Parameters:
+  parameters - A pointer to the insert_document_into_collection_json_thread_parameters struct
+  struct insert_document_into_collection_json_thread_parameters
+    DATABASE - The database name
+    COLLECTION - The collection name
+    DATA - The json data to insert into the collection
 Return: NULL
 -----------------------------------------------------------------------------------------------------------
 */
@@ -2254,7 +2431,193 @@ Return: NULL
 void* insert_document_into_collection_json_thread(void* parameters)
 {
   struct insert_document_into_collection_json_thread_parameters* data = parameters;
-  int settings = insert_document_into_collection_json(data->DATABASE, data->COLLECTION, data->DATA ,1);
+  int settings = insert_document_into_collection_json(data->DATABASE, data->COLLECTION, data->DATA, 1);
+  pthread_exit((void *)(intptr_t)settings);
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
+Name: read_document_from_collection_thread
+Description: Reads a document from the collection on a separate thread
+Parameters:
+  parameters - A pointer to the read_document_from_collection_thread_parameters struct
+  struct read_document_from_collection_thread_parameters
+    DATABASE - The database name
+    COLLECTION - The collection name
+    DATA - The json data to use to search the collection for
+    result - The document read from the collection
+Return: 0 if an error has occured, 1 if successfull
+-----------------------------------------------------------------------------------------------------------
+*/
+
+void* read_document_from_collection_thread(void* parameters)
+{
+  struct read_document_from_collection_thread_parameters* data = parameters;
+  int settings = read_document_from_collection(data->DATABASE, data->COLLECTION, data->DATA, data->result, 1);
+  pthread_exit((void *)(intptr_t)settings);
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
+Name: read_document_field_from_collection_thread
+Description: Reads a field from a document from the collection on a separate thread
+Parameters:
+  parameters - A pointer to the read_document_field_from_collection_thread_parameters struct
+  struct read_document_field_from_collection_thread_parameters
+    DATABASE - The database name
+    COLLECTION - The collection name
+    DATA - The json data to use to search the collection for
+    FIELD_NAME - The field of the document data to read
+    result - The document data read from the collection
+Return: 0 if an error has occured, 1 if successfull
+-----------------------------------------------------------------------------------------------------------
+*/
+
+void* read_document_field_from_collection_thread(void* parameters)
+{
+  struct read_document_field_from_collection_thread_parameters* data = parameters;
+  int settings = read_document_field_from_collection(data->DATABASE, data->COLLECTION, data->DATA, data->FIELD_NAME, data->result, 1);
+  pthread_exit((void *)(intptr_t)settings);
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
+Name: update_document_from_collection_thread
+Description: Updates a document from the collection on a separate thread
+Parameters:
+  parameters - A pointer to the update_document_from_collection_thread_parameters struct
+  struct update_document_from_collection_thread_parameters
+    DATABASE - The database name
+    COLLECTION - The collection name
+    DATA - The json data to use to search the collection for
+    FIELD_NAME_AND_DATA - The json data to use to update the document
+Return: 0 if an error has occured, 1 if successfull
+-----------------------------------------------------------------------------------------------------------
+*/
+
+void* update_document_from_collection_thread(void* parameters)
+{
+  struct update_document_from_collection_thread_parameters* data = parameters;
+  int settings = update_document_from_collection(data->DATABASE, data->COLLECTION, data->DATA, data->FIELD_NAME_AND_DATA, 1);
+  pthread_exit((void *)(intptr_t)settings);
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
+Name: update_all_documents_from_collection_thread
+Description: Updates all documents in a collection on a separate thread
+Parameters:
+  parameters - A pointer to the update_all_documents_from_collection_thread_parameters struct
+  struct update_all_documents_from_collection_thread_parameters
+    DATABASE - The database name
+    COLLECTION - The collection name
+    DATA - The json data to use to update the documents
+Return: 0 if an error has occured, 1 if successfull
+-----------------------------------------------------------------------------------------------------------
+*/
+
+void* update_all_documents_from_collection_thread(void* parameters)
+{
+  struct update_all_documents_from_collection_thread_parameters* data = parameters;
+  int settings = update_all_documents_from_collection(data->DATABASE, data->COLLECTION, data->DATA, 1);
+  pthread_exit((void *)(intptr_t)settings);
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
+Name: delete_document_from_collection_thread
+Description: Deletes a document from the collection on a separate thread
+Parameters:
+  parameters - A pointer to the delete_document_from_collection_thread_parameters struct
+  struct delete_document_from_collection_thread_parameters
+    DATABASE - The database name
+    COLLECTION - The collection name
+    DATA - The json data to use to delete the document
+Return: 0 if an error has occured, 1 if successfull
+-----------------------------------------------------------------------------------------------------------
+*/
+
+void* delete_document_from_collection_thread(void* parameters)
+{
+  struct delete_document_from_collection_thread_parameters* data = parameters;
+  int settings = delete_document_from_collection(data->DATABASE, data->COLLECTION, data->DATA, 1);
+  pthread_exit((void *)(intptr_t)settings);
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
+Name: delete_collection_from_database_thread
+Description: Deletes a collection from the database on a separate thread
+Parameters:
+  parameters - A pointer to the delete_collection_from_database_thread_parameters struct
+  struct delete_collection_from_database_thread_parameters
+    DATABASE - The database name
+    COLLECTION - The collection name
+Return: 0 if an error has occured, 1 if successfull
+-----------------------------------------------------------------------------------------------------------
+*/
+
+void* delete_collection_from_database_thread(void* parameters)
+{
+  struct delete_collection_from_database_thread_parameters* data = parameters;
+  int settings = delete_collection_from_database(data->DATABASE, data->COLLECTION, 1);
+  pthread_exit((void *)(intptr_t)settings);
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
+Name: count_documents_in_collection_thread
+Description: Counts the documents in the collection that match a specific field name and field on a separate thread
+Parameters:
+  parameters - A pointer to the count_documents_in_collection_thread_parameters struct
+  struct count_documents_in_collection_thread_parameters
+    DATABASE - The database name
+    COLLECTION - The collection name
+    DATA - The json data to use to search the collection for
+Return: -1 if an error has occured, otherwise the amount of documents that match a specific field name and field in the collection
+-----------------------------------------------------------------------------------------------------------
+*/
+
+void* count_documents_in_collection_thread(void* parameters)
+{
+  struct count_documents_in_collection_thread_parameters* data = parameters;
+  int settings = count_documents_in_collection(data->DATABASE, data->COLLECTION, data->DATA, 1);
+  pthread_exit((void *)(intptr_t)settings);
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
+Name: count_all_documents_in_collection_thread
+Description: Counts all the documents in the collection on a separate thread
+Parameters:
+  parameters - A pointer to the count_all_documents_in_collection_thread_parameters struct
+  struct count_all_documents_in_collection_thread_parameters
+    DATABASE - The database name
+    COLLECTION - The collection name
+Return: -1 if an error has occured, otherwise the amount of documents in the collection
+-----------------------------------------------------------------------------------------------------------
+*/
+
+void* count_all_documents_in_collection_thread(void* parameters)
+{
+  struct count_all_documents_in_collection_thread_parameters* data = parameters;
+  int settings = count_all_documents_in_collection(data->DATABASE, data->COLLECTION, 1);
   pthread_exit((void *)(intptr_t)settings);
 }
 
