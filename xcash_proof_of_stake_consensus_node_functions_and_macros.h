@@ -146,7 +146,6 @@ int sign_data(char *message, const int HTTP_SETTINGS);
 int verify_data(const char* MESSAGE, const int HTTP_SETTINGS, const int VERIFY_CURRENT_ROUND_PART_SETTINGS, const int VERIFY_CURRENT_ROUND_PART_BACKUP_NODE_SETTINGS);
 int read_file(char *result, const char* FILE_NAME);
 int write_file(const char* DATA, const char* FILE_NAME);
-int create_server(const int MESSAGE_SETTINGS);
 // database functions
 int create_database_connection();
 int insert_document_into_collection_array(const char* DATABASE, const char* COLLECTION, char** field_name_array, char** field_data_array, const size_t DATA_COUNT);

@@ -1419,23 +1419,25 @@ int read_file(char *result, const char* FILE_NAME)
   // Variables
   FILE* file;
   char data [BUFFER_SIZE];
+  int settings;
   
   // check if the file exist
   file = fopen(FILE_NAME,"r");
   if (file != NULL)
   {
     // the file exist, read the data in the result
-    memset(&data, 0, sizeof(data));
-    fscanf(file, "%s", data);    
-    memset(result,0,strnlen(result,BUFFER_SIZE));
-    memcpy(result,data,strnlen(data,BUFFER_SIZE)); 
-    return 1;
+    fseek(file, 0, SEEK_END);
+    const long file_size = ftell(file);
+    fseek(file, 0, SEEK_SET); 
+    fread(result, file_size, 1, file);
+    settings = 1;
   }
   else
   {
-    return 0;
+    settings = 0;
   }
   fclose(file);
+  return settings;
 }
 
 
