@@ -697,6 +697,63 @@ int send_data_socket(const char* HOST, const int PORT, const char* DATA, const c
 
 /*
 -----------------------------------------------------------------------------------------------------------
+Name: create_json_data_from_database_array
+Description: Counts the occurences of a string
+Parameters:
+  database_data - A database_document_fields struct
+  struct database_document_fields
+    count - The number of items in the database document
+    item[100] - The database document items
+    value[100] - The database document values
+  result - Where the result is stored
+Return: 0 if an error has occured, 1 if successfull
+-----------------------------------------------------------------------------------------------------------
+*/
+
+int create_json_data_from_database_array(struct database_document_fields* database_data, char* result)
+{
+  // Variables
+  size_t count = 0;
+  size_t counter = 1;
+  size_t item_length;
+  size_t value_length;
+
+  memcpy(result,"{",1); 
+  for (count = 0; count < database_data->count; count++)
+  {
+    // get the length of the item and the value
+    item_length = strnlen(database_data->item[count],BUFFER_SIZE);
+    value_length = strnlen(database_data->value[count],BUFFER_SIZE);
+    // copy the item and the value to the json string
+    memcpy(result+counter,"\"",1);
+    counter = counter + 1;
+    memcpy(result+counter,database_data->item[count],item_length);
+    counter = counter + item_length;
+    memcpy(result+counter,"\":\"",3);
+    counter = counter + 3; 
+    memcpy(result+counter,database_data->value[count],value_length);
+    counter = counter + value_length;
+    memcpy(result+counter,"\"",1);
+    counter = counter + 1;
+    // check if this is the last item
+    if (count + 1 != database_data->count)
+    {
+      memcpy(result+counter,",",1);
+      counter = counter + 1;
+    }
+    else
+    {
+      memcpy(result+counter,"}",1);
+      counter = counter + 1;
+    }
+  }
+  return 1;
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
 Name: string_count
 Description: Counts the occurences of a string
 Parameters:
