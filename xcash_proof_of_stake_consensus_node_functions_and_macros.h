@@ -25,6 +25,7 @@ Using define statements instead of constants for increased efficiency
 #define NODES_NAME_LIST_FILE_NAME "nodes_name_list.txt" // The current enabled nodes name list
 #define DATABASE_CONNECTION "mongodb://localhost:27017" // the database connection string
 #define DATABASE_NAME "XCASH_PROOF_OF_STAKE" // The name of the database
+#define DATABASE_ARRAY_COUNT 100 // The maximum amount of parsed item and value from the database
 #define MAXIMUM_CONNECTIONS 100 // The maximum connections a node can have at one time
 #define SOCKET_TIMEOUT_SETTINGS 1 // The time in between read calls where there is no data
 #define RECEIVE_DATA_TIMEOUT_SETTINGS 5 // The maximum amount of time to wait for the total data, once data has been read

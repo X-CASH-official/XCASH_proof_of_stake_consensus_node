@@ -4835,6 +4835,109 @@ int random_string_test()
 
 /*
 -----------------------------------------------------------------------------------------------------------
+Name: create_json_data_from_database_array test
+Description: Test the create_json_data_from_database_array function
+Return: The number of passed create_json_data_from_database_array test
+-----------------------------------------------------------------------------------------------------------
+*/
+
+int create_json_data_from_database_array_test()
+{  
+  // define macros
+  #define CREATE_JSON_DATA_FROM_DATABASE_ARRAY_TOTAL_TEST 1
+  #define MESSAGE "{\"username\":\"XCASH\",\"most_total_rounds\":\"DELEGATE_NAME\",\"best_block_verifier_online_percentage\":\"DELEGATE_NAME\",\"most_block_producer_total_rounds\":\"DELEGATE_NAME\",\"most_VRF_node_public_and_private_key_total_rounds\":\"DELEGATE_NAME\",\"most_VRF_node_random_data_total_rounds\":\"DELEGATE_NAME\",\"total_XCASH_proof_of_stake_rounds\":\"5\",\"total_coins_in_proof_of_stake\":\"10\",\"total_circulating_supply_percentage_in_proof_of_stake\":\"15\",\"proof_of_stake_round_number\":\"5\"}"
+
+  // reset the variables
+  memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
+  count_test = 0;
+
+  // write the start test message
+  color_print(TEST_OUTLINE,"blue");
+  printf("\033[1;34mcreate_json_data_from_database_array_test - Total test: %d\033[0m\n",CREATE_JSON_DATA_FROM_DATABASE_ARRAY_TOTAL_TEST);
+  color_print(TEST_OUTLINE,"blue");
+  printf("\n");
+
+  // run the test
+  int count;
+  struct database_document_fields database_data;
+
+  // initialize the database_document_fields struct 
+  for (count = 0; count < DATABASE_ARRAY_COUNT; count++)
+  {
+    database_data.item[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
+    database_data.value[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  }
+
+  memcpy(database_data.item[0],"username",8);
+  memcpy(database_data.item[1],"most_total_rounds",17);
+  memcpy(database_data.item[2],"best_block_verifier_online_percentage",37);
+  memcpy(database_data.item[3],"most_block_producer_total_rounds",32);
+  memcpy(database_data.item[4],"most_VRF_node_public_and_private_key_total_rounds",49);
+  memcpy(database_data.item[5],"most_VRF_node_random_data_total_rounds",38);
+  memcpy(database_data.item[6],"total_XCASH_proof_of_stake_rounds",33);
+  memcpy(database_data.item[7],"total_coins_in_proof_of_stake",29);
+  memcpy(database_data.item[8],"total_circulating_supply_percentage_in_proof_of_stake",53);
+  memcpy(database_data.item[9],"proof_of_stake_round_number",27);
+
+  memcpy(database_data.value[0],"XCASH",5);
+  memcpy(database_data.value[1],"DELEGATE_NAME",13);
+  memcpy(database_data.value[2],"DELEGATE_NAME",13);
+  memcpy(database_data.value[3],"DELEGATE_NAME",13);
+  memcpy(database_data.value[4],"DELEGATE_NAME",13);
+  memcpy(database_data.value[5],"DELEGATE_NAME",13);
+  memcpy(database_data.value[6],"5",1);
+  memcpy(database_data.value[7],"10",2);
+  memcpy(database_data.value[8],"15",2);
+  memcpy(database_data.value[9],"5",1);
+
+  database_data.count = 10;
+
+  create_json_data_from_database_array(&database_data,result_test); 
+  
+  if (strncmp(result_test,MESSAGE,BUFFER_SIZE) == 0)  
+  {
+    color_print("PASSED! Test for creating json data from a database array","green");
+    count_test++;
+  }
+  else
+  {
+    color_print("FAILED! Test for creating json data from a database array","red");
+  }
+
+  for (count = 0; count < DATABASE_ARRAY_COUNT; count++)
+  {
+    pointer_reset(database_data.item[count]);
+    pointer_reset(database_data.value[count]);
+  }
+
+
+
+  // write the end test message
+  if (count_test == CREATE_JSON_DATA_FROM_DATABASE_ARRAY_TOTAL_TEST)
+  {
+    printf("\n");
+    color_print(TEST_OUTLINE,"green");
+    printf("\033[1;32mstring_count test - Passed test: %d, Failed test: 0\033[0m\n",CREATE_JSON_DATA_FROM_DATABASE_ARRAY_TOTAL_TEST);
+    color_print(TEST_OUTLINE,"green");
+    printf("\n\n");
+  }
+  else
+  {
+    printf("\n");
+    color_print(TEST_OUTLINE,"red");
+    printf("\033[1;31mcreate_json_data_from_database_array_test - Passed test: %d, Failed test: %d\033[0m\n",count_test,CREATE_JSON_DATA_FROM_DATABASE_ARRAY_TOTAL_TEST-count_test);
+    color_print(TEST_OUTLINE,"red");
+    printf("\n\n");
+  } 
+  #undef MESSAGE
+  return count_test;
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
 Name: string_count test
 Description: Test the string_count function
 Return: The number of passed string_count test
@@ -5904,7 +6007,7 @@ void test()
   int xcash_proof_of_stake_total_passed_test = 0;
 
   // define macros
-  #define XCASH_PROOF_OF_STAKE_TOTAL_TEST 270
+  #define XCASH_PROOF_OF_STAKE_TOTAL_TEST 271
 
   // write the test message
   printf("Starting Test\n\n");
@@ -5917,7 +6020,8 @@ void test()
   // run the tests
   xcash_proof_of_stake_total_passed_test += append_string_test();
   xcash_proof_of_stake_total_passed_test += parse_json_data_test();
-  xcash_proof_of_stake_total_passed_test += random_string_test();  
+  xcash_proof_of_stake_total_passed_test += random_string_test();
+  xcash_proof_of_stake_total_passed_test += create_json_data_from_database_array_test();   
   xcash_proof_of_stake_total_passed_test += string_count_test(); 
   xcash_proof_of_stake_total_passed_test += string_replace_test(); 
   xcash_proof_of_stake_total_passed_test += send_wallet_http_request_test(); 
