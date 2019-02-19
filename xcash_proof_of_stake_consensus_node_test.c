@@ -4835,6 +4835,66 @@ int random_string_test()
 
 /*
 -----------------------------------------------------------------------------------------------------------
+Name: string_count test
+Description: Test the string_count function
+Return: The number of passed string_count test
+-----------------------------------------------------------------------------------------------------------
+*/
+
+int string_count_test()
+{  
+  // define macros
+  #define STRING_COUNT_TOTAL_TEST 1
+
+  // reset the variables
+  memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
+  count_test = 0;
+
+  // write the start test message
+  color_print(TEST_OUTLINE,"blue");
+  printf("\033[1;34msstring_count test - Total test: %d\033[0m\n",STRING_COUNT_TOTAL_TEST);
+  color_print(TEST_OUTLINE,"blue");
+  printf("\n");
+
+  // run the test
+  memcpy(result_test,TEST_OUTLINE,strnlen(TEST_OUTLINE,BUFFER_SIZE));
+  if (string_count(result_test,'-') == strnlen(TEST_OUTLINE,BUFFER_SIZE))  
+  {
+    color_print("PASSED! Test for using string_count to count occurences of a string","green");
+    count_test++;
+  }
+  else
+  {
+    color_print("FAILED! Test for using string_count to count occurences of a string","red");
+  }
+
+
+
+  // write the end test message
+  if (count_test == STRING_COUNT_TOTAL_TEST)
+  {
+    printf("\n");
+    color_print(TEST_OUTLINE,"green");
+    printf("\033[1;32mstring_count test - Passed test: %d, Failed test: 0\033[0m\n",STRING_COUNT_TOTAL_TEST);
+    color_print(TEST_OUTLINE,"green");
+    printf("\n\n");
+  }
+  else
+  {
+    printf("\n");
+    color_print(TEST_OUTLINE,"red");
+    printf("\033[1;31mstring_count test - Passed test: %d, Failed test: %d\033[0m\n",count_test,STRING_COUNT_TOTAL_TEST-count_test);
+    color_print(TEST_OUTLINE,"red");
+    printf("\n\n");
+  } 
+  return count_test;
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
 Name: string_replace_test
 Description: Test the string_replace function
 Return: The number of passed string_replace test
@@ -5230,7 +5290,7 @@ int database_test()
   pthread_t thread_id;
 
   // define macros
-  #define DATABASE_TEST 19
+  #define DATABASE_TEST 21
   #define DATA_COUNT 5
   #define MESSAGE "{\"message_settings\": \"XCASH_PROOF_OF_STAKE_TEST_DATA\"}"
   #define MESSAGE_SETTINGS "{\"message_settings\": \"XCASH_PROOF_OF_STAKE_DATA\"}"
@@ -5422,6 +5482,104 @@ int database_test()
   {
     color_print("PASSED! Test for updating all documents in a collection","green");
     count_test++;
+  }
+
+  // read a document in the collection and parse all fields
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
+  delete_collection_from_database("XCASH_PROOF_OF_STAKE","statistics",0);
+  insert_document_into_collection_json("XCASH_PROOF_OF_STAKE","statistics","{\"username\":\"XCASH\",\"most_total_rounds\":\"DELEGATE_NAME\",\"best_block_verifier_online_percentage\":\"DELEGATE_NAME\",\"most_block_producer_total_rounds\":\"DELEGATE_NAME\",\"most_VRF_node_public_and_private_key_total_rounds\":\"DELEGATE_NAME\",\"most_VRF_node_random_data_total_rounds\":\"DELEGATE_NAME\",\"total_XCASH_proof_of_stake_rounds\":\"5\",\"total_coins_in_proof_of_stake\":\"10\",\"total_circulating_supply_percentage_in_proof_of_stake\":\"15\",\"proof_of_stake_round_number\":\"5\"}",0);
+  struct database_document_fields database_data;
+
+  // initialize the database_document_fields struct 
+  for (count = 0; count < 100; count++)
+  {
+    database_data.item[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
+    database_data.value[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  }
+
+  if (read_document_all_fields_from_collection("XCASH_PROOF_OF_STAKE","statistics","{\"username\":\"XCASH\"}",&database_data,0) == 1)
+  {
+    if (strncmp(database_data.item[0],"username",BUFFER_SIZE) == 0 && strncmp(database_data.value[0],"XCASH",BUFFER_SIZE) == 0 &&
+        strncmp(database_data.item[1],"most_total_rounds",BUFFER_SIZE) == 0 && strncmp(database_data.value[1],"DELEGATE_NAME",BUFFER_SIZE) == 0 &&
+        strncmp(database_data.item[2],"best_block_verifier_online_percentage",BUFFER_SIZE) == 0 && strncmp(database_data.value[2],"DELEGATE_NAME",BUFFER_SIZE) == 0 &&
+        strncmp(database_data.item[3],"most_block_producer_total_rounds",BUFFER_SIZE) == 0 && strncmp(database_data.value[3],"DELEGATE_NAME",BUFFER_SIZE) == 0 &&
+        strncmp(database_data.item[4],"most_VRF_node_public_and_private_key_total_rounds",BUFFER_SIZE) == 0 && strncmp(database_data.value[4],"DELEGATE_NAME",BUFFER_SIZE) == 0 &&
+        strncmp(database_data.item[5],"most_VRF_node_random_data_total_rounds",BUFFER_SIZE) == 0 && strncmp(database_data.value[5],"DELEGATE_NAME",BUFFER_SIZE) == 0 &&
+        strncmp(database_data.item[6],"total_XCASH_proof_of_stake_rounds",BUFFER_SIZE) == 0 && strncmp(database_data.value[6],"5",BUFFER_SIZE) == 0 &&
+        strncmp(database_data.item[7],"total_coins_in_proof_of_stake",BUFFER_SIZE) == 0 && strncmp(database_data.value[7],"10",BUFFER_SIZE) == 0 &&
+        strncmp(database_data.item[8],"total_circulating_supply_percentage_in_proof_of_stake",BUFFER_SIZE) == 0 && strncmp(database_data.value[8],"15",BUFFER_SIZE) == 0 &&
+        strncmp(database_data.item[9],"proof_of_stake_round_number",BUFFER_SIZE) == 0 && strncmp(database_data.value[9],"5",BUFFER_SIZE) == 0)
+    {
+      color_print("PASSED! Test for reading a document from a collection and parsing all fields","green");
+      count_test++;
+    }
+    else
+    {
+      color_print("FAILED! Test for reading a document from a collection and parsing all fields","red");
+    }    
+  }
+  else
+  {
+    color_print("FAILED! Test for reading a document from a collection and parsing all fields","red");
+  }
+
+  for (count = 0; count < 100; count++)
+  {
+    pointer_reset(database_data.item[count]);
+    pointer_reset(database_data.value[count]);
+  }
+
+  // read a document in the collection and parse all fields on a separate thread
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
+  delete_collection_from_database("XCASH_PROOF_OF_STAKE","statistics",0);
+  insert_document_into_collection_json("XCASH_PROOF_OF_STAKE","statistics","{\"username\":\"XCASH\",\"most_total_rounds\":\"DELEGATE_NAME\",\"best_block_verifier_online_percentage\":\"DELEGATE_NAME\",\"most_block_producer_total_rounds\":\"DELEGATE_NAME\",\"most_VRF_node_public_and_private_key_total_rounds\":\"DELEGATE_NAME\",\"most_VRF_node_random_data_total_rounds\":\"DELEGATE_NAME\",\"total_XCASH_proof_of_stake_rounds\":\"5\",\"total_coins_in_proof_of_stake\":\"10\",\"total_circulating_supply_percentage_in_proof_of_stake\":\"15\",\"proof_of_stake_round_number\":\"5\"}",0);
+  
+  // initialize the database_document_fields struct 
+  for (count = 0; count < 100; count++)
+  {
+    database_data.item[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
+    database_data.value[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  }
+
+  struct read_document_all_fields_from_collection_thread_parameters read_document_all_fields_from_collection_thread_parameters = {"XCASH_PROOF_OF_STAKE","statistics","{\"username\":\"XCASH\"}",&database_data};
+  pthread_create(&thread_id, NULL, &read_document_all_fields_from_collection_thread,(void *)&read_document_all_fields_from_collection_thread_parameters);
+  if (thread_settings(thread_id) == 1)
+  {
+    if (read_document_all_fields_from_collection("XCASH_PROOF_OF_STAKE","statistics","{\"username\":\"XCASH\"}",&database_data,0) == 1)
+    {
+      if (strncmp(database_data.item[0],"username",BUFFER_SIZE) == 0 && strncmp(database_data.value[0],"XCASH",BUFFER_SIZE) == 0 &&
+        strncmp(database_data.item[1],"most_total_rounds",BUFFER_SIZE) == 0 && strncmp(database_data.value[1],"DELEGATE_NAME",BUFFER_SIZE) == 0 &&
+        strncmp(database_data.item[2],"best_block_verifier_online_percentage",BUFFER_SIZE) == 0 && strncmp(database_data.value[2],"DELEGATE_NAME",BUFFER_SIZE) == 0 &&
+        strncmp(database_data.item[3],"most_block_producer_total_rounds",BUFFER_SIZE) == 0 && strncmp(database_data.value[3],"DELEGATE_NAME",BUFFER_SIZE) == 0 &&
+        strncmp(database_data.item[4],"most_VRF_node_public_and_private_key_total_rounds",BUFFER_SIZE) == 0 && strncmp(database_data.value[4],"DELEGATE_NAME",BUFFER_SIZE) == 0 &&
+        strncmp(database_data.item[5],"most_VRF_node_random_data_total_rounds",BUFFER_SIZE) == 0 && strncmp(database_data.value[5],"DELEGATE_NAME",BUFFER_SIZE) == 0 &&
+        strncmp(database_data.item[6],"total_XCASH_proof_of_stake_rounds",BUFFER_SIZE) == 0 && strncmp(database_data.value[6],"5",BUFFER_SIZE) == 0 &&
+        strncmp(database_data.item[7],"total_coins_in_proof_of_stake",BUFFER_SIZE) == 0 && strncmp(database_data.value[7],"10",BUFFER_SIZE) == 0 &&
+        strncmp(database_data.item[8],"total_circulating_supply_percentage_in_proof_of_stake",BUFFER_SIZE) == 0 && strncmp(database_data.value[8],"15",BUFFER_SIZE) == 0 &&
+        strncmp(database_data.item[9],"proof_of_stake_round_number",BUFFER_SIZE) == 0 && strncmp(database_data.value[9],"5",BUFFER_SIZE) == 0)
+      {
+        color_print("PASSED! Test for reading a document from a collection and parsing all fields","green");
+        count_test++;
+      }
+      else
+      {
+        color_print("FAILED! Test for reading a document from a collection and parsing all fields","red");
+      }    
+    }
+    else
+    {
+      color_print("FAILED! Test for reading a document from a collection and parsing all fields","red");
+    }
+  }
+  else
+  {
+    color_print("FAILED! Test for reading a document from a collection and parsing all fields","red");
+  }
+
+  for (count = 0; count < 100; count++)
+  {
+    pointer_reset(database_data.item[count]);
+    pointer_reset(database_data.value[count]);
   }
 
   // update all document in the collection on a separate thread
@@ -5746,7 +5904,7 @@ void test()
   int xcash_proof_of_stake_total_passed_test = 0;
 
   // define macros
-  #define XCASH_PROOF_OF_STAKE_TOTAL_TEST 267
+  #define XCASH_PROOF_OF_STAKE_TOTAL_TEST 270
 
   // write the test message
   printf("Starting Test\n\n");
@@ -5759,7 +5917,8 @@ void test()
   // run the tests
   xcash_proof_of_stake_total_passed_test += append_string_test();
   xcash_proof_of_stake_total_passed_test += parse_json_data_test();
-  xcash_proof_of_stake_total_passed_test += random_string_test();
+  xcash_proof_of_stake_total_passed_test += random_string_test();  
+  xcash_proof_of_stake_total_passed_test += string_count_test(); 
   xcash_proof_of_stake_total_passed_test += string_replace_test(); 
   xcash_proof_of_stake_total_passed_test += send_wallet_http_request_test(); 
   xcash_proof_of_stake_total_passed_test += read_and_write_file_test(); 

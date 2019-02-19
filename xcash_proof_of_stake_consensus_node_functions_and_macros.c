@@ -694,6 +694,34 @@ int send_data_socket(const char* HOST, const int PORT, const char* DATA, const c
 }
 
 
+
+/*
+-----------------------------------------------------------------------------------------------------------
+Name: string_count
+Description: Counts the occurences of a string
+Parameters:
+  data - The string to count the occurence for
+  string - The string to count the occurences of
+Return: The number of occurences of string in data
+-----------------------------------------------------------------------------------------------------------
+*/
+
+size_t string_count(char* data, char string)
+{
+  // Variables
+  size_t count = 0;
+  size_t count_string = 0;
+ 
+  for (count = 0; data[count]; count++)
+  {
+    count_string += (data[count] == string);
+  }
+   
+  return count_string;
+}
+
+
+
 /*
 -----------------------------------------------------------------------------------------------------------
 Name: string_replace
@@ -1802,6 +1830,137 @@ int read_document_field_from_collection(const char* DATABASE, const char* COLLEC
 
 /*
 -----------------------------------------------------------------------------------------------------------
+Name: database_parse_json_data_
+Description: Parses the json data from the database
+Parameters:
+  data - The json data from the database
+  result - A database_document_fields struct
+  struct database_document_fields
+    count - The number of items in the database document
+    item[100] - The database document items
+    value[100] - The database document values
+Return: 0 if an error has occured, 1 if successfull
+-----------------------------------------------------------------------------------------------------------
+*/
+
+int database_parse_json_data(char* data, struct database_document_fields* result)
+{
+  // Variables
+  char* data2;
+  char* data3;
+  size_t count = 0;
+
+  // get the parameter count
+  result->count = string_count(data,':') - 2;
+
+  // get the first item  
+  data2 = strstr(data,",") + 3;
+  data3 = strstr(data2,"\"");
+  memcpy(result->item[0],data2,strnlen(data2,BUFFER_SIZE)-strnlen(data3,BUFFER_SIZE)); 
+  
+  for (count = 0; count < result->count; count++)
+  {
+    data2 = data3+5;
+    data3 = strstr(data2,"\"");
+    memcpy(result->value[count],data2,strnlen(data2,BUFFER_SIZE)-strnlen(data3,BUFFER_SIZE));
+      
+    // only get the item if its not the last count
+    if (count+1 != result->count)
+    { 
+      data2 = data3+4;
+      data3 = strstr(data2,"\"");
+      memcpy(result->item[count+1],data2,strnlen(data2,BUFFER_SIZE)-strnlen(data3,BUFFER_SIZE));
+    }    
+  } 
+  return 1;
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
+Name: read_document_all_fields_from_collection
+Description: Reads all fields from a document from the collection
+Parameters:
+  DATABASE - The database name
+  COLLECTION - The collection name 
+  DATA - The json data to use to search the collection for 
+  result - A database_fields struct to hold the data
+  struct database_document_fields
+    count - The number of items in the database document
+    item[100] - The database document items
+    value[100] - The database document values
+  THREAD_SETTINGS - 1 to use a separate thread, otherwise 0
+Return: 0 if an error has occured, 1 if successfull
+-----------------------------------------------------------------------------------------------------------
+*/
+
+int read_document_all_fields_from_collection(const char* DATABASE, const char* COLLECTION, const char* DATA, struct database_document_fields* result, const int THREAD_SETTINGS)
+{
+  // Constants
+  const bson_t* current_document;
+
+  // Variables
+  mongoc_client_t* database_client_thread;
+  mongoc_collection_t* collection;
+  mongoc_cursor_t* document_settings;
+  bson_error_t error;
+  bson_t* document = NULL;  
+  char* message;
+  char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
+
+   // check if we need to create a database connection, or use the global database connection
+  if (THREAD_SETTINGS == 0)
+  {
+    // set the collection
+    collection = mongoc_client_get_collection(database_client, DATABASE, COLLECTION);
+  }
+  else
+  {
+    database_client_thread = mongoc_client_pool_pop(database_client_thread_pool);
+    if (!database_client_thread)
+    {
+      return 0;
+    }
+    // set the collection
+    collection = mongoc_client_get_collection(database_client_thread, DATABASE, COLLECTION);
+  }
+  
+  document = bson_new_from_json((const uint8_t *)DATA, -1, &error);
+  if (!document)
+  {
+    bson_destroy(document);
+    mongoc_collection_destroy(collection);
+    return 0;
+  }
+ 
+  document_settings = mongoc_collection_find_with_opts(collection, document, NULL, NULL);
+  while (mongoc_cursor_next(document_settings, &current_document))
+  {
+    message = bson_as_canonical_extended_json(current_document, NULL);
+    memcpy(data,message,strnlen(message,BUFFER_SIZE));
+    bson_free(message);
+  }
+
+  // parse the json data
+  database_parse_json_data(data,result);
+
+  if (THREAD_SETTINGS == 1)
+  {
+    mongoc_client_pool_push(database_client_thread_pool, database_client_thread);
+  }
+  
+  bson_destroy(document);
+  mongoc_cursor_destroy(document_settings);
+  mongoc_collection_destroy(collection);
+  pointer_reset(data);
+  return 1;
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
 Name: update_document_from_collection
 Description: Updates a document from the collection
 Parameters:
@@ -2483,6 +2642,34 @@ void* read_document_field_from_collection_thread(void* parameters)
 {
   struct read_document_field_from_collection_thread_parameters* data = parameters;
   int settings = read_document_field_from_collection(data->DATABASE, data->COLLECTION, data->DATA, data->FIELD_NAME, data->result, 1);
+  pthread_exit((void *)(intptr_t)settings);
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
+Name: read_document_all_fields_from_collection_thread
+Description: Reads all fields from a document from the collection on a separate thread
+Parameters:
+  parameters - A pointer to the read_document_all_fields_from_collection_thread_parameters struct
+  struct read_document_all_fields_from_collection_thread_parameters
+    DATABASE - The database name
+    COLLECTION - The collection name
+    DATA - The json data to use to search the collection for
+    result - A pointer to the database_document_fields struct
+      struct database_document_fields
+        count - The number of items in the database document
+        item[100] - The database document items
+        value[100] - The database document values
+Return: 0 if an error has occured, 1 if successfull
+-----------------------------------------------------------------------------------------------------------
+*/
+
+void* read_document_all_fields_from_collection_thread(void* parameters)
+{
+  struct read_document_all_fields_from_collection_thread_parameters* data = parameters;
+  int settings = read_document_all_fields_from_collection(data->DATABASE, data->COLLECTION, data->DATA, data->result, 1);
   pthread_exit((void *)(intptr_t)settings);
 }
 
