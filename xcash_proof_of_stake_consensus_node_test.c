@@ -4944,10 +4944,18 @@ Return: The number of passed string_count test
 -----------------------------------------------------------------------------------------------------------
 */
 
+/*
+-----------------------------------------------------------------------------------------------------------
+Name: string_count test
+Description: Test the string_count function
+Return: The number of passed string_count test
+-----------------------------------------------------------------------------------------------------------
+*/
+
 int string_count_test()
 {  
   // define macros
-  #define STRING_COUNT_TOTAL_TEST 1
+  #define STRING_COUNT_TOTAL_TEST 2
 
   // reset the variables
   memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
@@ -4956,20 +4964,33 @@ int string_count_test()
 
   // write the start test message
   color_print(TEST_OUTLINE,"blue");
-  printf("\033[1;34msstring_count test - Total test: %d\033[0m\n",STRING_COUNT_TOTAL_TEST);
+  printf("\033[1;34mstring_count test - Total test: %d\033[0m\n",STRING_COUNT_TOTAL_TEST);
   color_print(TEST_OUTLINE,"blue");
   printf("\n");
 
   // run the test
   memcpy(result_test,TEST_OUTLINE,strnlen(TEST_OUTLINE,BUFFER_SIZE));
-  if (string_count(result_test,'-') == strnlen(TEST_OUTLINE,BUFFER_SIZE))  
+
+  // test for counting a byte in a string
+  if (string_count(result_test,"-") == strnlen(TEST_OUTLINE,BUFFER_SIZE))  
   {
-    color_print("PASSED! Test for using string_count to count occurences of a string","green");
+    color_print("PASSED! Test for using string_count to count occurences of a byte in a string","green");
     count_test++;
   }
   else
   {
-    color_print("FAILED! Test for using string_count to count occurences of a string","red");
+    color_print("FAILED! Test for using string_count to count occurences of a byte in a string","red");
+  }
+
+  // test for counting multiple bytes in a string
+  if (string_count(result_test,"--") == strnlen(TEST_OUTLINE,BUFFER_SIZE)/2)  
+  {
+    color_print("PASSED! Test for using string_count to count occurences of multiple bytes in a string","green");
+    count_test++;
+  }
+  else
+  { 
+    color_print("FAILED! Test for using string_count to count occurences of multiple bytes a string","red");
   }
 
 
@@ -6007,7 +6028,7 @@ void test()
   int xcash_proof_of_stake_total_passed_test = 0;
 
   // define macros
-  #define XCASH_PROOF_OF_STAKE_TOTAL_TEST 271
+  #define XCASH_PROOF_OF_STAKE_TOTAL_TEST 272
 
   // write the test message
   printf("Starting Test\n\n");

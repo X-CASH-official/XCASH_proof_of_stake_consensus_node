@@ -271,7 +271,7 @@ int send_http_request(char *result, const char* HOST, const char* URL, const int
 int send_and_receive_data_socket(char *result, const char* HOST, const int PORT, const char* DATA, const int DATA_TIMEOUT_SETTINGS, const char* TITLE, const int MESSAGE_SETTINGS);
 int send_data_socket(const char* HOST, const int PORT, const char* DATA, const char* TITLE, const int MESSAGE_SETTINGS);
 int create_json_data_from_database_array(struct database_document_fields* database_data, char* result);
-size_t string_count(char* data, char string);
+size_t string_count(char* data, char* string);
 int string_replace(char *data, const char* STR1, const char* STR2);
 int send_data(const int SOCKET, char* data, const int APPEND_STRING_SETTINGS);
 int receive_data(const int SOCKET, char *message, const char* STRING, const int RECEIVE_DATA_SOCKET_TIMEOUT_SETTINGS, const int RECEIVE_DATA_SOCKET_TIMEOUT);
