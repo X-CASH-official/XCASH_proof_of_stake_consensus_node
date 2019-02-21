@@ -706,11 +706,12 @@ Parameters:
     item[100] - The database document items
     value[100] - The database document values
   result - Where the result is stored
+  document_fields - The document fields to not include in the json data
 Return: 0 if an error has occured, 1 if successfull
 -----------------------------------------------------------------------------------------------------------
 */
 
-int create_json_data_from_database_array(struct database_document_fields* database_data, char* result)
+int create_json_data_from_database_array(struct database_document_fields* database_data, char* result, const char* document_fields)
 {
   // Variables
   size_t count = 0;
@@ -721,6 +722,8 @@ int create_json_data_from_database_array(struct database_document_fields* databa
   memcpy(result,"{",1); 
   for (count = 0; count < database_data->count; count++)
   {
+    if (strstr(document_fields,database_data->item[count]) == NULL)
+    {
     // get the length of the item and the value
     item_length = strnlen(database_data->item[count],BUFFER_SIZE);
     value_length = strnlen(database_data->value[count],BUFFER_SIZE);
@@ -745,6 +748,7 @@ int create_json_data_from_database_array(struct database_document_fields* databa
     {
       memcpy(result+counter,"}",1);
       counter = counter + 1;
+    }
     }
   }
   return 1;
