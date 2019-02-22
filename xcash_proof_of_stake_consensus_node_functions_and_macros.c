@@ -711,46 +711,38 @@ Return: 0 if an error has occured, 1 if successfull
 -----------------------------------------------------------------------------------------------------------
 */
 
-int create_json_data_from_database_array(struct database_document_fields* database_data, char* result, const char* document_fields)
+int create_json_data_from_database_array(struct database_document_fields* database_data, char* result, const char* DOCUMENT_FIELDS)
 {
   // Variables
   size_t count = 0;
   size_t counter = 1;
   size_t item_length;
   size_t value_length;
-
+  
   memcpy(result,"{",1); 
   for (count = 0; count < database_data->count; count++)
   {
-    if (strstr(document_fields,database_data->item[count]) == NULL)
+    if (strstr(DOCUMENT_FIELDS,database_data->item[count]) == NULL)
     {
-    // get the length of the item and the value
-    item_length = strnlen(database_data->item[count],BUFFER_SIZE);
-    value_length = strnlen(database_data->value[count],BUFFER_SIZE);
-    // copy the item and the value to the json string
-    memcpy(result+counter,"\"",1);
-    counter = counter + 1;
-    memcpy(result+counter,database_data->item[count],item_length);
-    counter = counter + item_length;
-    memcpy(result+counter,"\":\"",3);
-    counter = counter + 3; 
-    memcpy(result+counter,database_data->value[count],value_length);
-    counter = counter + value_length;
-    memcpy(result+counter,"\"",1);
-    counter = counter + 1;
-    // check if this is the last item
-    if (count + 1 != database_data->count)
-    {
+      // get the length of the item and the value
+      item_length = strnlen(database_data->item[count],BUFFER_SIZE);
+      value_length = strnlen(database_data->value[count],BUFFER_SIZE);
+      // copy the item and the value to the json string
+      memcpy(result+counter,"\"",1);
+      counter = counter + 1;
+      memcpy(result+counter,database_data->item[count],item_length);
+      counter = counter + item_length;
+      memcpy(result+counter,"\":\"",3);
+      counter = counter + 3; 
+      memcpy(result+counter,database_data->value[count],value_length);
+      counter = counter + value_length;
+      memcpy(result+counter,"\"",1);
+      counter = counter + 1;
       memcpy(result+counter,",",1);
       counter = counter + 1;
     }
-    else
-    {
-      memcpy(result+counter,"}",1);
-      counter = counter + 1;
-    }
-    }
   }
+  memcpy(result+counter-1,"}",1);
   return 1;
 }
 
@@ -767,18 +759,21 @@ Return: The number of occurences of the substring in the string
 -----------------------------------------------------------------------------------------------------------
 */
 
-size_t string_count(char* data, char* string)
+size_t string_count(const char* DATA, const char* STRING)
 {
+  // Constants
+  const size_t STRING_LENGTH = strnlen(STRING,BUFFER_SIZE);
+  
   // Variables
-  char* datacopy = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* datacopy = (char*)calloc(BUFFER_SIZE,sizeof(char));  
   size_t count = 0;
 
   // get the occurences of the string 
-  memcpy(datacopy,data,strnlen(data,BUFFER_SIZE));
-  while((datacopy = strstr(datacopy, string)) != NULL)
+  memcpy(datacopy,DATA,strnlen(DATA,BUFFER_SIZE));
+  while((datacopy = strstr(datacopy, STRING)) != NULL)
   {
     count++;
-    datacopy+= strnlen(string,BUFFER_SIZE);
+    datacopy+= STRING_LENGTH;
   } 
 
   pointer_reset(datacopy);
