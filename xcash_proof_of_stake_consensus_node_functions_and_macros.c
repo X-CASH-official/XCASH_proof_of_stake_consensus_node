@@ -697,7 +697,7 @@ int send_data_socket(const char* HOST, const int PORT, const char* DATA, const c
 
 /*
 -----------------------------------------------------------------------------------------------------------
-Name: create_json_data_from_database_array
+Name: create_json_data_from_database_document_array
 Description: Counts the occurences of a string
 Parameters:
   database_data - A database_document_fields struct
@@ -711,7 +711,7 @@ Return: 0 if an error has occured, 1 if successfull
 -----------------------------------------------------------------------------------------------------------
 */
 
-int create_json_data_from_database_array(struct database_document_fields* database_data, char* result, const char* DOCUMENT_FIELDS)
+int create_json_data_from_database_document_array(struct database_document_fields* database_data, char* result, const char* DOCUMENT_FIELDS)
 {
   // Variables
   size_t count = 0;
@@ -729,23 +729,85 @@ int create_json_data_from_database_array(struct database_document_fields* databa
       value_length = strnlen(database_data->value[count],BUFFER_SIZE);
       // copy the item and the value to the json string
       memcpy(result+counter,"\"",1);
-      counter = counter + 1;
+      counter++;
       memcpy(result+counter,database_data->item[count],item_length);
-      counter = counter + item_length;
+      counter += item_length;
       memcpy(result+counter,"\":\"",3);
-      counter = counter + 3; 
+      counter += 3; 
       memcpy(result+counter,database_data->value[count],value_length);
-      counter = counter + value_length;
+      counter += value_length;
       memcpy(result+counter,"\"",1);
-      counter = counter + 1;
+      counter++;
       memcpy(result+counter,",",1);
-      counter = counter + 1;
+      counter++;
     }
   }
   memcpy(result+counter-1,"}",1);
   return 1;
 }
 
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
+Name: create_json_data_from_database_multiple_documents_array
+Description: Counts the occurences of a string
+Parameters:
+  database_data - A database_document_fields struct
+  struct database_multiple_documents_fields
+    document_count - The number of documents
+    database_fields_count - The number of items in the database document
+    item[100][100] - The database document items
+    value[100][100] - The database document values
+  result - Where the result is stored
+  document_fields - The document fields to not include in the json data
+Return: 0 if an error has occured, 1 if successfull
+-----------------------------------------------------------------------------------------------------------
+*/
+
+int create_json_data_from_database_multiple_documents_array(struct database_multiple_documents_fields* database_data, char* result, const char* DOCUMENT_FIELDS)
+{
+  // Variables
+  size_t count = 0;
+  size_t counter = 0;
+  size_t data_count = 1;
+  size_t item_length;
+  size_t value_length; 
+
+  memcpy(result,"[",1); 
+  
+  for (count = 0; count < database_data->document_count; count++)
+  {
+    memcpy(result+data_count,"{",1); 
+    data_count++;
+    for (counter = 0; counter < database_data->database_fields_count; counter++)
+    {
+      if (strstr(DOCUMENT_FIELDS,database_data->item[count][counter]) == NULL)
+      {
+        // get the length of the item and the value
+        item_length = strnlen(database_data->item[count][counter],BUFFER_SIZE);
+        value_length = strnlen(database_data->value[count][counter],BUFFER_SIZE);
+        // copy the item and the value to the json string
+        memcpy(result+data_count,"\"",1);
+        data_count++;
+        memcpy(result+data_count,database_data->item[count][counter],item_length);
+        data_count += item_length;
+        memcpy(result+data_count,"\":\"",3);
+        data_count += 3; 
+        memcpy(result+data_count,database_data->value[count][counter],value_length);
+        data_count += value_length;
+        memcpy(result+data_count,"\"",1);
+        data_count++;
+        memcpy(result+data_count,",",1);
+        data_count++;
+      }      
+    }
+    memcpy(result+data_count-1,"},",2);
+    data_count += 1;    
+  }
+  memcpy(result+data_count-1,"]",1);
+  return 1;
+}
 
 
 /*
@@ -1885,7 +1947,7 @@ int read_document_field_from_collection(const char* DATABASE, const char* COLLEC
 
 /*
 -----------------------------------------------------------------------------------------------------------
-Name: database_parse_json_data_
+Name: database_document_parse_json_data_
 Description: Parses the json data from the database
 Parameters:
   data - The json data from the database
@@ -1894,11 +1956,12 @@ Parameters:
     count - The number of items in the database document
     item[100] - The database document items
     value[100] - The database document values
+  database_fields - The database fields to not include in the database array
 Return: 0 if an error has occured, 1 if successfull
 -----------------------------------------------------------------------------------------------------------
 */
 
-int database_parse_json_data(char* data, struct database_document_fields* result)
+int database_document_parse_json_data(char* data, struct database_document_fields* result)
 {
   // Variables
   char* data2;
@@ -1927,6 +1990,62 @@ int database_parse_json_data(char* data, struct database_document_fields* result
       memcpy(result->item[count+1],data2,strnlen(data2,BUFFER_SIZE)-strnlen(data3,BUFFER_SIZE));
     }    
   } 
+  return 1;
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
+Name: database_multiple_documents_parse_json_data
+Description: Parses the json data from the database
+Parameters:
+  data - The json data from the database
+  result - A database_document_fields struct
+  struct database_multiple_documents_fields
+    document_count - The number of documents
+    database_fields_count - The number of items in the database document
+    item[100][100] - The database document items
+    value[100][100] - The database document values
+  database_fields - The database fields to not include in the database array
+Return: 0 if an error has occured, 1 if successfull
+-----------------------------------------------------------------------------------------------------------
+*/
+
+int database_multiple_documents_parse_json_data(char* data, struct database_multiple_documents_fields* result)
+{
+  // Variables
+  char* data2;
+  char* data3;
+  size_t count;
+  size_t counter;
+
+  // get the document count
+  result->document_count = string_count(data,"\"_id\"");
+  result->database_fields_count = (string_count(data,":") - (2 * result->document_count)) / 2;
+
+  for (count = 0; count < result->document_count; count++)
+  {
+    // get the first item  
+    data2 = strstr(data,",") + 3;
+    data3 = strstr(data2,"\"");
+    memcpy(result->item[count][0],data2,strnlen(data2,BUFFER_SIZE)-strnlen(data3,BUFFER_SIZE)); 
+  
+    for (counter = 0; counter < result->database_fields_count; counter++)
+    {
+      data2 = data3+5;
+      data3 = strstr(data2,"\"");
+      memcpy(result->value[count][counter],data2,strnlen(data2,BUFFER_SIZE)-strnlen(data3,BUFFER_SIZE));
+      
+      // only get the item if its not the last count
+      if (count+1 != result->database_fields_count)
+      { 
+        data2 = data3+4;
+        data3 = strstr(data2,"\"");
+        memcpy(result->item[count][counter+1],data2,strnlen(data2,BUFFER_SIZE)-strnlen(data3,BUFFER_SIZE));
+      }    
+    } 
+  }  
   return 1;
 }
 
@@ -1998,7 +2117,111 @@ int read_document_all_fields_from_collection(const char* DATABASE, const char* C
   }
 
   // parse the json data
-  database_parse_json_data(data,result);
+  database_document_parse_json_data(data,result);
+
+  if (THREAD_SETTINGS == 1)
+  {
+    mongoc_client_pool_push(database_client_thread_pool, database_client_thread);
+  }
+  
+  bson_destroy(document);
+  mongoc_cursor_destroy(document_settings);
+  mongoc_collection_destroy(collection);
+  pointer_reset(data);
+  return 1;
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
+Name: read_document_all_fields_from_collection
+Description: Reads all fields from a document from the collection
+Parameters:
+  DATABASE - The database name
+  COLLECTION - The collection name 
+  DATA - The json data to use to search the collection for 
+  result - A database_fields struct to hold the data
+  struct database_multiple_documents_fields
+    document_count - The number of documents
+    database_fields_count - The number of items in the database document
+    item[100][100] - The database document items
+    value[100][100] - The database document values
+  DOCUMENT_COUNT_START - The document to start at when reading the data
+  DOCUMENT_COUNT_TOTAL - The total amount of documents to read
+  THREAD_SETTINGS - 1 to use a separate thread, otherwise 0
+Return: 0 if an error has occured, 1 if successfull
+-----------------------------------------------------------------------------------------------------------
+*/
+
+int read_multiple_documents_all_fields_from_collection(const char* DATABASE, const char* COLLECTION, struct database_multiple_documents_fields* result, const size_t DOCUMENT_COUNT_START, const size_t DOCUMENT_COUNT_TOTAL, const int THREAD_SETTINGS)
+{
+  // Constants
+  const bson_t* current_document;
+
+  // Variables
+  mongoc_client_t* database_client_thread;
+  mongoc_collection_t* collection;
+  mongoc_cursor_t* document_settings;
+  bson_error_t error;
+  bson_t* document = NULL;  
+  char* message;
+  char* data = (char*)calloc(10485760,sizeof(char)); // 10 MB
+  size_t message_length;
+  size_t data_count = 0;
+  size_t count = 1;
+  size_t counter = 0;
+
+   // check if we need to create a database connection, or use the global database connection
+  if (THREAD_SETTINGS == 0)
+  {
+    // set the collection
+    collection = mongoc_client_get_collection(database_client, DATABASE, COLLECTION);
+  }
+  else
+  {
+    database_client_thread = mongoc_client_pool_pop(database_client_thread_pool);
+    if (!database_client_thread)
+    {
+      pointer_reset(data);
+      return 0;
+    }
+    // set the collection
+    collection = mongoc_client_get_collection(database_client_thread, DATABASE, COLLECTION);
+  }
+  
+  document = bson_new();
+  if (!document)
+  {
+    bson_destroy(document);
+    mongoc_collection_destroy(collection);
+    pointer_reset(data);
+    return 0;
+  }
+ 
+  document_settings = mongoc_collection_find_with_opts(collection, document, NULL, NULL);
+  while (mongoc_cursor_next(document_settings, &current_document))
+  {    
+    if (count >= DOCUMENT_COUNT_START)
+    {
+      message = bson_as_canonical_extended_json(current_document, NULL);
+      //printf("%s",message);
+      message_length = strnlen(message,BUFFER_SIZE);
+      memcpy(data+data_count,message,message_length); 
+      data_count += message_length;   
+      bson_free(message);
+      counter++;
+      // check if that is the total amount of documents to read
+      if (counter == DOCUMENT_COUNT_TOTAL)
+      {
+        break;
+      }     
+    }
+    count++;    
+  }
+
+  // parse the json data
+  database_multiple_documents_parse_json_data(data,result);
 
   if (THREAD_SETTINGS == 1)
   {
@@ -2725,6 +2948,37 @@ void* read_document_all_fields_from_collection_thread(void* parameters)
 {
   struct read_document_all_fields_from_collection_thread_parameters* data = parameters;
   int settings = read_document_all_fields_from_collection(data->DATABASE, data->COLLECTION, data->DATA, data->result, 1);
+  pthread_exit((void *)(intptr_t)settings);
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
+Name: read_multiple_documents_all_fields_from_collection_thread
+Description: Reads all fields from multiple documents from the collection on a separate thread
+Parameters:
+  parameters - A pointer to the read_multiple_documents_all_fields_from_collection_thread_parameters struct
+  struct read_multiple_documents_all_fields_from_collection_thread_parameters
+    DATABASE - The database name
+    COLLECTION - The collection name 
+    DATA - The json data to use to search the collection for 
+    result - A database_fields struct to hold the data
+    struct database_multiple_documents_fields
+      document_count - The number of documents
+      database_fields_count - The number of items in the database document
+      item[100][100] - The database document items
+      value[100][100] - The database document values
+    DOCUMENT_COUNT_START - The document to start at when reading the data
+    DOCUMENT_COUNT_TOTAL - The total amount of documents to read
+Return: 0 if an error has occured, 1 if successfull
+-----------------------------------------------------------------------------------------------------------
+*/
+
+void* read_multiple_documents_all_fields_from_collection_thread(void* parameters)
+{
+  struct read_multiple_documents_all_fields_from_collection_thread_parameters* data = parameters;
+  int settings = read_multiple_documents_all_fields_from_collection(data->DATABASE, data->COLLECTION, data->result, data->DOCUMENT_COUNT_START, data->DOCUMENT_COUNT_TOTAL, 1);
   pthread_exit((void *)(intptr_t)settings);
 }
 

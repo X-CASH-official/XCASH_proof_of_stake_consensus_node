@@ -142,6 +142,13 @@ struct database_document_fields {
     char* value[100];
 };
 
+struct database_multiple_documents_fields {
+    size_t document_count;
+    size_t database_fields_count;
+    char* item[DATABASE_ARRAY_COUNT][DATABASE_ARRAY_COUNT];
+    char* value[DATABASE_ARRAY_COUNT][DATABASE_ARRAY_COUNT];
+};
+
 
 
  // Thread functions
@@ -181,6 +188,14 @@ struct read_document_all_fields_from_collection_thread_parameters {
     const char* COLLECTION; // The collection name
     const char* DATA; // The json data to use to search the collection for
     struct database_document_fields* result; // A pointer to the database_document_fields struct
+};
+
+struct read_multiple_documents_all_fields_from_collection_thread_parameters {
+    const char* DATABASE; // The database name
+    const char* COLLECTION; // The collection name
+    struct database_multiple_documents_fields* result; // A pointer to the database_multiple_documents_fields struct
+    const size_t DOCUMENT_COUNT_START; // The document to start at when reading the data
+    const size_t DOCUMENT_COUNT_TOTAL; // The total amount of documents to read
 };
 
 struct update_document_from_collection_thread_parameters {
@@ -270,7 +285,8 @@ int parse_json_data(const char* DATA, const char* FIELD_NAME, char *result);
 int send_http_request(char *result, const char* HOST, const char* URL, const int PORT, const char* HTTP_SETTINGS, const char* HTTP_HEADERS[], const size_t HTTP_HEADERS_LENGTH, const char* DATA, const int DATA_TIMEOUT_SETTINGS, const char* TITLE, const int MESSAGE_SETTINGS);
 int send_and_receive_data_socket(char *result, const char* HOST, const int PORT, const char* DATA, const int DATA_TIMEOUT_SETTINGS, const char* TITLE, const int MESSAGE_SETTINGS);
 int send_data_socket(const char* HOST, const int PORT, const char* DATA, const char* TITLE, const int MESSAGE_SETTINGS);
-int create_json_data_from_database_array(struct database_document_fields* database_data, char* result, const char* DOCUMENT_FIELDS);
+int create_json_data_from_database_document_array(struct database_document_fields* database_data, char* result, const char* DOCUMENT_FIELDS);
+int create_json_data_from_database_multiple_documents_array(struct database_multiple_documents_fields* database_data, char* result, const char* DOCUMENT_FIELDS);
 size_t string_count(const char* DATA, const char* STRING);
 int string_replace(char *data, const char* STR1, const char* STR2);
 int send_data(const int SOCKET, char* data, const int APPEND_STRING_SETTINGS);
@@ -290,8 +306,10 @@ int insert_document_into_collection_array(const char* DATABASE, const char* COLL
 int insert_document_into_collection_json(const char* DATABASE, const char* COLLECTION, const char* DATA, const int THREAD_SETTINGS);
 int read_document_from_collection(const char* DATABASE, const char* COLLECTION, const char* DATA, char *result, const int THREAD_SETTINGS);
 int read_document_field_from_collection(const char* DATABASE, const char* COLLECTION, const char* DATA, const char* FIELD_NAME, char *result, const int THREAD_SETTINGS);
-int database_parse_json_data(char* data, struct database_document_fields* result);
+int database_document_parse_json_data(char* data, struct database_document_fields* result);
+int database_multiple_documents_parse_json_data(char* data, struct database_multiple_documents_fields* result);
 int read_document_all_fields_from_collection(const char* DATABASE, const char* COLLECTION, const char* DATA, struct database_document_fields* result, const int THREAD_SETTINGS);
+int read_multiple_documents_all_fields_from_collection(const char* DATABASE, const char* COLLECTION, struct database_multiple_documents_fields* result, const size_t DOCUMENT_COUNT_START, const size_t DOCUMENT_COUNT_TOTAL, const int THREAD_SETTINGS);
 int update_document_from_collection(const char* DATABASE, const char* COLLECTION, const char* DATA, const char* FIELD_NAME_AND_DATA, const int THREAD_SETTINGS);
 int update_all_documents_from_collection(const char* DATABASE, const char* COLLECTION, const char* DATA, const int THREAD_SETTINGS);
 int delete_document_from_collection(const char* DATABASE, const char* COLLECTION, const char* DATA, const int THREAD_SETTINGS);
@@ -309,6 +327,7 @@ void* insert_document_into_collection_json_thread(void* parameters);
 void* read_document_from_collection_thread(void* parameters);
 void* read_document_field_from_collection_thread(void* parameters);
 void* read_document_all_fields_from_collection_thread(void* parameters);
+void* read_multiple_documents_all_fields_from_collection_thread(void* parameters);
 void* update_document_from_collection_thread(void* parameters);
 void* update_all_documents_from_collection_thread(void* parameters);
 void* delete_document_from_collection_thread(void* parameters);
