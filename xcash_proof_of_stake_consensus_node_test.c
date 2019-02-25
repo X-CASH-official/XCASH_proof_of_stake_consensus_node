@@ -5564,7 +5564,7 @@ int database_test()
   {
     data[count] = (char*)calloc(BUFFER_SIZE,sizeof(char)); 
     settings[count] = (char*)calloc(BUFFER_SIZE,sizeof(char)); 
-  }
+  }  
 
   // create the the arrays
   for (count = 0; count < DATA_COUNT; count++)
@@ -5732,6 +5732,7 @@ int database_test()
     database_data.item[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
     database_data.value[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
   }
+  database_data.count = 0;
 
   if (read_document_all_fields_from_collection(DATABASE_NAME,DATABASE_COLLECTION,"{\"username\":\"XCASH\"}",&database_data,0) == 1)
   {
@@ -5780,6 +5781,7 @@ int database_test()
     database_data.item[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
     database_data.value[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
   }
+  database_data.count = 0;
 
   struct read_document_all_fields_from_collection_thread_parameters read_document_all_fields_from_collection_thread_parameters = {DATABASE_NAME,DATABASE_COLLECTION,"{\"username\":\"XCASH\"}",&database_data};
   pthread_create(&thread_id, NULL, &read_document_all_fields_from_collection_thread,(void *)&read_document_all_fields_from_collection_thread_parameters);
@@ -5842,6 +5844,8 @@ int database_test()
       database_multiple_documents_fields.value[count][counter] = (char*)calloc(BUFFER_SIZE,sizeof(char));
     }
   }
+  database_multiple_documents_fields.document_count = 0;
+  database_multiple_documents_fields.database_fields_count = 0;
 
   if (read_multiple_documents_all_fields_from_collection(DATABASE_NAME,DATABASE_COLLECTION,&database_multiple_documents_fields,1,2,0) == 1)
   {
@@ -5911,6 +5915,8 @@ int database_test()
       database_multiple_documents_fields.value[count][counter] = (char*)calloc(BUFFER_SIZE,sizeof(char));
     }
   }
+  database_multiple_documents_fields.document_count = 0;
+  database_multiple_documents_fields.database_fields_count = 0;
 
   struct read_multiple_documents_all_fields_from_collection_thread_parameters read_multiple_documents_all_fields_from_collection_thread_parameters = {DATABASE_NAME,DATABASE_COLLECTION,&database_multiple_documents_fields,1,2};
   pthread_create(&thread_id, NULL, &read_multiple_documents_all_fields_from_collection_thread,(void *)&read_multiple_documents_all_fields_from_collection_thread_parameters);
@@ -6091,9 +6097,9 @@ int database_test()
     }  
   }
 
-/*delete_collection_from_database(DATABASE_NAME,"delegates",0);
+  /*delete_collection_from_database(DATABASE_NAME,"delegates",0);
   delete_collection_from_database(DATABASE_NAME,"statistics",0);
-  insert_document_into_collection_json(DATABASE_NAME,"delegates","{\"public_address\":\"XCA\",\"password\":\"XCA\",\"salt\":\"XCA\",\"session\":\"XCA\",\"total_vote_count\":\"XCA\",\"current_vote_count\":\"XCA\",\"delegate_number\":\"XCA\",\"IP_address\":\"XCA\",\"delegate_name\":\"XCA\",\"about\":\"XCA\",\"website\":\"XCA\",\"team\":\"XCA\",\"pool_mode\":\"XCA\",\"fee_structure\":\"XCA\",\"server_settings\":\"XCA\",\"block_producer_eligibility\":\"XCA\",\"block_verifier_total_rounds\":\"XCA\",\"block_verifier_online_total_rounds\":\"XCA\",\"block_verifier_online_percentage\":\"XCA\",\"block_producer_total_rounds\":\"XCA\",\"VRF_node_public_and_private_key_total_rounds\":\"XCA\",\"VRF_node_random_data_total_rounds\":\"XCA\",\"block_producer_block_heights\":\"XCA\",\"VRF_node_public_and_private_key_block_heights\":\"XCA\",\"VRF_node_random_data_block_heights\":\"XCA\"}",0);
+  insert_document_into_collection_json(DATABASE_NAME,"delegates","{\"public_address\":\"XCA\",\"password\":\"XCA\",\"salt\":\"XCA\",\"session\":\"XCA\",\"total_vote_count\":\"XCA\",\"current_vote_count\":\"XCA\",\"delegate_number\":\"XCA\",\"IP_address\":\"XCA\",\"delegate_name\":\"XCA\",\"about\":\"XCA\",\"website\":\"XCA\",\"team\":\"XCA\",\"pool_mode\":\"XCA\",\"fee_structure\":\"XCA\",\"server_settings\":\"XCA\",\"block_producer_eligibility\":\"XCA\",\"online_status\":\"XCA\",\"block_verifier_total_rounds\":\"XCA\",\"block_verifier_online_total_rounds\":\"XCA\",\"block_verifier_online_percentage\":\"XCA\",\"block_producer_total_rounds\":\"XCA\",\"VRF_node_public_and_private_key_total_rounds\":\"XCA\",\"VRF_node_random_data_total_rounds\":\"XCA\",\"block_producer_block_heights\":\"XCA\",\"VRF_node_public_and_private_key_block_heights\":\"XCA\",\"VRF_node_random_data_block_heights\":\"XCA\"}",0);
   insert_document_into_collection_json(DATABASE_NAME,"statistics",DATABASE_COLLECTION_STATISTICS_DATA,0);*/
   
   // write the end test message

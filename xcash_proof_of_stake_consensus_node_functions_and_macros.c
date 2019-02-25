@@ -2007,45 +2007,40 @@ Parameters:
     database_fields_count - The number of items in the database document
     item[100][100] - The database document items
     value[100][100] - The database document values
-  database_fields - The database fields to not include in the database array
+  document_count - The count of the document
 Return: 0 if an error has occured, 1 if successfull
 -----------------------------------------------------------------------------------------------------------
 */
 
-int database_multiple_documents_parse_json_data(char* data, struct database_multiple_documents_fields* result)
+int database_multiple_documents_parse_json_data(char* data, struct database_multiple_documents_fields* result, const int document_count)
 {
   // Variables
   char* data2;
   char* data3;
-  size_t count;
-  size_t counter;
+  size_t count = 0;
 
-  // get the document count
-  result->document_count = string_count(data,"\"_id\"");
-  result->database_fields_count = (string_count(data,":") - (2 * result->document_count)) / 2;
+  // get the parameter count
+  result->database_fields_count = string_count(data,":") - 2;
 
-  for (count = 0; count < result->document_count; count++)
-  {
-    // get the first item  
-    data2 = strstr(data,",") + 3;
-    data3 = strstr(data2,"\"");
-    memcpy(result->item[count][0],data2,strnlen(data2,BUFFER_SIZE)-strnlen(data3,BUFFER_SIZE)); 
+  // get the first item  
+  data2 = strstr(data,",") + 3;
+  data3 = strstr(data2,"\"");
+  memcpy(result->item[document_count][0],data2,strnlen(data2,BUFFER_SIZE)-strnlen(data3,BUFFER_SIZE)); 
   
-    for (counter = 0; counter < result->database_fields_count; counter++)
-    {
-      data2 = data3+5;
-      data3 = strstr(data2,"\"");
-      memcpy(result->value[count][counter],data2,strnlen(data2,BUFFER_SIZE)-strnlen(data3,BUFFER_SIZE));
+  for (count = 0; count < result->database_fields_count; count++)
+  {
+    data2 = data3+5;
+    data3 = strstr(data2,"\"");
+    memcpy(result->value[document_count][count],data2,strnlen(data2,BUFFER_SIZE)-strnlen(data3,BUFFER_SIZE));
       
-      // only get the item if its not the last count
-      if (count+1 != result->database_fields_count)
-      { 
-        data2 = data3+4;
-        data3 = strstr(data2,"\"");
-        memcpy(result->item[count][counter+1],data2,strnlen(data2,BUFFER_SIZE)-strnlen(data3,BUFFER_SIZE));
-      }    
-    } 
-  }  
+    // only get the item if its not the last count
+    if (count+1 != result->database_fields_count)
+    { 
+      data2 = data3+4;
+      data3 = strstr(data2,"\"");
+      memcpy(result->item[document_count][count+1],data2,strnlen(data2,BUFFER_SIZE)-strnlen(data3,BUFFER_SIZE));
+    }    
+  } 
   return 1;
 }
 
@@ -2166,9 +2161,7 @@ int read_multiple_documents_all_fields_from_collection(const char* DATABASE, con
   bson_error_t error;
   bson_t* document = NULL;  
   char* message;
-  char* data = (char*)calloc(10485760,sizeof(char)); // 10 MB
-  size_t message_length;
-  size_t data_count = 0;
+  char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
   size_t count = 1;
   size_t counter = 0;
 
@@ -2205,12 +2198,13 @@ int read_multiple_documents_all_fields_from_collection(const char* DATABASE, con
     if (count >= DOCUMENT_COUNT_START)
     {
       message = bson_as_canonical_extended_json(current_document, NULL);
-      //printf("%s",message);
-      message_length = strnlen(message,BUFFER_SIZE);
-      memcpy(data+data_count,message,message_length); 
-      data_count += message_length;   
-      bson_free(message);
+      memset(data,0,strnlen(data,BUFFER_SIZE));
+      memcpy(data,message,strnlen(message,BUFFER_SIZE));
+      bson_free(message);      
+      // parse the json data
+      database_multiple_documents_parse_json_data(data,result,counter);
       counter++;
+      result->document_count++;
       // check if that is the total amount of documents to read
       if (counter == DOCUMENT_COUNT_TOTAL)
       {
@@ -2220,8 +2214,14 @@ int read_multiple_documents_all_fields_from_collection(const char* DATABASE, con
     count++;    
   }
 
-  // parse the json data
-  database_multiple_documents_parse_json_data(data,result);
+  if (counter == 0)
+  {
+    bson_destroy(document);
+    mongoc_cursor_destroy(document_settings);
+    mongoc_collection_destroy(collection);
+    pointer_reset(data);
+    return 0;
+  }
 
   if (THREAD_SETTINGS == 1)
   {
@@ -2234,7 +2234,6 @@ int read_multiple_documents_all_fields_from_collection(const char* DATABASE, con
   pointer_reset(data);
   return 1;
 }
-
 
 
 /*
