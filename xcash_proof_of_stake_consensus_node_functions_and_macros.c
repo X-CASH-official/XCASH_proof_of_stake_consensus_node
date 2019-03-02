@@ -2176,7 +2176,6 @@ int read_multiple_documents_all_fields_from_collection(const char* DATABASE, con
   mongoc_client_t* database_client_thread;
   mongoc_collection_t* collection;
   mongoc_cursor_t* document_settings;
-  bson_error_t error;
   bson_t* document = NULL;  
   char* message;
   char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
