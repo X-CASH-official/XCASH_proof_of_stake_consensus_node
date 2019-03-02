@@ -132,6 +132,8 @@ int append_string_test()
     printf("\n\n");
   } 
   return count_test;
+
+  #undef APPEND_STRING_TOTAL_TEST
 }
 
 
@@ -4771,6 +4773,38 @@ int parse_json_data_test()
     printf("\n\n");
   }
   return count_test;
+
+  #undef PARSE_JSON_DATA_TOTAL_TEST
+  #undef SIGN_RPC_CALL_TEST_DATA
+  #undef VERIFY_RPC_CALL_TEST_DATA
+  #undef GET_BLOCK_TEMPLATE_RPC_CALL_TEST_DATA
+  #undef CONSENSUS_NODE_TO_NODE_RECEIVE_CURRENT_CONSENSUS_NODE_IP_ADDRESS
+  #undef NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS
+  #undef CONSENSUS_NODE_TO_NODE_RECEIVE_UPDATED_NODE_LIST
+  #undef NODE_TO_CONSENSUS_NODE_SEND_UPDATED_NODE_LIST
+  #undef CONSENSUS_NODE_TO_NODES_MAIN_NODE_PUBLIC_ADDRESS
+  #undef NODES_TO_CONSENSUS_NODE_MAIN_NODE_SOCKET_TIMEOUT_ROUND_CHANGE
+  #undef CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND
+  #undef MAIN_NODES_TO_NODES_PART_1_OF_ROUND
+  #undef MAIN_NODES_TO_NODES_PART_2_OF_ROUND
+  #undef MAIN_NODES_TO_NODES_PART_3_OF_ROUND
+  #undef MAIN_NODES_TO_NODES_PART_4_OF_ROUND
+  #undef NODES_TO_NODES_VOTE_RESULTS
+  #undef NODES_TO_CONSENSUS_NODE_VOTE_RESULTS
+  #undef CONSENSUS_NODE_TO_NODES_LIST_OF_ENABLED_NODES
+  #undef CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_ROUND_CHANGE
+  #undef CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CHANGE
+  #undef CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_XCASH_PROOF_OF_STAKE_MESSAGE
+  #undef CONSENSUS_NODE_TO_CONSENSUS_NODE_PRIVATE_KEY_RECEIVE_XCASH_PROOF_OF_STAKE_SETTINGS
+  #undef CONSENSUS_NODE_PRIVATE_KEY_TO_CONSENSUS_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS
+  #undef CONSENSUS_NODE_TO_CONSENSUS_NODE_PRIVATE_KEY_CONSENSUS_NODE_CREATE_NEW_BLOCK
+  #undef CONSENSUS_NODE_PRIVATE_KEY_TO_CONSENSUS_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK
+  #undef CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEW_PART_OF_ROUND
+  #undef CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEXT_ROUND
+  #undef CONSENSUS_NODE_TO_CONSENSUS_NODE_PRIVATE_KEY_CREATE_NEW_BLOCK
+  #undef CONSENSUS_NODE_PRIVATE_KEY_TO_CONSENSUS_NODE_CREATE_NEW_BLOCK
+  #undef CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_RECALCULATING_VOTES
+  #undef VOTING_WEBSITE_API_PROGRAM_TO_CONSENSUS_NODE_PRIVATE_KEY_SEND_XCASH_PROOF_OF_STAKE_SETTINGS
 }
 
 
@@ -4829,6 +4863,8 @@ int random_string_test()
     printf("\n\n");
   } 
   return count_test;
+
+  #undef RANDOM_STRING_TOTAL_TEST
 }
 
 
@@ -5049,9 +5085,11 @@ int create_json_data_from_database_document_array_test()
     color_print(TEST_OUTLINE,"red");
     printf("\n\n");
   } 
+  return count_test;
+
+  #undef create_json_data_from_database_document_array_TOTAL_TEST
   #undef DATA1
   #undef DATA2
-  return count_test;
 }
 
 
@@ -5133,6 +5171,8 @@ int string_count_test()
     printf("\n\n");
   } 
   return count_test;
+
+  #undef STRING_COUNT_TOTAL_TEST
 }
 
 
@@ -5262,6 +5302,8 @@ int string_replace_test()
     printf("\n\n");
   } 
   return count_test;
+
+  #undef STRING_REPLACE_TOTAL_TEST
 }
 
 
@@ -5355,7 +5397,7 @@ int send_wallet_http_request_test()
   }
   
   // create the message
-  memset(result_test,0,strlen(result_test));
+  memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
   append_string(result_test,MESSAGE);
 
   // test the sign_data functions
@@ -5400,8 +5442,10 @@ int send_wallet_http_request_test()
     printf("\n\n");
   } 
   pointer_reset(data);
-  #undef MESSAGE
   return count_test;
+
+  #undef SEND_WALLET_HTTP_REQUEST_TOTAL_TEST
+  #undef MESSAGE
 }
 
 
@@ -5513,9 +5557,11 @@ int read_and_write_file_test()
     color_print(TEST_OUTLINE,"red");
     printf("\n\n");
   } 
+  return count_test;
+
+  #undef READ_AND_WRITE_FILE_TEST
   #undef NODES_PUBLIC_ADDRESS_LIST_FILE_NAME_COPY
   #undef MESSAGE
-  return count_test;
 }
 
 
@@ -6118,13 +6164,15 @@ int database_test()
     printf("\033[1;31mdatabase test - Passed test: %d, Failed test: %d\033[0m\n",count_test,DATABASE_TEST-count_test);
     color_print(TEST_OUTLINE,"red");
     printf("\n\n");
-  } 
+  }   
+  return count_test;
 
+  #undef DATABASE_TEST  
+  #undef DATA_COUNT
+  #undef DATABASE_COLLECTION
   #undef MESSAGE
   #undef MESSAGE_SETTINGS
-  #undef DATABASE_COLLECTION
-  #undef DATA_COUNT
-  return count_test;
+  #undef DATABASE_COLLECTION_STATISTICS_DATA
 }
 
 
@@ -6165,6 +6213,13 @@ int send_and_receive_data_socket_test()
   // define macros
   #define SEND_AND_RECEIVE_DATA_SOCKET_TOTAL_TEST 2
   #define MESSAGE "{\r\n \"message_settings\": \"XCASH_PROOF_OF_STAKE_TEST_DATA\",\r\n}"
+  #define pointer_reset_all \
+  free(message); \
+  message = NULL; \
+  free(public_address); \
+  public_address = NULL; \
+  free(string); \
+  string = NULL; 
 
   // reset the variables
   memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
@@ -6211,7 +6266,7 @@ int send_and_receive_data_socket_test()
 
   // test for sending and receiving data using sockets
   // create the message
-  memset(message,0,strlen(message));
+  memset(message,0,strnlen(message,BUFFER_SIZE));
   append_string(message,MESSAGE);
 
   // sign_data
@@ -6294,11 +6349,12 @@ int send_and_receive_data_socket_test()
     color_print(TEST_OUTLINE,"red");
     printf("\n\n");
   } 
-  pointer_reset(message);
-  pointer_reset(public_address);
-  pointer_reset(string);
-  #undef MESSAGE
+  pointer_reset_all;
   return count_test;
+
+  #undef SEND_AND_RECEIVE_DATA_SOCKET_TOTAL_TEST
+  #undef MESSAGE
+  #undef pointer_reset_all
 }
 
 
@@ -6362,4 +6418,6 @@ void test()
   pointer_reset(result_test);
   pointer_reset(data_test);
   return;
+
+  #undef XCASH_PROOF_OF_STAKE_TOTAL_TEST
 }

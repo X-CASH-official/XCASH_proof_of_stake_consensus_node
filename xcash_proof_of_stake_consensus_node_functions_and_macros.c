@@ -103,8 +103,9 @@ int parse_json_data(const char* DATA, const char* FIELD_NAME, char *result)
   }
 
   pointer_reset_all;
-  #undef pointer_reset_all
   return settings;
+  
+  #undef pointer_reset_all
 }
 
 
@@ -354,8 +355,9 @@ int send_http_request(char *result, const char* HOST, const char* URL, const int
   }
     
   pointer_reset_all;
-  #undef pointer_reset_all
   return 1;
+
+  #undef pointer_reset_all
 }
 
 
@@ -541,8 +543,9 @@ int send_and_receive_data_socket(char *result, const char* HOST, const int PORT,
   close(SOCKET);
 
   pointer_reset_all;
-  #undef pointer_reset_all
   return 1;
+
+  #undef pointer_reset_all
 }
 
 
@@ -689,8 +692,9 @@ int send_data_socket(const char* HOST, const int PORT, const char* DATA, const c
   close(SOCKET);
 
   pointer_reset_all;
-  #undef pointer_reset_all
   return 1;
+
+  #undef pointer_reset_all
 }
 
 
@@ -718,7 +722,7 @@ int create_json_data_from_database_document_array(struct database_document_field
   size_t counter = 1;
   size_t item_length;
   size_t value_length;
-  
+
   memcpy(result,"{",1); 
   for (count = 0; count < database_data->count; count++)
   {
@@ -926,7 +930,9 @@ int string_replace(char *data, const char* STR1, const char* STR2)
   else
   {
     return 0;
-  }  
+  } 
+
+  #undef REPLACE_STRING
 }
 
 
@@ -1068,10 +1074,11 @@ int random_string(char *result, const size_t LENGTH)
     memcpy(result+count,&data[((rand() % (MAXIMUM - MINIMUM + 1)) + MINIMUM)],1);
   }
   pointer_reset(data); 
+  return 1;
+  
   #undef STRING
   #undef MINIMUM
-  #undef MAXIMUM
-  return 1;
+  #undef MAXIMUM  
 }
 
 
@@ -1118,6 +1125,8 @@ int get_public_address(const int HTTP_SETTINGS)
   
   pointer_reset(data); 
   return 1;
+
+  #undef GET_PUBLIC_ADDRESS_DATA
 }
 
 
@@ -1140,7 +1149,7 @@ int get_block_template(char *result, const int HTTP_SETTINGS)
   // Variables
   char* message = (char*)calloc(BUFFER_SIZE,sizeof(char));
   char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
-  
+
   // define macros
   #define pointer_reset_all \
   free(message); \
@@ -1166,8 +1175,10 @@ int get_block_template(char *result, const int HTTP_SETTINGS)
   }
   
   pointer_reset_all; 
-  #undef pointer_reset_all
   return 1;
+
+
+  #undef pointer_reset_all
 }
 
 
@@ -1369,8 +1380,9 @@ int sign_data(char *message, const int HTTP_SETTINGS)
   memcpy(message+message_length+173+XCASH_WALLET_LENGTH+previous_block_hash_LENGTH+RANDOM_STRING_LENGTH+XCASH_PROOF_OF_STAKE_SIGNATURE_LENGTH,"\",\r\n}",5);
 
   pointer_reset_all;
-  #undef pointer_reset_all
   return 1;
+
+  #undef pointer_reset_all
 }
 
 
@@ -1541,9 +1553,10 @@ int verify_data(const char* MESSAGE, const int HTTP_SETTINGS, const int VERIFY_C
      return 0;
   }
  
-  pointer_reset_all;
-  #undef pointer_reset_all
+  pointer_reset_all;  
   return 1;
+
+  #undef pointer_reset_all
 }
 
 
@@ -1563,9 +1576,8 @@ int read_file(char *result, const char* FILE_NAME)
 {
   // Variables
   FILE* file;
-  char data [BUFFER_SIZE];
   int settings;
-  
+
   // check if the file exist
   file = fopen(FILE_NAME,"r");
   if (file != NULL)
@@ -1601,7 +1613,7 @@ int write_file(const char* DATA, const char* FILE_NAME)
 {
   // Variables
   FILE* file;
-  
+
   file = fopen(FILE_NAME,"w");
   fprintf(file,"%s",DATA);
   fclose(file);
@@ -1873,7 +1885,7 @@ int read_document_field_from_collection(const char* DATABASE, const char* COLLEC
   mongoc_cursor_t* document_settings;
   bson_error_t error;
   bson_t* document = NULL;  
-  char* message = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* message;
   char* data2 = (char*)calloc(BUFFER_SIZE,sizeof(char)); 
   char* settings = (char*)calloc(BUFFER_SIZE,sizeof(char));
   char* message_copy1;
@@ -1897,6 +1909,8 @@ int read_document_field_from_collection(const char* DATABASE, const char* COLLEC
     database_client_thread = mongoc_client_pool_pop(database_client_thread_pool);
     if (!database_client_thread)
     {
+      pointer_reset(message);
+      pointer_reset_all;
       return 0;
     }
     // set the collection
@@ -1908,6 +1922,7 @@ int read_document_field_from_collection(const char* DATABASE, const char* COLLEC
   {
     bson_destroy(document);
     mongoc_collection_destroy(collection);
+    pointer_reset(message);
     pointer_reset_all;
     return 0;
   }
@@ -1938,9 +1953,10 @@ int read_document_field_from_collection(const char* DATABASE, const char* COLLEC
   bson_destroy(document);
   mongoc_cursor_destroy(document_settings);
   mongoc_collection_destroy(collection);
-  pointer_reset_all;
-  #undef pointer_reset_all
+  pointer_reset_all;  
   return 1;
+
+  #undef pointer_reset_all
 }
 
 
@@ -2089,6 +2105,7 @@ int read_document_all_fields_from_collection(const char* DATABASE, const char* C
     database_client_thread = mongoc_client_pool_pop(database_client_thread_pool);
     if (!database_client_thread)
     {
+      pointer_reset(data);
       return 0;
     }
     // set the collection
@@ -2100,6 +2117,7 @@ int read_document_all_fields_from_collection(const char* DATABASE, const char* C
   {
     bson_destroy(document);
     mongoc_collection_destroy(collection);
+    pointer_reset(data);
     return 0;
   }
  
@@ -2271,6 +2289,7 @@ int update_document_from_collection(const char* DATABASE, const char* COLLECTION
     database_client_thread = mongoc_client_pool_pop(database_client_thread_pool);
     if (!database_client_thread)
     {
+      pointer_reset(data2);
       return 0;
     }
     // set the collection
@@ -2357,6 +2376,7 @@ int update_all_documents_from_collection(const char* DATABASE, const char* COLLE
     database_client_thread = mongoc_client_pool_pop(database_client_thread_pool);
     if (!database_client_thread)
     {
+      pointer_reset(data2);
       return 0;
     }
     // set the collection
@@ -2796,6 +2816,7 @@ int server_receive_data_socket_consensus_node_to_node(const int CLIENT_SOCKET, p
     pointer_reset(data);
     _exit(0);
   }
+  pointer_reset(data);
   return 1;
 }
 
@@ -3320,6 +3341,7 @@ int create_server(const int MESSAGE_SETTINGS)
     {
       color_print("Error setting socket options","red"); 
     }
+    pointer_reset_all;
     return 0;
   } 
   if (MESSAGE_SETTINGS == 1)
@@ -3414,7 +3436,7 @@ int create_server(const int MESSAGE_SETTINGS)
            pointer_reset_all;
            _exit(0);
          }
-         // set the thread to dettach once completed, since we do not need to use anything it will return.
+         // set the thread to dettach once completed, since we do not need to use anything.
          if (pthread_detach(thread_id) != 0)
          {
            // close the forked process
@@ -3511,8 +3533,9 @@ int create_server(const int MESSAGE_SETTINGS)
          
        
        }
-     }
-     #undef pointer_reset_all
+     }     
      close(CLIENT_SOCKET);
    }
+   
+   #undef pointer_reset_all
 }
