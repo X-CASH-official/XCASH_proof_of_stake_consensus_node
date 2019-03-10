@@ -1576,7 +1576,7 @@ int read_file(char *result, const char* FILE_NAME)
 {
   // Variables
   FILE* file;
-  int settings;
+  int settings = 0;
 
   // check if the file exist
   file = fopen(FILE_NAME,"r");
@@ -1586,14 +1586,10 @@ int read_file(char *result, const char* FILE_NAME)
     fseek(file, 0, SEEK_END);
     const long file_size = ftell(file);
     fseek(file, 0, SEEK_SET); 
-    fread(result, sizeof(char), file_size, file);
+    fread(result, file_size, sizeof(char), file);
+    fclose(file);
     settings = 1;
   }
-  else
-  {
-    settings = 0;
-  }
-  fclose(file);
   return settings;
 }
 
@@ -1613,11 +1609,16 @@ int write_file(const char* DATA, const char* FILE_NAME)
 {
   // Variables
   FILE* file;
+  int settings = 0;
 
   file = fopen(FILE_NAME,"w");
-  fprintf(file,"%s",DATA);
-  fclose(file);
-  return 1;   
+  if (file != NULL)
+  {
+    fprintf(file,"%s",DATA);
+    fclose(file);
+    settings = 1;
+  }
+  return settings;  
 }
 
 
