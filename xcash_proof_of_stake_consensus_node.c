@@ -1,19 +1,42 @@
 #include "stdio.h"
 #include "stdlib.h"
-#include "string.h"
-#include <unistd.h>
-#include <signal.h>
 #include "sys/types.h"
 #include "sys/socket.h"
+#include "string.h"
 #include <netdb.h> 
 #include "netinet/in.h"
 #include <arpa/inet.h>
+#include <unistd.h>
+#include <signal.h>
 #include <pthread.h>
 #include <time.h> 
 #include <mongoc/mongoc.h>
 #include <bson/bson.h>
 
-#include "xcash_proof_of_stake_consensus_node_functions_and_macros.h"
+#include "define_macro_functions.h"
+#include "define_macros.h"
+#include "structures.h"
+#include "variables.h"
+
+#include "define_macros_functions.h"
+#include "database_functions.h"
+#include "file_functions.h"
+#include "network_daemon_functions.h"
+#include "network_functions.h"
+#include "network_security_functions.h"
+#include "network_wallet_functions.h"
+#include "server_functions.h"
+#include "string_functions.h"
+#include "thread_functions.h"
+#include "thread_server_functions.h"
+
+#include "define_macros_test.h"
+#include "variables_test.h"
+#include "analysing_code_test.h"
+#include "database_functions_test.h"
+#include "file_functions_test.h"
+#include "network_functions_test.h"
+#include "string_functions_test.h"
 #include "xcash_proof_of_stake_consensus_node_test.h"
 
 /*
@@ -84,7 +107,7 @@ int main(int parameters_count, char* parameters[])
   // set the server_message
   memcpy(server_message,"CONSENSUS_NODE_TO_NODES_MAIN_NODE_PUBLIC_ADDRESS",48);
 
-  // get the wallets public address
+ /* // get the wallets public address
   printf("Getting the public address\n\n");
   if (get_public_address(0) == 1)
   {  
@@ -102,7 +125,7 @@ int main(int parameters_count, char* parameters[])
     mongoc_uri_destroy(uri_thread_pool);
     mongoc_cleanup();
     exit(0);
-  }
+  }*/
   
   // check if the program needs to run the test
   if (parameters_count == 2)
