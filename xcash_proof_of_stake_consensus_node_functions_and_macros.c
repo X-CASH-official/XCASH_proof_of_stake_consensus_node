@@ -1669,6 +1669,12 @@ int create_database_connection()
   bson_t reply;
   bson_error_t error;
 
+  // define macros
+  #define database_reset_all \
+  mongoc_uri_destroy(uri); \
+  bson_destroy(&reply); \
+  bson_destroy(command);
+
   // create a connection to the database
   uri = mongoc_uri_new_with_error(DATABASE_CONNECTION, &error);
   if (!uri)
@@ -1678,17 +1684,19 @@ int create_database_connection()
   database_client = mongoc_client_new_from_uri(uri);
   if (!database_client)
   {
-    mongoc_uri_destroy(uri);
+    database_reset_all;
     return 0;
   }
   command = BCON_NEW("ping", BCON_INT32(1));
   if (!mongoc_client_command_simple(database_client, "admin", command, NULL, &reply, &error))
   {
-    mongoc_uri_destroy(uri);
+    database_reset_all;
     return 0;
   }
-  mongoc_uri_destroy(uri);
+  database_reset_all;
   return 1;
+
+  #undef database_reset_all
 }
 
 
@@ -1716,6 +1724,11 @@ int insert_document_into_collection_array(const char* DATABASE, const char* COLL
   bson_t* document;
   size_t count;
 
+  // define macros
+  #define database_reset_all \
+  bson_destroy(document); \
+  mongoc_collection_destroy(collection);
+
   // set the collection
   collection = mongoc_client_get_collection(database_client, DATABASE, COLLECTION);  
 
@@ -1729,14 +1742,13 @@ int insert_document_into_collection_array(const char* DATABASE, const char* COLL
 
   if (!mongoc_collection_insert_one(collection, document, NULL, NULL, &error))
   {
-    bson_destroy(document);
-    mongoc_collection_destroy(collection);
+    database_reset_all;
     return 0;
-  }
-  
-  bson_destroy(document);
-  mongoc_collection_destroy(collection);
+  } 
+  database_reset_all;
   return 1;
+
+  #undef database_reset_all
 }
 
 
@@ -1763,6 +1775,15 @@ int insert_document_into_collection_json(const char* DATABASE, const char* COLLE
   bson_oid_t oid;
   bson_t* document;
 
+  // define macros
+  #define database_reset_all \
+  bson_destroy(document); \
+  mongoc_collection_destroy(collection); \
+  if (THREAD_SETTINGS == 1) \
+  { \
+    mongoc_client_pool_push(database_client_thread_pool, database_client_thread); \
+  }
+
   // check if we need to create a database connection, or use the global database connection
   if (THREAD_SETTINGS == 0)
   {
@@ -1785,26 +1806,19 @@ int insert_document_into_collection_json(const char* DATABASE, const char* COLLE
   document = bson_new_from_json((const uint8_t *)DATA, -1, &error);
   if (!document)
   {
-    bson_destroy(document);
-    mongoc_collection_destroy(collection);
+    database_reset_all;
     return 0;
   }
     
   if (!mongoc_collection_insert_one(collection, document, NULL, NULL, &error))
   {
-    bson_destroy(document);
-    mongoc_collection_destroy(collection);
+    database_reset_all;
     return 0;
   }
-
-  if (THREAD_SETTINGS == 1)
-  {
-    mongoc_client_pool_push(database_client_thread_pool, database_client_thread);
-  }
-
-  bson_destroy(document);
-  mongoc_collection_destroy(collection);
+  database_reset_all;
   return 1;
+
+  #undef database_reset_all
 }
 
 
@@ -1836,7 +1850,17 @@ int read_document_from_collection(const char* DATABASE, const char* COLLECTION, 
   bson_t* document = NULL;  
   char* message;
 
-   // check if we need to create a database connection, or use the global database connection
+  // define macros
+  #define database_reset_all \
+  bson_destroy(document); \
+  mongoc_cursor_destroy(document_settings); \
+  mongoc_collection_destroy(collection); \
+  if (THREAD_SETTINGS == 1) \
+  { \
+    mongoc_client_pool_push(database_client_thread_pool, database_client_thread); \
+  }
+
+  // check if we need to create a database connection, or use the global database connection
   if (THREAD_SETTINGS == 0)
   {
     // set the collection
@@ -1856,8 +1880,7 @@ int read_document_from_collection(const char* DATABASE, const char* COLLECTION, 
   document = bson_new_from_json((const uint8_t *)DATA, -1, &error);
   if (!document)
   {
-    bson_destroy(document);
-    mongoc_collection_destroy(collection);
+    database_reset_all;
     return 0;
   }
  
@@ -1868,16 +1891,10 @@ int read_document_from_collection(const char* DATABASE, const char* COLLECTION, 
     memcpy(result,message,strnlen(message,BUFFER_SIZE));
     bson_free(message);
   }
-
-  if (THREAD_SETTINGS == 1)
-  {
-    mongoc_client_pool_push(database_client_thread_pool, database_client_thread);
-  }
-  
-  bson_destroy(document);
-  mongoc_cursor_destroy(document_settings);
-  mongoc_collection_destroy(collection);
+  database_reset_all;
   return 1;
+
+  #undef database_reset_all
 }
 
 
@@ -1913,6 +1930,7 @@ int read_document_field_from_collection(const char* DATABASE, const char* COLLEC
   char* settings = (char*)calloc(BUFFER_SIZE,sizeof(char));
   char* message_copy1;
   char* message_copy2;
+  int count = 0;
 
   // define macros
   #define pointer_reset_all \
@@ -1921,7 +1939,16 @@ int read_document_field_from_collection(const char* DATABASE, const char* COLLEC
   free(settings); \
   settings = NULL; 
 
-   // check if we need to create a database connection, or use the global database connection
+  #define database_reset_all \
+  bson_destroy(document); \
+  mongoc_cursor_destroy(document_settings); \
+  mongoc_collection_destroy(collection); \
+  if (THREAD_SETTINGS == 1) \
+  { \
+    mongoc_client_pool_push(database_client_thread_pool, database_client_thread); \
+  }
+
+  // check if we need to create a database connection, or use the global database connection
   if (THREAD_SETTINGS == 0)
   {
     // set the collection
@@ -1932,7 +1959,6 @@ int read_document_field_from_collection(const char* DATABASE, const char* COLLEC
     database_client_thread = mongoc_client_pool_pop(database_client_thread_pool);
     if (!database_client_thread)
     {
-      pointer_reset(message);
       pointer_reset_all;
       return 0;
     }
@@ -1942,11 +1968,9 @@ int read_document_field_from_collection(const char* DATABASE, const char* COLLEC
   
   document = bson_new_from_json((const uint8_t *)DATA, -1, &error);
   if (!document)
-  {
-    bson_destroy(document);
-    mongoc_collection_destroy(collection);
-    pointer_reset(message);
+  {    
     pointer_reset_all;
+    database_reset_all;
     return 0;
   }
  
@@ -1956,30 +1980,29 @@ int read_document_field_from_collection(const char* DATABASE, const char* COLLEC
     message = bson_as_canonical_extended_json(current_document, NULL);
     memcpy(data2,message,strnlen(message,BUFFER_SIZE));
     bson_free(message);
+    count = 1;
   }
 
-  // parse the json data
-  const size_t FIELD_NAME_LENGTH = strnlen(FIELD_NAME,BUFFER_SIZE);
-  memcpy(settings,", \"",3);
-  memcpy(settings+3,FIELD_NAME,FIELD_NAME_LENGTH);
-  memcpy(settings+3+FIELD_NAME_LENGTH,"\" : \"",5);
-
-  message_copy1 = strstr(data2,settings) + strnlen(settings,BUFFER_SIZE);
-  message_copy2 = strstr(message_copy1,"\"");
-  memcpy(result,message_copy1,message_copy2 - message_copy1);
-
-  if (THREAD_SETTINGS == 1)
+  if (count == 1)
   {
-    mongoc_client_pool_push(database_client_thread_pool, database_client_thread);
+    // parse the json data
+    const size_t FIELD_NAME_LENGTH = strnlen(FIELD_NAME,BUFFER_SIZE);
+    memcpy(settings,", \"",3);
+    memcpy(settings+3,FIELD_NAME,FIELD_NAME_LENGTH);
+    memcpy(settings+3+FIELD_NAME_LENGTH,"\" : \"",5);
+
+    message_copy1 = strstr(data2,settings) + strnlen(settings,BUFFER_SIZE);
+    message_copy2 = strstr(message_copy1,"\"");
+    memcpy(result,message_copy1,message_copy2 - message_copy1);
   }
   
-  bson_destroy(document);
-  mongoc_cursor_destroy(document_settings);
-  mongoc_collection_destroy(collection);
-  pointer_reset_all;  
+
+  pointer_reset_all; 
+  database_reset_all; 
   return 1;
 
   #undef pointer_reset_all
+  #undef database_reset_all
 }
 
 
@@ -2116,6 +2139,17 @@ int read_document_all_fields_from_collection(const char* DATABASE, const char* C
   bson_t* document = NULL;  
   char* message;
   char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  int count = 0;
+
+  // define macros
+  #define database_reset_all \
+  bson_destroy(document); \
+  mongoc_cursor_destroy(document_settings); \
+  mongoc_collection_destroy(collection); \
+  if (THREAD_SETTINGS == 1) \
+  { \
+    mongoc_client_pool_push(database_client_thread_pool, database_client_thread); \
+  }
 
    // check if we need to create a database connection, or use the global database connection
   if (THREAD_SETTINGS == 0)
@@ -2137,10 +2171,9 @@ int read_document_all_fields_from_collection(const char* DATABASE, const char* C
   
   document = bson_new_from_json((const uint8_t *)DATA, -1, &error);
   if (!document)
-  {
-    bson_destroy(document);
-    mongoc_collection_destroy(collection);
+  {    
     pointer_reset(data);
+    database_reset_all;
     return 0;
   }
  
@@ -2150,21 +2183,20 @@ int read_document_all_fields_from_collection(const char* DATABASE, const char* C
     message = bson_as_canonical_extended_json(current_document, NULL);
     memcpy(data,message,strnlen(message,BUFFER_SIZE));
     bson_free(message);
+    count = 1;
   }
 
-  // parse the json data
-  database_document_parse_json_data(data,result);
-
-  if (THREAD_SETTINGS == 1)
+  if (count == 1)
   {
-    mongoc_client_pool_push(database_client_thread_pool, database_client_thread);
-  }
-  
-  bson_destroy(document);
-  mongoc_cursor_destroy(document_settings);
-  mongoc_collection_destroy(collection);
+    // parse the json data
+    database_document_parse_json_data(data,result);
+  }  
+
   pointer_reset(data);
+  database_reset_all;
   return 1;
+
+  #undef database_reset_all
 }
 
 
@@ -2205,6 +2237,16 @@ int read_multiple_documents_all_fields_from_collection(const char* DATABASE, con
   size_t count = 1;
   size_t counter = 0;
 
+  // define macros
+  #define database_reset_all \
+  bson_destroy(document); \
+  mongoc_cursor_destroy(document_settings); \
+  mongoc_collection_destroy(collection); \
+  if (THREAD_SETTINGS == 1) \
+  { \
+    mongoc_client_pool_push(database_client_thread_pool, database_client_thread); \
+  }
+
    // check if we need to create a database connection, or use the global database connection
   if (THREAD_SETTINGS == 0)
   {
@@ -2226,9 +2268,8 @@ int read_multiple_documents_all_fields_from_collection(const char* DATABASE, con
   document = bson_new();
   if (!document)
   {
-    bson_destroy(document);
-    mongoc_collection_destroy(collection);
     pointer_reset(data);
+    database_reset_all;
     return 0;
   }
  
@@ -2256,24 +2297,18 @@ int read_multiple_documents_all_fields_from_collection(const char* DATABASE, con
 
   if (counter == 0)
   {
-    bson_destroy(document);
-    mongoc_cursor_destroy(document_settings);
-    mongoc_collection_destroy(collection);
     pointer_reset(data);
+    database_reset_all;
     return 0;
   }
 
-  if (THREAD_SETTINGS == 1)
-  {
-    mongoc_client_pool_push(database_client_thread_pool, database_client_thread);
-  }
-  
-  bson_destroy(document);
-  mongoc_cursor_destroy(document_settings);
-  mongoc_collection_destroy(collection);
   pointer_reset(data);
+  database_reset_all;
   return 1;
+
+  #undef database_reset_all
 }
+
 
 
 /*
@@ -2300,6 +2335,16 @@ int update_document_from_collection(const char* DATABASE, const char* COLLECTION
   bson_t* update_settings = NULL;
   char* data2 = (char*)calloc(BUFFER_SIZE,sizeof(char));
 
+  // define macros
+  #define database_reset_all \
+  bson_destroy(update); \
+  bson_destroy(update_settings); \
+  mongoc_collection_destroy(collection); \
+  if (THREAD_SETTINGS == 1) \
+  { \
+    mongoc_client_pool_push(database_client_thread_pool, database_client_thread); \
+  }
+
    // check if we need to create a database connection, or use the global database connection
   if (THREAD_SETTINGS == 0)
   {
@@ -2322,8 +2367,7 @@ int update_document_from_collection(const char* DATABASE, const char* COLLECTION
   if (!update)
   {
     pointer_reset(data2);
-    bson_destroy(update);
-    mongoc_collection_destroy(collection);
+    database_reset_all;
     return 0;
   }
  
@@ -2336,32 +2380,24 @@ int update_document_from_collection(const char* DATABASE, const char* COLLECTION
   if (!update_settings)
   {
     pointer_reset(data2);
-    bson_destroy(update);
-    bson_destroy(update_settings);
-    mongoc_collection_destroy(collection);
+    database_reset_all;
     return 0;
   }
   
   if (!mongoc_collection_update_one(collection, update, update_settings, NULL, NULL, &error))
   {
     pointer_reset(data2);
-    bson_destroy(update);
-    bson_destroy(update_settings);
-    mongoc_collection_destroy(collection);
+    database_reset_all;
     return 0;
   }
 
-  if (THREAD_SETTINGS == 1)
-  {
-    mongoc_client_pool_push(database_client_thread_pool, database_client_thread);
-  }
-
   pointer_reset(data2);
-  bson_destroy(update);
-  bson_destroy(update_settings);
-  mongoc_collection_destroy(collection);
+  database_reset_all;
   return 1;
+
+  #undef database_reset_all
 }
+
 
 
 /*
@@ -2387,6 +2423,16 @@ int update_all_documents_from_collection(const char* DATABASE, const char* COLLE
   bson_t* update_settings = NULL;
   char* data2 = (char*)calloc(BUFFER_SIZE,sizeof(char));
 
+  // define macros
+  #define database_reset_all \
+  bson_destroy(update); \
+  bson_destroy(update_settings); \
+  mongoc_collection_destroy(collection); \
+  if (THREAD_SETTINGS == 1) \
+  { \
+    mongoc_client_pool_push(database_client_thread_pool, database_client_thread); \
+  }
+
    // check if we need to create a database connection, or use the global database connection
   if (THREAD_SETTINGS == 0)
   {
@@ -2410,8 +2456,7 @@ int update_all_documents_from_collection(const char* DATABASE, const char* COLLE
   if (!update)
   {
     pointer_reset(data2);
-    bson_destroy(update);
-    mongoc_collection_destroy(collection);
+    database_reset_all;
     return 0;
   }
  
@@ -2424,31 +2469,22 @@ int update_all_documents_from_collection(const char* DATABASE, const char* COLLE
   if (!update_settings)
   {
     pointer_reset(data2);
-    bson_destroy(update);
-    bson_destroy(update_settings);
-    mongoc_collection_destroy(collection);
+    database_reset_all;
     return 0;
   }
   
   if (!mongoc_collection_update_many(collection, update, update_settings, NULL, NULL, &error))
   {
     pointer_reset(data2);
-    bson_destroy(update);
-    bson_destroy(update_settings);
-    mongoc_collection_destroy(collection);
+    database_reset_all;
     return 0;
   }
 
-  if (THREAD_SETTINGS == 1)
-  {
-    mongoc_client_pool_push(database_client_thread_pool, database_client_thread);
-  }
-
   pointer_reset(data2);
-  bson_destroy(update);
-  bson_destroy(update_settings);
-  mongoc_collection_destroy(collection);
+  database_reset_all;
   return 1;
+
+  #undef database_reset_all
 }
 
 
@@ -2474,6 +2510,15 @@ int delete_document_from_collection(const char* DATABASE, const char* COLLECTION
   bson_error_t error;
   bson_t* document;
 
+  // define macros
+  #define database_reset_all \
+  bson_destroy(document); \
+  mongoc_collection_destroy(collection); \
+  if (THREAD_SETTINGS == 1) \
+  { \
+    mongoc_client_pool_push(database_client_thread_pool, database_client_thread); \
+  }
+
    // check if we need to create a database connection, or use the global database connection
   if (THREAD_SETTINGS == 0)
   {
@@ -2494,26 +2539,19 @@ int delete_document_from_collection(const char* DATABASE, const char* COLLECTION
   document = bson_new_from_json((const uint8_t *)DATA, -1, &error);
   if (!document)
   {
-    bson_destroy(document);
-    mongoc_collection_destroy(collection);
+    database_reset_all;
     return 0;
   }
   
   if (!mongoc_collection_delete_one(collection, document, NULL, NULL, &error))
   {
-    bson_destroy(document);
-    mongoc_collection_destroy(collection);
+    database_reset_all;
     return 0;
   }
-
-  if (THREAD_SETTINGS == 1)
-  {
-    mongoc_client_pool_push(database_client_thread_pool, database_client_thread);
-  }
-
-  bson_destroy(document);
-  mongoc_collection_destroy(collection);
+  database_reset_all;
   return 1;
+
+  #undef database_reset_all
 }
 
 
@@ -2537,6 +2575,14 @@ int delete_collection_from_database(const char* DATABASE, const char* COLLECTION
   mongoc_collection_t* collection;
   bson_error_t error;
 
+  // define macros
+  #define database_reset_all \
+  mongoc_collection_destroy(collection); \
+  if (THREAD_SETTINGS == 1) \
+  { \
+    mongoc_client_pool_push(database_client_thread_pool, database_client_thread); \
+  }
+
    // check if we need to create a database connection, or use the global database connection
   if (THREAD_SETTINGS == 0)
   {
@@ -2556,17 +2602,13 @@ int delete_collection_from_database(const char* DATABASE, const char* COLLECTION
    
   if (!mongoc_collection_drop(collection, &error))
   {    
-    mongoc_collection_destroy(collection);
+    database_reset_all;
     return 0;
   }
-
-  if (THREAD_SETTINGS == 1)
-  {
-    mongoc_client_pool_push(database_client_thread_pool, database_client_thread);
-  }
-
-  mongoc_collection_destroy(collection);
+  database_reset_all;
   return 1;
+
+  #undef database_reset_all
 }
 
 
@@ -2592,6 +2634,15 @@ int count_documents_in_collection(const char* DATABASE, const char* COLLECTION, 
   bson_error_t error;
   bson_t* document;
 
+  // define macros
+  #define database_reset_all \
+  bson_destroy(document); \
+  mongoc_collection_destroy(collection); \
+  if (THREAD_SETTINGS == 1) \
+  { \
+    mongoc_client_pool_push(database_client_thread_pool, database_client_thread); \
+  }
+
    // check if we need to create a database connection, or use the global database connection
   if (THREAD_SETTINGS == 0)
   {
@@ -2612,27 +2663,20 @@ int count_documents_in_collection(const char* DATABASE, const char* COLLECTION, 
   document = bson_new_from_json((const uint8_t *)DATA, -1, &error);
   if (!document)
   {
-    bson_destroy(document);
-    mongoc_collection_destroy(collection);
+    database_reset_all;
     return -1;
   }
   
   const int count = mongoc_collection_count_documents(collection, document, NULL, NULL, NULL, &error);
   if (count < 0)
   {
-    bson_destroy(document);
-    mongoc_collection_destroy(collection);
+    database_reset_all;
     return -1;
   }
-
-  if (THREAD_SETTINGS == 1)
-  {
-    mongoc_client_pool_push(database_client_thread_pool, database_client_thread);
-  }
-
-  bson_destroy(document);
-  mongoc_collection_destroy(collection);
+  database_reset_all;
   return count;
+
+  #undef database_reset_all
 }
 
 
@@ -2657,6 +2701,15 @@ int count_all_documents_in_collection(const char* DATABASE, const char* COLLECTI
   bson_error_t error;
   bson_t* document;
 
+  // define macros
+  #define database_reset_all \
+  bson_destroy(document); \
+  mongoc_collection_destroy(collection); \
+  if (THREAD_SETTINGS == 1) \
+  { \
+    mongoc_client_pool_push(database_client_thread_pool, database_client_thread); \
+  }
+
    // check if we need to create a database connection, or use the global database connection
   if (THREAD_SETTINGS == 0)
   {
@@ -2677,27 +2730,20 @@ int count_all_documents_in_collection(const char* DATABASE, const char* COLLECTI
   document = bson_new();
   if (!document)
   {
-    bson_destroy(document);
-    mongoc_collection_destroy(collection);
+    database_reset_all;
     return -1;
   }
   
   const int count = mongoc_collection_count_documents(collection, document, NULL, NULL, NULL, &error);
   if (count < 0)
   {
-    bson_destroy(document);
-    mongoc_collection_destroy(collection);
+    database_reset_all;
     return -1;
   }
-
-  if (THREAD_SETTINGS == 1)
-  {
-    mongoc_client_pool_push(database_client_thread_pool, database_client_thread);
-  }
-
-  bson_destroy(document);
-  mongoc_collection_destroy(collection);
+  database_reset_all;
   return count;
+
+  #undef database_reset_all
 }
 
 
