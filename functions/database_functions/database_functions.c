@@ -1110,3 +1110,155 @@ int count_all_documents_in_collection(const char* DATABASE, const char* COLLECTI
   #undef database_reset_all
 }
 
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
+Name: update_delegates_online_status
+Description: Updates all of the delegates online status
+Return: 0 if an error has occured, 1 if successfull
+-----------------------------------------------------------------------------------------------------------
+*/
+
+int update_delegates_online_status(const int THREAD_SETTINGS)
+{
+  // Constants
+  const bson_t* current_document;
+
+  // Variables
+  mongoc_client_t* database_client_thread;
+  mongoc_collection_t* collection;
+  mongoc_cursor_t* document_settings;
+  bson_t* document = NULL;  
+  bson_error_t error;
+  bson_t* update = NULL;
+  bson_t* update_settings = NULL;
+  char* message;
+  char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* data2 = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* public_address = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* IP_address = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* message_copy1;
+  char* message_copy2;
+  int count = 0;
+
+  // define macros
+  #define COLLECTION "delegates" 
+
+  #define pointer_reset_all \
+  free(data); \
+  data = NULL; \
+  free(data2); \
+  data2 = NULL; \
+  free(public_address); \
+  public_address = NULL; \
+  free(IP_address); \
+  IP_address = NULL; 
+
+  #define database_reset_all \
+  bson_destroy(document); \
+  bson_destroy(update); \
+  bson_destroy(update_settings); \
+  mongoc_cursor_destroy(document_settings); \
+  mongoc_collection_destroy(collection); \
+  if (THREAD_SETTINGS == 1) \
+  { \
+    mongoc_client_pool_push(database_client_thread_pool, database_client_thread); \
+  }
+
+   // check if we need to create a database connection, or use the global database connection
+  if (THREAD_SETTINGS == 0)
+  {
+    // set the collection
+    collection = mongoc_client_get_collection(database_client, DATABASE_NAME, COLLECTION);
+  }
+  else
+  {
+    database_client_thread = mongoc_client_pool_pop(database_client_thread_pool);
+    if (!database_client_thread)
+    {
+      pointer_reset_all;
+      return 0;
+    }
+    // set the collection
+    collection = mongoc_client_get_collection(database_client_thread, DATABASE_NAME, COLLECTION);
+  }
+  
+  document = bson_new();
+  if (!document)
+  {
+    pointer_reset_all;
+    database_reset_all;
+    return 0;
+  }
+ 
+  document_settings = mongoc_collection_find_with_opts(collection, document, NULL, NULL);
+  while (mongoc_cursor_next(document_settings, &current_document))
+  { 
+    // get the current document
+    memset(data,0,strnlen(data,BUFFER_SIZE));
+    memset(data2,0,strnlen(data2,BUFFER_SIZE));
+    message = bson_as_canonical_extended_json(current_document, NULL);
+    memcpy(data,message,strnlen(message,BUFFER_SIZE));
+    bson_free(message);
+
+    // get the public_address and IP_address
+    memcpy(data2,data,strnlen(data,BUFFER_SIZE));
+    message_copy1 = strstr(data,", \"public_address\" : \"") + 22;
+    message_copy2 = strstr(message_copy1,"\"");
+    memcpy(public_address,message_copy1,message_copy2 - message_copy1);
+    message_copy1 = strstr(data2,", \"IP_address\" : \"") + 18;
+    message_copy2 = strstr(message_copy1,"\"");
+    memcpy(IP_address,message_copy1,message_copy2 - message_copy1);
+
+    // create the data to use to search the collection for
+    memset(data,0,strnlen(data,BUFFER_SIZE));
+    memcpy(data,"{\"public_address\": \"",20);
+    memcpy(data+20,public_address,strnlen(public_address,BUFFER_SIZE));
+    memcpy(data+20+strnlen(public_address,BUFFER_SIZE),"\"}",2);
+
+    update = bson_new_from_json((const uint8_t *)data, -1, &error);
+    if (!update)
+    {
+      pointer_reset_all;
+      database_reset_all;
+      return 0;
+    }
+
+    // get the online status of the delegate
+    memset(data2,0,strnlen(data2,BUFFER_SIZE));
+    if (get_delegate_online_status(IP_address) == 1)
+    {
+      memcpy(data2,"{\"$set\":{\"online_status\": \"true\"}}",34);
+    }
+    else
+    {
+      memcpy(data2,"{\"$set\":{\"online_status\": \"false\"}}",35);
+    }
+
+    update_settings = bson_new_from_json((const uint8_t *)data2, -1, &error);
+    if (!update_settings)
+    {
+      pointer_reset_all;
+      database_reset_all;
+      return 0;
+    }
+
+    // update the document  
+    if (!mongoc_collection_update_one(collection, update, update_settings, NULL, NULL, &error))
+    {
+      pointer_reset_all;
+      database_reset_all;
+      return 0;
+    }
+  }
+
+  pointer_reset_all;
+  database_reset_all;
+  return 1;
+
+  #undef COLLECTION
+  #undef pointer_reset_all
+  #undef database_reset_all
+}
+
