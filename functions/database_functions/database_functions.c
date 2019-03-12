@@ -9,6 +9,7 @@
 #include "variables.h"
 
 #include "database_functions.h"
+#include "network_functions.h"
 #include "string_functions.h"
 
 /*

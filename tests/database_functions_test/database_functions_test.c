@@ -14,6 +14,7 @@
 #include "define_macros_test.h"
 #include "variables_test.h"
 #include "database_functions_test.h"
+#include "network_functions.h"
 
 /*
 -----------------------------------------------------------------------------------------------------------

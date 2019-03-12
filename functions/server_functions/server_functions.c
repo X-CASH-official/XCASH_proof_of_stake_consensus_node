@@ -189,8 +189,10 @@ int create_server(const int MESSAGE_SETTINGS)
   int len;
   int receive_data_result; 
   struct sockaddr_in addr, cl_addr;  
+  struct sockaddr_in serv_addr;
 
   // define macros
+  #define SOCKET_FILE_DESCRIPTORS_LENGTH 1
   #define pointer_reset_all \
   free(string); \
   string = NULL;
@@ -206,7 +208,7 @@ int create_server(const int MESSAGE_SETTINGS)
   SOCK_STREAM = TCP protocol
   */
   const int SOCKET = socket(AF_INET, SOCK_STREAM, 0);
-  if (SOCKET < 0)
+  if (SOCKET == -1)
   {
     if (MESSAGE_SETTINGS == 1)
     {
@@ -221,7 +223,7 @@ int create_server(const int MESSAGE_SETTINGS)
   SO_REUSEADDR = allows for reuse of the same address, so one can shutdown and restart the program without errros
   SO_REUSEPORT = allows for reuse of the same port, so one can shutdown and restart the program without errros
   */
-  if (setsockopt(SOCKET, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &SOCKET_OPTION,sizeof(int)) < 0)
+  if (setsockopt(SOCKET, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &SOCKET_OPTION,sizeof(int)) != 0)
   {
     if (MESSAGE_SETTINGS == 1)
     {
@@ -250,7 +252,7 @@ int create_server(const int MESSAGE_SETTINGS)
   addr.sin_port = htons(SEND_DATA_PORT);
  
   // connect to 0.0.0.0
-  if (bind(SOCKET, (struct sockaddr *) &addr, sizeof(addr)) < 0)
+  if (bind(SOCKET, (struct sockaddr *) &addr, sizeof(addr)) != 0)
   {
    if (MESSAGE_SETTINGS == 1)
    {
@@ -272,17 +274,36 @@ int create_server(const int MESSAGE_SETTINGS)
 
     printf("Waiting for a connection...\n");
   }
+
   // set the maximum simultaneous connections
-  listen(SOCKET, MAXIMUM_CONNECTIONS);
+  if (listen(SOCKET, MAXIMUM_CONNECTIONS) != 0)
+  {
+    if (MESSAGE_SETTINGS == 1)
+    {
+      color_print("Error creating the server","red"); 
+    }
+    close(SOCKET);
+    pointer_reset_all;
+    return 0;
+  }
+
   for (;;)
   {
     len = sizeof(cl_addr);
     const int CLIENT_SOCKET = accept(SOCKET, (struct sockaddr *) &cl_addr, (socklen_t*)&len);
     inet_ntop(AF_INET, &(cl_addr.sin_addr), client_address, BUFFER_SIZE);
+    if (client_address == NULL)
+    {
+      if (MESSAGE_SETTINGS == 1)
+      {
+        color_print("Error accepting connection","red"); 
+      }
+      continue;
+    }
     const size_t CLIENT_ADDRESS_LENGTH = strnlen(client_address,BUFFER_SIZE);
     const size_t BUFFER2_LENGTH = strnlen(buffer2,BUFFER_SIZE);
   
-    if (CLIENT_SOCKET < 0)
+    if (CLIENT_SOCKET == -1)
     {
       if (MESSAGE_SETTINGS == 1)
       {
