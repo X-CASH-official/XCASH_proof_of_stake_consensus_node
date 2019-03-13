@@ -313,6 +313,20 @@ int read_document_field_from_collection(const char* DATABASE, const char* COLLEC
     mongoc_client_pool_push(database_client_thread_pool, database_client_thread); \
   }
 
+  // check if the memory needed was allocated on the heap successfully
+  if (data2 == NULL || settings == NULL)
+  {
+    if (data2 != NULL)
+    {
+      pointer_reset(data2);
+    }
+    if (settings != NULL)
+    {
+      pointer_reset(settings);
+    }
+    return 0;
+  } 
+
   // check if we need to create a database connection, or use the global database connection
   if (THREAD_SETTINGS == 0)
   {
@@ -516,6 +530,12 @@ int read_document_all_fields_from_collection(const char* DATABASE, const char* C
     mongoc_client_pool_push(database_client_thread_pool, database_client_thread); \
   }
 
+  // check if the memory needed was allocated on the heap successfully
+  if (data == NULL)
+  {
+    return 0;
+  } 
+
    // check if we need to create a database connection, or use the global database connection
   if (THREAD_SETTINGS == 0)
   {
@@ -611,6 +631,12 @@ int read_multiple_documents_all_fields_from_collection(const char* DATABASE, con
   { \
     mongoc_client_pool_push(database_client_thread_pool, database_client_thread); \
   }
+
+  // check if the memory needed was allocated on the heap successfully
+  if (data == NULL)
+  {
+    return 0;
+  } 
 
    // check if we need to create a database connection, or use the global database connection
   if (THREAD_SETTINGS == 0)
@@ -710,6 +736,12 @@ int update_document_from_collection(const char* DATABASE, const char* COLLECTION
     mongoc_client_pool_push(database_client_thread_pool, database_client_thread); \
   }
 
+  // check if the memory needed was allocated on the heap successfully
+  if (data2 == NULL)
+  {
+    return 0;
+  } 
+
    // check if we need to create a database connection, or use the global database connection
   if (THREAD_SETTINGS == 0)
   {
@@ -797,6 +829,12 @@ int update_all_documents_from_collection(const char* DATABASE, const char* COLLE
   { \
     mongoc_client_pool_push(database_client_thread_pool, database_client_thread); \
   }
+
+  // check if the memory needed was allocated on the heap successfully
+  if (data2 == NULL)
+  {
+    return 0;
+  } 
 
    // check if we need to create a database connection, or use the global database connection
   if (THREAD_SETTINGS == 0)
@@ -1166,6 +1204,28 @@ int update_delegates_online_status(const int THREAD_SETTINGS)
   { \
     mongoc_client_pool_push(database_client_thread_pool, database_client_thread); \
   }
+
+  // check if the memory needed was allocated on the heap successfully
+  if (data == NULL || data2 == NULL || public_address == NULL || IP_address == NULL)
+  {
+    if (data != NULL)
+    {
+      pointer_reset(data);
+    }
+    if (data2 != NULL)
+    {
+      pointer_reset(data2);
+    }
+    if (public_address != NULL)
+    {
+      pointer_reset(public_address);
+    }
+    if (IP_address != NULL)
+    {
+      pointer_reset(IP_address);
+    }
+    return 0;
+  } 
 
    // check if we need to create a database connection, or use the global database connection
   if (THREAD_SETTINGS == 0)

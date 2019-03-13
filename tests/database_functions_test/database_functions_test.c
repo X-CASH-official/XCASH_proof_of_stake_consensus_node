@@ -49,6 +49,19 @@ int database_test()
   char** data = (char**)calloc(DATA_COUNT * sizeof(char*),sizeof(char*));
   char** settings = (char**)calloc(DATA_COUNT * sizeof(char*),sizeof(char*));
 
+  if (data == NULL || settings == NULL)
+  {
+    if (data != NULL)
+    {
+      pointer_reset(data);
+    }
+    if (settings != NULL)
+    {
+      pointer_reset(settings);
+    }
+    return 0;
+  }
+
   // reset the variables
   memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   count_test = 0;

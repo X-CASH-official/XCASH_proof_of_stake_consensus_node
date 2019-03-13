@@ -77,6 +77,11 @@ int server_receive_data_socket_consensus_node_to_node(const int CLIENT_SOCKET, p
   // Variables
   char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
 
+  if (data == NULL)
+  {
+    return 0;
+  }
+
   // verify the data
   if (verify_data(message,1,0,0) == 0)
   {
@@ -201,7 +206,12 @@ int create_server(const int MESSAGE_SETTINGS)
   pthread_t thread_id;
 
   // set the main process to ignore if forked processes return a value or not, since the timeout for the total connection time is run on a different thread
-  signal(SIGCHLD, SIG_IGN);  
+  signal(SIGCHLD, SIG_IGN); 
+
+  if (string == NULL)
+  {
+    return 0;
+  } 
     
   /* Create the socket  
   AF_INET = IPV4 support

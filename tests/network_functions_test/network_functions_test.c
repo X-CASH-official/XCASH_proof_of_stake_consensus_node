@@ -45,6 +45,11 @@ int send_wallet_http_request_test()
   // define macros
   #define SEND_WALLET_HTTP_REQUEST_TOTAL_TEST 6
   #define MESSAGE "{\r\n \"message_settings\": \"XCASH_PROOF_OF_STAKE_TEST_DATA\",\r\n}"
+
+  if (data == NULL)
+  {
+    return 0;
+  }
   
   // reset the variables
   memset(result_test,0,strnlen(result_test,BUFFER_SIZE));

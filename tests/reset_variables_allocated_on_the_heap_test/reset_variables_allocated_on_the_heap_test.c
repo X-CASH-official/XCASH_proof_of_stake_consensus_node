@@ -49,6 +49,11 @@ size_t get_program_memory_usage(char* process_id_file)
   char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
   size_t programs_memory_usage = 0;
 
+  if (data == NULL)
+  {
+    return 0;
+  }
+
   // read the current system memory usage
   file = fopen(process_id_file,"r");
   if (file != NULL)
@@ -113,6 +118,23 @@ int reset_variables_allocated_on_the_heap_test()
   #define MESSAGE_SETTINGS "{\"message_settings\": \"XCASH_PROOF_OF_STAKE_DATA\"}"
   #define DATABASE_COLLECTION_STATISTICS_DATA "{\"username\":\"XCASH\",\"most_total_rounds_delegate_name\":\"DELEGATE_NAME\",\"most_total_rounds\":\"5\",\"best_block_verifier_online_percentage_delegate_name\":\"DELEGATE_NAME\",\"best_block_verifier_online_percentage\":\"10\",\"most_block_producer_total_rounds_delegate_name\":\"DELEGATE_NAME\",\"most_block_producer_total_rounds\":\"15\",\"most_VRF_node_public_and_private_key_total_rounds_delegate_name\":\"DELEGATE_NAME\",\"most_VRF_node_public_and_private_key_total_rounds\":\"5\",\"most_VRF_node_random_data_total_rounds_delegate_name\":\"DELEGATE_NAME\",\"most_VRF_node_random_data_total_rounds\":\"10\",\"total_XCASH_proof_of_stake_rounds\":\"15\",\"total_coins_in_proof_of_stake\":\"5\",\"total_circulating_supply_percentage_in_proof_of_stake\":\"10\"}"
   
+  if (process_id_file == NULL || data == NULL || settings == NULL)
+  {
+    if (process_id_file != NULL)
+    {
+      pointer_reset(process_id_file);
+    }
+    if (data != NULL)
+    {
+      pointer_reset(data);
+    }
+    if (settings != NULL)
+    {
+      pointer_reset(settings);
+    }
+    return 0;
+  }
+
   // reset the variables
   memset(&string1_test,0,sizeof(string1_test)); 
   memset(string2_test,0,strnlen(string2_test,BUFFER_SIZE)); 

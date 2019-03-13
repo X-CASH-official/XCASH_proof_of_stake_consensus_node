@@ -38,6 +38,11 @@ int parse_json_data(const char* DATA, const char* FIELD_NAME, char *result)
   int settings = 1;
   size_t start; 
 
+  if (str == NULL)
+  {
+    return 0;
+  }
+
   // check if the field is in the data
   if (strstr(DATA,FIELD_NAME) != NULL)
   { 
@@ -229,6 +234,11 @@ size_t string_count(const char* DATA, const char* STRING)
   char* datacopy2 = datacopy1; 
   size_t count = 0;
 
+  if (datacopy1 == NULL)
+  {
+    return 0;
+  }
+
   // get the occurences of the string 
   memcpy(datacopy1,DATA,strnlen(DATA,BUFFER_SIZE));
   while((datacopy1 = strstr(datacopy1, STRING)) != NULL)
@@ -271,6 +281,11 @@ int string_replace(char *data, const char* STR1, const char* STR2)
 
     // define macros
     #define REPLACE_STRING "|REPLACE_STRING|"  
+
+    if (datacopy == NULL)
+    {
+      return 0;
+    }
 
     // get the occurences of STR1   
     total = string_count(data,(char*)STR1);
@@ -354,6 +369,11 @@ int random_string(char *result, const size_t LENGTH)
   #define STRING "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789" 
   #define MINIMUM 0
   #define MAXIMUM 61
+
+  if (data == NULL)
+  {
+    return 0;
+  }
   
   memcpy(data,STRING,62);
   for (count = 0; count < LENGTH; count++)
