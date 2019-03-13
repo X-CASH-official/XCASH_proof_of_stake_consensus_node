@@ -105,6 +105,11 @@ struct count_all_documents_in_collection_thread_parameters {
     const char* COLLECTION; // The collection name
 };
 
+struct update_delegates_online_status_thread_parameters {
+    const char* DATABASE; // The database name
+    const char* COLLECTION; // The collection name
+};
+
 
 
  // Server thread functions

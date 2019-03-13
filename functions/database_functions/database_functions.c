@@ -1155,11 +1155,15 @@ int count_all_documents_in_collection(const char* DATABASE, const char* COLLECTI
 -----------------------------------------------------------------------------------------------------------
 Name: update_delegates_online_status
 Description: Updates all of the delegates online status
+Parameters:
+  DATABASE - The database name
+  COLLECTION - The collection name
+  THREAD_SETTINGS - 1 to use a separate thread, otherwise 0
 Return: 0 if an error has occured, 1 if successfull
 -----------------------------------------------------------------------------------------------------------
 */
 
-int update_delegates_online_status(const int THREAD_SETTINGS)
+int update_delegates_online_status(const char* DATABASE, const char* COLLECTION, const int THREAD_SETTINGS)
 {
   // Constants
   const bson_t* current_document;
@@ -1182,8 +1186,6 @@ int update_delegates_online_status(const int THREAD_SETTINGS)
   int count = 0;
 
   // define macros
-  #define COLLECTION "delegates" 
-
   #define pointer_reset_all \
   free(data); \
   data = NULL; \
@@ -1231,7 +1233,7 @@ int update_delegates_online_status(const int THREAD_SETTINGS)
   if (THREAD_SETTINGS == 0)
   {
     // set the collection
-    collection = mongoc_client_get_collection(database_client, DATABASE_NAME, COLLECTION);
+    collection = mongoc_client_get_collection(database_client, DATABASE, COLLECTION);
   }
   else
   {
@@ -1242,7 +1244,7 @@ int update_delegates_online_status(const int THREAD_SETTINGS)
       return 0;
     }
     // set the collection
-    collection = mongoc_client_get_collection(database_client_thread, DATABASE_NAME, COLLECTION);
+    collection = mongoc_client_get_collection(database_client_thread, DATABASE, COLLECTION);
   }
   
   document = bson_new();
@@ -1263,62 +1265,64 @@ int update_delegates_online_status(const int THREAD_SETTINGS)
     memcpy(data,message,strnlen(message,BUFFER_SIZE));
     bson_free(message);
 
-    // get the public_address and IP_address
-    memcpy(data2,data,strnlen(data,BUFFER_SIZE));
-    message_copy1 = strstr(data,", \"public_address\" : \"") + 22;
-    message_copy2 = strstr(message_copy1,"\"");
-    memcpy(public_address,message_copy1,message_copy2 - message_copy1);
-    message_copy1 = strstr(data2,", \"IP_address\" : \"") + 18;
-    message_copy2 = strstr(message_copy1,"\"");
-    memcpy(IP_address,message_copy1,message_copy2 - message_copy1);
-
-    // create the data to use to search the collection for
-    memset(data,0,strnlen(data,BUFFER_SIZE));
-    memcpy(data,"{\"public_address\": \"",20);
-    memcpy(data+20,public_address,strnlen(public_address,BUFFER_SIZE));
-    memcpy(data+20+strnlen(public_address,BUFFER_SIZE),"\"}",2);
-
-    update = bson_new_from_json((const uint8_t *)data, -1, &error);
-    if (!update)
+    if (strstr(data,"public_address") != NULL && strstr(data,"IP_address") != NULL && strstr(data,"online_status") != NULL)
     {
-      pointer_reset_all;
-      database_reset_all;
-      return 0;
-    }
+      // get the public_address and IP_address
+      memcpy(data2,data,strnlen(data,BUFFER_SIZE));
+      message_copy1 = strstr(data,", \"public_address\" : \"") + 22;
+      message_copy2 = strstr(message_copy1,"\"");
+      memcpy(public_address,message_copy1,message_copy2 - message_copy1);
+      message_copy1 = strstr(data2,", \"IP_address\" : \"") + 18;
+      message_copy2 = strstr(message_copy1,"\"");
+      memcpy(IP_address,message_copy1,message_copy2 - message_copy1);
 
-    // get the online status of the delegate
-    memset(data2,0,strnlen(data2,BUFFER_SIZE));
-    if (get_delegate_online_status(IP_address) == 1)
-    {
-      memcpy(data2,"{\"$set\":{\"online_status\": \"true\"}}",34);
-    }
-    else
-    {
-      memcpy(data2,"{\"$set\":{\"online_status\": \"false\"}}",35);
-    }
+      // create the data to use to search the collection for
+      memset(data,0,strnlen(data,BUFFER_SIZE));
+      memcpy(data,"{\"public_address\": \"",20);
+      memcpy(data+20,public_address,strnlen(public_address,BUFFER_SIZE));
+      memcpy(data+20+strnlen(public_address,BUFFER_SIZE),"\"}",2);
 
-    update_settings = bson_new_from_json((const uint8_t *)data2, -1, &error);
-    if (!update_settings)
-    {
-      pointer_reset_all;
-      database_reset_all;
-      return 0;
-    }
+      update = bson_new_from_json((const uint8_t *)data, -1, &error);
+      if (!update)
+      {
+        pointer_reset_all;
+        database_reset_all;
+        return 0;
+      }
 
-    // update the document  
-    if (!mongoc_collection_update_one(collection, update, update_settings, NULL, NULL, &error))
-    {
-      pointer_reset_all;
-      database_reset_all;
-      return 0;
-    }
+      // get the online status of the delegate
+      memset(data2,0,strnlen(data2,BUFFER_SIZE));
+      if (get_delegate_online_status(IP_address) == 1)
+      {
+        memcpy(data2,"{\"$set\":{\"online_status\": \"true\"}}",34);
+      }
+      else
+      {
+        memcpy(data2,"{\"$set\":{\"online_status\": \"false\"}}",35);
+      }
+
+      update_settings = bson_new_from_json((const uint8_t *)data2, -1, &error);
+      if (!update_settings)
+      {
+        pointer_reset_all;
+        database_reset_all;
+        return 0;
+      }
+
+      // update the document  
+      if (!mongoc_collection_update_one(collection, update, update_settings, NULL, NULL, &error))
+      {
+        pointer_reset_all;
+        database_reset_all;
+        return 0;
+      }
+    }    
   }
 
   pointer_reset_all;
   database_reset_all;
   return 1;
 
-  #undef COLLECTION
   #undef pointer_reset_all
   #undef database_reset_all
 }

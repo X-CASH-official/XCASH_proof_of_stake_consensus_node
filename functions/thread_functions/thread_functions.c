@@ -332,6 +332,23 @@ void* count_all_documents_in_collection_thread(void* parameters)
 
 /*
 -----------------------------------------------------------------------------------------------------------
+Name: update_delegates_online_status_thread
+Description: Updates all of the delegates online status on a separate thread
+Return: 0 if an error has occured, 1 if successfull
+-----------------------------------------------------------------------------------------------------------
+*/
+
+void* update_delegates_online_status_thread(void* parameters)
+{
+  struct update_delegates_online_status_thread_parameters* data = parameters;
+  int settings = update_delegates_online_status(data->DATABASE, data->COLLECTION, 1);
+  pthread_exit((void *)(intptr_t)settings);
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
 Name: thread_settings
 Description: Waits for a thread to return a value, and returns the value from the thread
 Parameters:
