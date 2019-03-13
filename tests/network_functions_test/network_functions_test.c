@@ -210,7 +210,7 @@ int send_and_receive_data_socket_test()
   pthread_t thread_id;
 
   // define macros
-  #define SEND_AND_RECEIVE_DATA_SOCKET_TOTAL_TEST 2
+  #define SEND_AND_RECEIVE_DATA_SOCKET_TOTAL_TEST 3
   #define MESSAGE "{\r\n \"message_settings\": \"XCASH_PROOF_OF_STAKE_TEST_DATA\",\r\n}"
 
   // reset the variables
@@ -240,6 +240,7 @@ int send_and_receive_data_socket_test()
   if (pthread_create(&thread_id, NULL, &create_server_on_separate_thread,NULL) != 0)
   {
     color_print("FAILED! Test for creating the server","red");
+    color_print("FAILED! Test for get delegate online status","red");
     color_print("FAILED! Test for sending and receving data using sockets","red");
     settings = 0;
   }
@@ -248,6 +249,7 @@ int send_and_receive_data_socket_test()
     if (pthread_detach(thread_id) != 0)
     {      
       color_print("FAILED! Test for creating the server","red");
+      color_print("FAILED! Test for get delegate online status","red");
       color_print("FAILED! Test for sending and receving data using sockets","red");
       settings = 0;
     }  
@@ -255,6 +257,20 @@ int send_and_receive_data_socket_test()
   sleep(1);
 
 
+
+  color_print("PASSED! Test for creating the server","green");
+  count_test++; 
+
+  // test for get delegate online status
+  if (get_delegate_online_status("127.0.0.1") == 1)
+  {
+    color_print("PASSED! Test for get delegate online status","green");
+    count_test++;
+  }
+  else
+  {
+    color_print("FAILED! Test for get delegate online status","red");
+  }
 
   // test for sending and receiving data using sockets
   // create the message
@@ -266,7 +282,6 @@ int send_and_receive_data_socket_test()
   {
     if (sign_data(message,0) == 0)
     { 
-      color_print("FAILED! Test for creating the server","red");
       color_print("FAILED! Test for sending and receving data using sockets","red");
     }
   }
@@ -275,7 +290,6 @@ int send_and_receive_data_socket_test()
   {
     if (send_and_receive_data_socket(string,"127.0.0.1",SEND_DATA_PORT,message,TOTAL_CONNECTION_TIME_SETTINGS,"XCASH_PROOF_OF_STAKE_TEST_DATA",0) <= 0)
     {
-      color_print("FAILED! Test for creating the server","red");
       color_print("FAILED! Test for sending and receving data using sockets","red");
       settings = 0;
     }
@@ -287,8 +301,7 @@ int send_and_receive_data_socket_test()
   if (settings == 1)
   {
     if (verify_data(string,0,1,1) == 0)
-    {   
-      color_print("FAILED! Test for creating the server","red");
+    {  
       color_print("FAILED! Test for sending and receving data using sockets","red");
       settings = 0;
     }
@@ -299,7 +312,6 @@ int send_and_receive_data_socket_test()
   {
     if (parse_json_data(string,"message_settings",data_test) == 0)
     {
-      color_print("FAILED! Test for creating the server","red");
       color_print("FAILED! Test for sending and receving data using sockets","red");
       settings = 0;
     }
@@ -310,13 +322,11 @@ int send_and_receive_data_socket_test()
   {
     if (strncmp(data_test,"XCASH_PROOF_OF_STAKE_TEST_DATA",BUFFER_SIZE) == 0)
     {
-      color_print("PASSED! Test for creating the server","green");
       color_print("PASSED! Test for sending and receving data using sockets","green");
-      count_test += 2;
+      count_test++;
     }
     else
     {
-      color_print("FAILED! Test for creating the server","red");
       color_print("FAILED! Test for sending and receving data using sockets","red");
       settings = 0;
     }

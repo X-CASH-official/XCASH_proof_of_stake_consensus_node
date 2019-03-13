@@ -1277,6 +1277,65 @@ int reset_variables_allocated_on_the_heap_test()
 
 
 
+  delete_collection_from_database(DATABASE_NAME,DATABASE_COLLECTION,0);
+  insert_document_into_collection_json(DATABASE_NAME,DATABASE_COLLECTION,DATABASE_COLLECTION_DELEGATES_DATA,0);
+
+  // update_delegates_online_status 
+  // read the current system memory usage
+  if (settings2 == 1)
+  {
+    previous_system_memory_usage = get_program_memory_usage(process_id_file);
+    for (count = 0; count <= 1000; count++)
+    {
+      update_delegates_online_status(DATABASE_NAME,DATABASE_COLLECTION,0);
+      if (count == 0)
+      {    
+        current_memory_usage = get_program_memory_usage(process_id_file) - previous_system_memory_usage;
+      }
+      if (count == 10)
+      {
+        current_system_memory_usage = get_program_memory_usage(process_id_file);
+        if ((current_system_memory_usage - previous_system_memory_usage) > current_memory_usage * 9 && current_memory_usage > 0)
+        {
+          color_print("FAILED! update_delegates_online_status has not reset all variables allocated on the heap","red");
+          settings2 = 0;
+          break;
+        }      
+      }
+      if (count == 100)
+      {
+        current_system_memory_usage = get_program_memory_usage(process_id_file);
+        if ((current_system_memory_usage - previous_system_memory_usage) > current_memory_usage * 50 && current_memory_usage > 0)
+        {
+          color_print("FAILED! update_delegates_online_status has not reset all variables allocated on the heap","red");
+          settings2 = 0;
+          break;
+        }  
+      }
+      if (count == 1000)
+      {
+        current_system_memory_usage = get_program_memory_usage(process_id_file);
+        if ((current_system_memory_usage - previous_system_memory_usage) > current_memory_usage * 100 && current_memory_usage > 0)
+        {
+          color_print("FAILED! update_delegates_online_status has not reset all variables allocated on the heap","red");
+          settings2 = 0;
+          break;
+        }
+        else
+        {
+          color_print("PASSED! update_delegates_online_status has reset all variables allocated on the heap","green");
+          count_test++;
+        }   
+      }  
+    }
+  }
+  else
+  {
+    color_print("All other test will not be run","red");
+  }
+
+
+
   // get_block_template 
   // read the current system memory usage
   if (settings2 == 1)
@@ -1588,6 +1647,60 @@ int reset_variables_allocated_on_the_heap_test()
   pthread_create(&thread_id, NULL, &create_server_on_separate_thread,NULL);
   pthread_detach(thread_id);
   sleep(1);
+
+  // get_delegate_online_status 
+  // read the current system memory usage
+  if (settings2 == 1)
+  {
+    previous_system_memory_usage = get_program_memory_usage(process_id_file);
+    for (count = 0; count <= 1000; count++)
+    {
+      get_delegate_online_status("127.0.0.1");
+      if (count == 0)
+      {    
+        current_memory_usage = get_program_memory_usage(process_id_file) - previous_system_memory_usage;
+      }
+      if (count == 10)
+      {
+        current_system_memory_usage = get_program_memory_usage(process_id_file);
+        if ((current_system_memory_usage - previous_system_memory_usage) > current_memory_usage * 9 && current_memory_usage > 0)
+        {
+          color_print("FAILED! get_delegate_online_status has not reset all variables allocated on the heap","red");
+          settings2 = 0;
+          break;
+        }  
+      } 
+      if (count == 100)
+      {
+        current_system_memory_usage = get_program_memory_usage(process_id_file);
+        if ((current_system_memory_usage - previous_system_memory_usage) > current_memory_usage * 50 && current_memory_usage > 0)
+        {
+          color_print("FAILED! get_delegate_online_status has not reset all variables allocated on the heap","red");
+          settings2 = 0;
+          break;
+        }  
+      } 
+      if (count == 1000)
+      {
+        current_system_memory_usage = get_program_memory_usage(process_id_file);
+        if ((current_system_memory_usage - previous_system_memory_usage) > current_memory_usage * 100 && current_memory_usage > 0)
+        {
+          color_print("FAILED! get_delegate_online_status has not reset all variables allocated on the heap","red");
+          settings2 = 0;
+          break;
+        }  
+        else
+        {
+          color_print("PASSED! get_delegate_online_status has reset all variables allocated on the heap","green");
+          count_test++;
+        }      
+      } 
+    }
+  }
+  else
+  {
+    color_print("All other test will not be run","red");
+  }
 
   // send_and_receive_data_socket 
   // read the current system memory usage

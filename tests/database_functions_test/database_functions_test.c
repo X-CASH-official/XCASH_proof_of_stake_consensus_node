@@ -612,6 +612,34 @@ int database_test()
     }  
   }
 
+  insert_document_into_collection_json(DATABASE_NAME,DATABASE_COLLECTION,DATABASE_COLLECTION_DELEGATES_DATA,0);
+
+  // update delegates online status
+  if (update_delegates_online_status(DATABASE_NAME,DATABASE_COLLECTION,0) == 0)
+  {
+    color_print("FAILED! Test for updating delegates online status","red");
+  }
+  else
+  {
+    color_print("PASSED! Test for updating delegates online status","green");
+    count_test++;
+  }
+
+  // update delegates online status on a separate thread
+  struct update_delegates_online_status_thread_parameters update_delegates_online_status_thread_parameters = {DATABASE_NAME,DATABASE_COLLECTION};
+  pthread_create(&thread_id, NULL, &update_delegates_online_status_thread,(void *)&update_delegates_online_status_thread_parameters);
+  if (thread_settings(thread_id) == 0)
+  {
+    color_print("FAILED! Test for updating delegates online status on a separate thread","red");
+  }
+  else
+  {
+    color_print("PASSED! Test for updating delegates online status on a separate thread","green");
+    count_test++;
+  }
+
+  delete_collection_from_database(DATABASE_NAME,DATABASE_COLLECTION,0);
+
   /*delete_collection_from_database(DATABASE_NAME,"delegates",0);
   delete_collection_from_database(DATABASE_NAME,"statistics",0);
   insert_document_into_collection_json(DATABASE_NAME,"delegates","{\"public_address\":\"XCA\",\"password\":\"XCA\",\"salt\":\"XCA\",\"session\":\"XCA\",\"total_vote_count\":\"XCA\",\"current_vote_count\":\"XCA\",\"delegate_number\":\"XCA\",\"IP_address\":\"XCA\",\"delegate_name\":\"XCA\",\"about\":\"XCA\",\"website\":\"XCA\",\"team\":\"XCA\",\"pool_mode\":\"XCA\",\"fee_structure\":\"XCA\",\"server_settings\":\"XCA\",\"block_producer_eligibility\":\"XCA\",\"online_status\":\"XCA\",\"block_verifier_total_rounds\":\"XCA\",\"block_verifier_online_total_rounds\":\"XCA\",\"block_verifier_online_percentage\":\"XCA\",\"block_producer_total_rounds\":\"XCA\",\"VRF_node_public_and_private_key_total_rounds\":\"XCA\",\"VRF_node_random_data_total_rounds\":\"XCA\",\"block_producer_block_heights\":\"XCA\",\"VRF_node_public_and_private_key_block_heights\":\"XCA\",\"VRF_node_random_data_block_heights\":\"XCA\"}",0);
