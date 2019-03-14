@@ -64,7 +64,8 @@ struct read_document_all_fields_from_collection_thread_parameters {
 
 struct read_multiple_documents_all_fields_from_collection_thread_parameters {
     const char* DATABASE; // The database name
-    const char* COLLECTION; // The collection name
+    const char* COLLECTION; // The collection name,
+    const char* DATA; // The data to search for in each document, set to "" for all items
     struct database_multiple_documents_fields* result; // A pointer to the database_multiple_documents_fields struct
     const size_t DOCUMENT_COUNT_START; // The document to start at when reading the data
     const size_t DOCUMENT_COUNT_TOTAL; // The total amount of documents to read

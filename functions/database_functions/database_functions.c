@@ -588,13 +588,13 @@ int read_document_all_fields_from_collection(const char* DATABASE, const char* C
 
 /*
 -----------------------------------------------------------------------------------------------------------
-Name: read_document_all_fields_from_collection
+Name: read_multiple_documents_all_fields_from_collection
 Description: Reads all fields from a document from the collection
 Parameters:
   DATABASE - The database name
   COLLECTION - The collection name 
   DATA - The json data to use to search the collection for 
-  result - A database_fields struct to hold the data
+  result - A database_multiple_documents_fields struct to hold the data
   struct database_multiple_documents_fields
     document_count - The number of documents
     database_fields_count - The number of items in the database document
@@ -607,7 +607,7 @@ Return: 0 if an error has occured, 1 if successfull
 -----------------------------------------------------------------------------------------------------------
 */
 
-int read_multiple_documents_all_fields_from_collection(const char* DATABASE, const char* COLLECTION, struct database_multiple_documents_fields* result, const size_t DOCUMENT_COUNT_START, const size_t DOCUMENT_COUNT_TOTAL, const int THREAD_SETTINGS)
+int read_multiple_documents_all_fields_from_collection(const char* DATABASE, const char* COLLECTION, const char* DATA, struct database_multiple_documents_fields* result, const size_t DOCUMENT_COUNT_START, const size_t DOCUMENT_COUNT_TOTAL, const int THREAD_SETTINGS)
 {
   // Constants
   const bson_t* current_document;
@@ -636,7 +636,7 @@ int read_multiple_documents_all_fields_from_collection(const char* DATABASE, con
   if (data == NULL)
   {
     return 0;
-  } 
+  }
 
    // check if we need to create a database connection, or use the global database connection
   if (THREAD_SETTINGS == 0)
@@ -672,11 +672,16 @@ int read_multiple_documents_all_fields_from_collection(const char* DATABASE, con
       message = bson_as_canonical_extended_json(current_document, NULL);
       memset(data,0,strnlen(data,BUFFER_SIZE));
       memcpy(data,message,strnlen(message,BUFFER_SIZE));
-      bson_free(message);      
-      // parse the json data
-      database_multiple_documents_parse_json_data(data,result,counter);
-      counter++;
-      result->document_count++;
+      bson_free(message); 
+
+      if ((strncmp(DATA,"",BUFFER_SIZE) == 0) || (strncmp(DATA,"",BUFFER_SIZE) != 0 && strstr(data,DATA) != NULL))
+      {
+        // parse the json data
+        database_multiple_documents_parse_json_data(data,result,counter);
+        counter++;
+        result->document_count++;
+      }
+     
       // check if that is the total amount of documents to read
       if (counter == DOCUMENT_COUNT_TOTAL)
       {
