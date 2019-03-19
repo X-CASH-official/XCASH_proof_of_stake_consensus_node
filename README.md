@@ -53,6 +53,14 @@ After you have built the MongoDB C driver from source, you will need to run
 
 
 
+### Adding MongoDB to your PATH
+You will probably want to add MongoDB to your path so you can run MonogDB by typing `mongod` at any terminal.
+
+To add MongoDB to your PATH (replace "MongoDB_folder" with the location of the bin folder in the folder you installed MongoDB in  
+`echo -e '\nexport PATH=MongoDB_folder:$PATH' >> ~/.profile && source ~/.profile`
+
+
+
 ### Cloning the repository
 
 `$ git clone https://github.com/X-CASH-official/XCASH_proof_of_stake_consensus_node.git`
@@ -74,6 +82,9 @@ Then use the make file to build the binary file
 ## Running MongoDB
 To run MongoDB you will need to navigate to the folder you downloaded the binaries to, and in the bin folder run mongod by running  
 `./mongod`
+
+If you have already added MongoDB to your path, you can just type in any terminal
+`mongod`
 
 
 
