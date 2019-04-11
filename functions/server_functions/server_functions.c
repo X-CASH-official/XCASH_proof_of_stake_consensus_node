@@ -182,9 +182,22 @@ int create_server(const int MESSAGE_SETTINGS)
 
   // define macros
   #define SOCKET_FILE_DESCRIPTORS_LENGTH 1
+
   #define pointer_reset_all \
   free(string); \
   string = NULL;
+
+  #define SERVER_ERROR(settings) \
+  close(SOCKET); \
+  pointer_reset_all; \
+  if (settings == 0) \
+  { \
+    return 0; \
+  } \
+  else \
+  { \
+    _exit(0); \
+  }  
 
   // threads
   pthread_t thread_id;
@@ -223,9 +236,7 @@ int create_server(const int MESSAGE_SETTINGS)
     {
       color_print("Error setting socket options","red"); 
     }
-    close(SOCKET);
-    pointer_reset_all;
-    return 0;
+    SERVER_ERROR(0);
   } 
   if (MESSAGE_SETTINGS == 1)
   {
@@ -255,9 +266,7 @@ int create_server(const int MESSAGE_SETTINGS)
      memcpy(string+25,buffer2,strnlen(buffer2,BUFFER_SIZE));
      color_print(string,"red"); 
    }
-   close(SOCKET);
-   pointer_reset_all;
-   return 0;
+   SERVER_ERROR(0);
   } 
   if (MESSAGE_SETTINGS == 1)
   {
@@ -276,9 +285,7 @@ int create_server(const int MESSAGE_SETTINGS)
     {
       color_print("Error creating the server","red"); 
     }
-    close(SOCKET);
-    pointer_reset_all;
-    return 0;
+    SERVER_ERROR(0);
   }
 
   for (;;)
@@ -336,17 +343,13 @@ int create_server(const int MESSAGE_SETTINGS)
          if (pthread_create(&thread_id, NULL, &total_connection_time_thread, (void *)&parameters) != 0)
          {
            // close the forked process
-           close(CLIENT_SOCKET);
-           pointer_reset_all;
-           _exit(0);
+           SERVER_ERROR(1);
          }
          // set the thread to dettach once completed, since we do not need to use anything.
          if (pthread_detach(thread_id) != 0)
          {
            // close the forked process
-           close(CLIENT_SOCKET);
-           pointer_reset_all;
-           _exit(0);
+           SERVER_ERROR(1);
          }
       
 
@@ -378,9 +381,7 @@ int create_server(const int MESSAGE_SETTINGS)
              color_print(string,"red"); 
            }
            // close the forked process, since the client had an error sending data       
-           close(CLIENT_SOCKET);
-           pointer_reset_all;
-           _exit(0);
+           SERVER_ERROR(1);
          }
          else if (receive_data_result == 2)
          {
@@ -395,18 +396,14 @@ int create_server(const int MESSAGE_SETTINGS)
          {
            if (server_received_data_xcash_proof_of_stake_test_data(CLIENT_SOCKET,buffer) == 0)
            {
-             close(CLIENT_SOCKET);
-             pointer_reset(data);
-             _exit(0);
+             SERVER_ERROR(1);
            }
          }
          else if (strstr(buffer,"\"message_settings\": \"NODE_TO_CONSENSUS_NODE_RECEIVE_UPDATED_NODE_LIST\"") != NULL && strncmp(server_message,"NODE_TO_CONSENSUS_NODE_RECEIVE_UPDATED_NODE_LIST",BUFFER_SIZE) == 0)
          {
            if (server_receive_data_socket_consensus_node_to_node(CLIENT_SOCKET,thread_id,buffer) == 0)
            {
-             close(CLIENT_SOCKET);
-             pointer_reset(data);
-             _exit(0);
+             SERVER_ERROR(1);
            }
          }
          else if (strstr(buffer,"\"message_settings\": \"CONSENSUS_NODE_TO_NODES_MAIN_NODE_PUBLIC_ADDRESS\"") != NULL && strncmp(server_message,"CONSENSUS_NODE_TO_NODES_MAIN_NODE_PUBLIC_ADDRESS",BUFFER_SIZE) == 0)
@@ -418,9 +415,7 @@ int create_server(const int MESSAGE_SETTINGS)
              {
                if (server_receive_data_socket_consensus_node_to_node(CLIENT_SOCKET,thread_id,buffer) == 0)
                {
-                 close(CLIENT_SOCKET);
-                 pointer_reset(data);
-                 _exit(0);
+                 SERVER_ERROR(1);
                }               
              }
            }
@@ -428,9 +423,7 @@ int create_server(const int MESSAGE_SETTINGS)
            {
              if (server_receive_data_socket_consensus_node_to_node(CLIENT_SOCKET,thread_id,buffer) == 0)
              {
-               close(CLIENT_SOCKET);
-               pointer_reset(data);
-               _exit(0);
+               SERVER_ERROR(1);
              }
            }           
          }
@@ -466,4 +459,5 @@ int create_server(const int MESSAGE_SETTINGS)
    }
    return 1;
    #undef pointer_reset_all
+   #undef SERVER_ERROR
 }
