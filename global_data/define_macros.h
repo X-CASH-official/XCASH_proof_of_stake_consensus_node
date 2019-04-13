@@ -18,6 +18,9 @@ Using define statements instead of constants for increased efficiency
 #define NODES_UPDATED_TIME_FILE_NAME "nodes_updated_time.txt" // The last time the node has updated the list of nodes from the consensus node
 #define NODES_PUBLIC_ADDRESS_LIST_FILE_NAME "nodes_public_address_list.txt" // The current enabled nodes public address list
 #define NODES_NAME_LIST_FILE_NAME "nodes_name_list.txt" // The current enabled nodes name list
+#define BLOCK_VERIFIERS_AMOUNT 100 // The amount of block verifiers in a round
+#define BLOCK_VERIFIERS_NAME_TOTAL_LENGTH 100 // The maximum length of the block verifiers name
+#define BLOCK_VERIFIERS_IP_ADDRESS_TOTAL_LENGTH 100 // The maximum length of the block verifiers IP address
 #define DATABASE_CONNECTION "mongodb://localhost:27017" // the database connection string
 #define DATABASE_NAME "XCASH_PROOF_OF_STAKE" // The name of the database
 #define DATABASE_ARRAY_COUNT 100 // The maximum amount of parsed item and value from the database

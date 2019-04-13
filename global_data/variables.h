@@ -1,6 +1,8 @@
 #ifndef VARIABLES_H_   /* Include guard */
 #define VARIABLES_H_
 
+#include "structures.h"
+
 /*
 -----------------------------------------------------------------------------------------------------------
 Global Variables
@@ -12,9 +14,7 @@ mongoc_client_t* database_client;
 mongoc_client_pool_t* database_client_thread_pool;
 
 char* xcash_wallet_public_address; // Holds your wallets public address
-char* nodes_public_address_list; // The list of the enabled nodes public address (100 of them) (node1|node2|)
-char* nodes_name_list; // The list of the enabled nodes public address (100 of them) (node1|node2|)
-char* nodes_public_address_list_received_data; // The list of enabled nodes public address that have sent data, to prevent multiple votes (node1|node2|)
+struct block_verifiers_list block_verifiers_list; // The list of the enabled nodes name, public address and IP address
 char* server_message; // The message the server should run. It will ignore any other messages.
 char* current_consensus_nodes_IP_address; // The current consensus nodes IP address
 char* main_nodes_public_address; // The current main nodes public address
