@@ -15,6 +15,10 @@ struct block_verifiers_list {
     char* block_verifiers_IP_address[BLOCK_VERIFIERS_AMOUNT];
 };
 
+struct block_validation_nodes_list {
+    char* block_validation_nodes_public_address[BLOCK_VALIDATION_NODES_AMOUNT];
+};
+
 // database struct
 struct database_document_fields {
     size_t count;

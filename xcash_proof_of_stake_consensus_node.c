@@ -50,11 +50,11 @@ int main(int parameters_count, char* parameters[])
   // iniltize the random number generator
   srand(time(0));
 
+  // Variables
+  size_t count = 0;
+
   // iniltize the global variables
   xcash_wallet_public_address = (char*)calloc(BUFFER_SIZE,sizeof(char)); 
-  nodes_public_address_list = (char*)calloc(BUFFER_SIZE,sizeof(char));
-  nodes_name_list = (char*)calloc(BUFFER_SIZE,sizeof(char));
-  nodes_public_address_list_received_data = (char*)calloc(BUFFER_SIZE,sizeof(char));
   server_message = (char*)calloc(BUFFER_SIZE,sizeof(char));
   current_consensus_nodes_IP_address = (char*)calloc(BUFFER_SIZE,sizeof(char));
   main_nodes_public_address = (char*)calloc(BUFFER_SIZE,sizeof(char)); 
@@ -62,23 +62,11 @@ int main(int parameters_count, char* parameters[])
   current_round_part_backup_node = (char*)calloc(BUFFER_SIZE,sizeof(char));
 
   // check if the memory needed was allocated on the heap successfully
-  if (xcash_wallet_public_address == NULL || nodes_public_address_list == NULL || nodes_name_list == NULL || nodes_public_address_list_received_data == NULL || server_message == NULL || current_consensus_nodes_IP_address == NULL || main_nodes_public_address == NULL || current_round_part == NULL || current_round_part_backup_node == NULL)
+  if (xcash_wallet_public_address == NULL || server_message == NULL || current_consensus_nodes_IP_address == NULL || main_nodes_public_address == NULL || current_round_part == NULL || current_round_part_backup_node == NULL)
   {
     if (xcash_wallet_public_address != NULL)
     {
       pointer_reset(xcash_wallet_public_address);
-    }
-    if (nodes_public_address_list != NULL)
-    {
-      pointer_reset(nodes_public_address_list);
-    }
-    if (nodes_name_list != NULL)
-    {
-      pointer_reset(nodes_name_list);
-    }
-    if (nodes_public_address_list_received_data != NULL)
-    {
-      pointer_reset(nodes_public_address_list_received_data);
     }
     if (server_message != NULL)
     {
@@ -102,6 +90,20 @@ int main(int parameters_count, char* parameters[])
     }
     return 0;
   } 
+
+  // initialize the block_verifiers_list struct 
+  for (count = 0; count < BLOCK_VERIFIERS_AMOUNT; count++)
+  {
+    block_verifiers_list.block_verifiers_name[count] = (char*)calloc(BLOCK_VERIFIERS_NAME_TOTAL_LENGTH,sizeof(char));
+    block_verifiers_list.block_verifiers_public_address[count] = (char*)calloc(XCASH_WALLET_LENGTH,sizeof(char));
+    block_verifiers_list.block_verifiers_IP_address[count] = (char*)calloc(BLOCK_VERIFIERS_IP_ADDRESS_TOTAL_LENGTH,sizeof(char));
+  }
+
+  // initialize the block_validation_nodes_list struct 
+  for (count = 0; count < BLOCK_VALIDATION_NODES_AMOUNT; count++)
+  {
+    block_validation_nodes_list.block_validation_nodes_public_address[count] = (char*)calloc(XCASH_WALLET_LENGTH,sizeof(char));
+  }
 
   // initialize the database connection
   mongoc_init();
