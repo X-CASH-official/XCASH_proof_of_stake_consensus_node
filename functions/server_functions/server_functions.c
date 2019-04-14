@@ -30,6 +30,46 @@ Functions
 -----------------------------------------------------------------------------------------------------------
 */
 
+int get_current_consensus_node()
+{
+  // Variables
+  char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
+
+  // define macros
+  #define DATABASE_COLLECTION "consensus_node"
+  #define MESSAGE "{\"username\":\"xcash\"}"
+
+  #define GET_CURRENT_CONSENSUS_NODE_ERROR(settings) \
+  color_print(settings,"red"); \
+  pointer_reset(data); \
+  return 0;
+
+
+  // check if the memory needed was allocated on the heap successfully
+  if (data == NULL)
+  {
+    return 0;
+  }
+
+  // read the current_consensus_node_IP_address from the consensus_node collection
+  if (read_document_field_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,"current_consensus_node_IP_address",data,0) == 0)
+  {
+    GET_CURRENT_CONSENSUS_NODE_ERROR("Could not get the current consensus node from the database\nFunction: get_current_consensus_node");
+  }
+
+  // check if the current_consensus_node_IP_address matches the CONSENSUS_NODES_IP_ADDRESS
+  if (strncmp(data,CONSENSUS_NODES_IP_ADDRESS,BUFFER_SIZE) != 0)
+  {
+    return 0;
+  }
+
+  return 1;
+
+  #undef DATABASE_COLLECTION
+  #undef MESSAGE
+  #undef GET_CURRENT_CONSENSUS_NODE_ERROR
+}
+
 /*
 -----------------------------------------------------------------------------------------------------------
 Name: server_received_data_xcash_proof_of_stake_test_data
