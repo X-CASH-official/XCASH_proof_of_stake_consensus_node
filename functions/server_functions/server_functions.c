@@ -16,6 +16,7 @@
 #include "variables.h"
 
 #include "define_macros_functions.h"
+#include "database_functions.h"
 #include "file_functions.h"
 #include "network_functions.h"
 #include "network_security_functions.h"

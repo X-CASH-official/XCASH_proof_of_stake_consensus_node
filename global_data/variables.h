@@ -26,6 +26,8 @@ char* current_consensus_nodes_IP_address; // The current consensus nodes IP addr
 char* main_nodes_public_address; // The current main nodes public address
 pthread_t xcash_proof_of_stake_timer; // The thread ID for the xcash_proof_of_stake_timer
 pthread_t check_if_consensus_node_is_offline_timer; // The thread ID for the check_if_consensus_node_is_offline_timer
+int xcash_proof_of_stake_timer_settings; // 1 if the xcash_proof_of_stake_timer is running, otherwise 0
+int check_if_consensus_node_is_offline_timer_settings; // 1 if the check_if_consensus_node_is_offline_timer is running, otherwise 0
 char* server_message; // The message the server should run. It will ignore any other messages.
 char* vote_round_change_timeout; // The amount of nodes that voted for a round change because the main node did not send any data
 char* vote_next_round_true; // The amount of nodes that voted true for a part of a round

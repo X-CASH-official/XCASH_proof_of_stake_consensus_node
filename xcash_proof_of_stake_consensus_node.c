@@ -116,6 +116,10 @@ int main(int parameters_count, char* parameters[])
     return 0;
   } 
 
+  // set the xcash_proof_of_stake_timer_settings and the check_if_consensus_node_is_offline_timer_settings
+  xcash_proof_of_stake_timer_settings = 0;
+  check_if_consensus_node_is_offline_timer_settings = 0;
+
   // initialize the block_verifiers_list struct 
   for (count = 0; count < BLOCK_VERIFIERS_AMOUNT; count++)
   {
