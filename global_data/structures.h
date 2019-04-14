@@ -19,6 +19,37 @@ struct block_validation_nodes_list {
     char* block_validation_nodes_public_address[BLOCK_VALIDATION_NODES_AMOUNT];
 };
 
+struct VRF_data_block_verifiers {
+    char* public_address[BLOCK_VERIFIERS_AMOUNT];
+    char* vrf_public_key_round_part_1[BLOCK_VERIFIERS_AMOUNT];
+    char* vrf_alpha_string_round_part_1[BLOCK_VERIFIERS_AMOUNT];
+    char* vrf_proof_round_part_1[BLOCK_VERIFIERS_AMOUNT];
+    char* vrf_beta_string_round_part_1[BLOCK_VERIFIERS_AMOUNT];
+    char* vrf_public_key_round_part_2[BLOCK_VERIFIERS_AMOUNT];
+    char* vrf_alpha_string_round_part_2[BLOCK_VERIFIERS_AMOUNT];
+    char* vrf_proof_round_part_2[BLOCK_VERIFIERS_AMOUNT];
+    char* vrf_beta_string_round_part_2[BLOCK_VERIFIERS_AMOUNT];
+    char* vrf_public_key_round_part_3[BLOCK_VERIFIERS_AMOUNT];
+    char* vrf_alpha_string_round_part_3[BLOCK_VERIFIERS_AMOUNT];
+    char* vrf_proof_round_part_3[BLOCK_VERIFIERS_AMOUNT];
+    char* vrf_beta_string_round_part_3[BLOCK_VERIFIERS_AMOUNT];
+};
+
+struct VRF_data {
+    char* vrf_public_key_round_part_1;
+    char* vrf_alpha_string_round_part_1;
+    char* vrf_proof_round_part_1;
+    char* vrf_beta_string_round_part_1;
+    char* vrf_public_key_round_part_2;
+    char* vrf_alpha_string_round_part_2;
+    char* vrf_proof_round_part_2;
+    char* vrf_beta_string_round_part_2;
+    char* vrf_public_key_round_part_3;
+    char* vrf_alpha_string_round_part_3;
+    char* vrf_proof_round_part_3;
+    char* vrf_beta_string_round_part_3;
+};
+
 // database struct
 struct database_document_fields {
     size_t count;

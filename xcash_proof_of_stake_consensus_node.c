@@ -55,22 +55,31 @@ int main(int parameters_count, char* parameters[])
 
   // iniltize the global variables
   xcash_wallet_public_address = (char*)calloc(BUFFER_SIZE,sizeof(char)); 
-  server_message = (char*)calloc(BUFFER_SIZE,sizeof(char));
-  current_consensus_nodes_IP_address = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  consensus_node_add_blocks_to_network = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  block_validation_xcash_proof_of_stake_settings_node = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  current_consensus_nodes_IP_address = (char*)calloc(BUFFER_SIZE,sizeof(char)); 
   main_nodes_public_address = (char*)calloc(BUFFER_SIZE,sizeof(char)); 
+  server_message = (char*)calloc(BUFFER_SIZE,sizeof(char)); 
+  vote_round_change_timeout = (char*)calloc(BUFFER_SIZE,sizeof(char)); 
+  vote_next_round_true = (char*)calloc(BUFFER_SIZE,sizeof(char)); 
+  vote_next_round_false = (char*)calloc(BUFFER_SIZE,sizeof(char)); 
   current_round_part = (char*)calloc(BUFFER_SIZE,sizeof(char)); 
   current_round_part_backup_node = (char*)calloc(BUFFER_SIZE,sizeof(char));
 
   // check if the memory needed was allocated on the heap successfully
-  if (xcash_wallet_public_address == NULL || server_message == NULL || current_consensus_nodes_IP_address == NULL || main_nodes_public_address == NULL || current_round_part == NULL || current_round_part_backup_node == NULL)
+  if (xcash_wallet_public_address == NULL || consensus_node_add_blocks_to_network == NULL || block_validation_xcash_proof_of_stake_settings_node == NULL || current_consensus_nodes_IP_address == NULL || main_nodes_public_address == NULL || server_message == NULL || vote_round_change_timeout == NULL || vote_next_round_true == NULL || vote_next_round_false == NULL || current_round_part == NULL || current_round_part_backup_node == NULL)
   {
     if (xcash_wallet_public_address != NULL)
     {
       pointer_reset(xcash_wallet_public_address);
     }
-    if (server_message != NULL)
+    if (consensus_node_add_blocks_to_network != NULL)
     {
-      pointer_reset(server_message);
+      pointer_reset(consensus_node_add_blocks_to_network);
+    }
+    if (block_validation_xcash_proof_of_stake_settings_node != NULL)
+    {
+      pointer_reset(block_validation_xcash_proof_of_stake_settings_node);
     }
     if (current_consensus_nodes_IP_address != NULL)
     {
@@ -79,6 +88,22 @@ int main(int parameters_count, char* parameters[])
     if (main_nodes_public_address != NULL)
     {
       pointer_reset(main_nodes_public_address);
+    }
+    if (server_message != NULL)
+    {
+      pointer_reset(server_message);
+    }
+    if (vote_round_change_timeout != NULL)
+    {
+      pointer_reset(vote_round_change_timeout);
+    }
+    if (vote_next_round_true != NULL)
+    {
+      pointer_reset(vote_next_round_true);
+    }
+    if (vote_next_round_false != NULL)
+    {
+      pointer_reset(vote_next_round_false);
     }
     if (current_round_part != NULL)
     {
@@ -94,16 +119,48 @@ int main(int parameters_count, char* parameters[])
   // initialize the block_verifiers_list struct 
   for (count = 0; count < BLOCK_VERIFIERS_AMOUNT; count++)
   {
-    block_verifiers_list.block_verifiers_name[count] = (char*)calloc(BLOCK_VERIFIERS_NAME_TOTAL_LENGTH,sizeof(char));
-    block_verifiers_list.block_verifiers_public_address[count] = (char*)calloc(XCASH_WALLET_LENGTH,sizeof(char));
-    block_verifiers_list.block_verifiers_IP_address[count] = (char*)calloc(BLOCK_VERIFIERS_IP_ADDRESS_TOTAL_LENGTH,sizeof(char));
+    block_verifiers_list.block_verifiers_name[count] = (char*)calloc(BLOCK_VERIFIERS_NAME_TOTAL_LENGTH+1,sizeof(char));
+    block_verifiers_list.block_verifiers_public_address[count] = (char*)calloc(XCASH_WALLET_LENGTH+1,sizeof(char));
+    block_verifiers_list.block_verifiers_IP_address[count] = (char*)calloc(BLOCK_VERIFIERS_IP_ADDRESS_TOTAL_LENGTH+1,sizeof(char));
   }
 
   // initialize the block_validation_nodes_list struct 
   for (count = 0; count < BLOCK_VALIDATION_NODES_AMOUNT; count++)
   {
-    block_validation_nodes_list.block_validation_nodes_public_address[count] = (char*)calloc(XCASH_WALLET_LENGTH,sizeof(char));
+    block_validation_nodes_list.block_validation_nodes_public_address[count] = (char*)calloc(XCASH_WALLET_LENGTH+1,sizeof(char));
   }
+
+  // initialize the VRF_data_block_verifiers struct 
+  for (count = 0; count < BLOCK_VERIFIERS_AMOUNT; count++)
+  {
+    VRF_data_block_verifiers.public_address[count] = (char*)calloc(XCASH_WALLET_LENGTH+1,sizeof(char));
+    VRF_data_block_verifiers.vrf_public_key_round_part_1[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
+    VRF_data_block_verifiers.vrf_alpha_string_round_part_1[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
+    VRF_data_block_verifiers.vrf_proof_round_part_1[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
+    VRF_data_block_verifiers.vrf_beta_string_round_part_1[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
+    VRF_data_block_verifiers.vrf_public_key_round_part_2[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
+    VRF_data_block_verifiers.vrf_alpha_string_round_part_2[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
+    VRF_data_block_verifiers.vrf_proof_round_part_2[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
+    VRF_data_block_verifiers.vrf_beta_string_round_part_2[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
+    VRF_data_block_verifiers.vrf_public_key_round_part_3[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
+    VRF_data_block_verifiers.vrf_alpha_string_round_part_3[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
+    VRF_data_block_verifiers.vrf_proof_round_part_3[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
+    VRF_data_block_verifiers.vrf_beta_string_round_part_3[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  }
+
+  // initialize the VRF_data struct 
+  VRF_data.vrf_public_key_round_part_1 = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  VRF_data.vrf_alpha_string_round_part_1 = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  VRF_data.vrf_proof_round_part_1 = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  VRF_data.vrf_beta_string_round_part_1 = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  VRF_data.vrf_public_key_round_part_2 = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  VRF_data.vrf_alpha_string_round_part_2 = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  VRF_data.vrf_proof_round_part_2 = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  VRF_data.vrf_beta_string_round_part_2 = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  VRF_data.vrf_public_key_round_part_3 = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  VRF_data.vrf_alpha_string_round_part_3 = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  VRF_data.vrf_proof_round_part_3 = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  VRF_data.vrf_beta_string_round_part_3 = (char*)calloc(BUFFER_SIZE,sizeof(char));
 
   // initialize the database connection
   mongoc_init();
