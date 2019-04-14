@@ -23,6 +23,7 @@ struct VRF_data VRF_data; // The list of all of the VRF data to send to the bloc
 char* consensus_node_add_blocks_to_network; // 1 if the consensus node should add new blocks to the network, otherwise 0
 char* block_validation_xcash_proof_of_stake_settings_node; // The IP address of the block validation node that the consensus node will check to see if it needs to add blocks to the network.
 char* current_consensus_nodes_IP_address; // The current consensus nodes IP address
+int current_consensus_node_settings; // 1 if the consensus node is the current consensus node, otherwise 0
 char* main_nodes_public_address; // The current main nodes public address
 pthread_t xcash_proof_of_stake_timer; // The thread ID for the xcash_proof_of_stake_timer
 pthread_t check_if_consensus_node_is_offline_timer; // The thread ID for the check_if_consensus_node_is_offline_timer

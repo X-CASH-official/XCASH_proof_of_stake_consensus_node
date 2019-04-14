@@ -197,11 +197,6 @@ int main(int parameters_count, char* parameters[])
     mongoc_cleanup();
     exit(0);
   }
-  
-
-  // set the current_round_part and current_round_part_backup_node to an empty string, this way the node will start at the begining of a round
-  memcpy(current_round_part,"",1); 
-  memcpy(current_round_part_backup_node,"",1);
 
   // Variables
   char* data = (char*)calloc(BUFFER_SIZE,sizeof(char)); 
@@ -209,10 +204,15 @@ int main(int parameters_count, char* parameters[])
   // write the message
   color_print("X-CASH Proof Of Stake - Consensus Node, Version 1.0.0\n","green");
 
-  // set the server_message
-  memcpy(server_message,"CONSENSUS_NODE_TO_NODES_MAIN_NODE_PUBLIC_ADDRESS",48);
+  // set the current_round_part, current_round_part_backup_node and server message, this way the node will start at the begining of a round
+  memset(current_round_part,0,strnlen(current_round_part,BUFFER_SIZE));
+  memset(current_round_part_backup_node,0,strnlen(current_round_part_backup_node,BUFFER_SIZE));
+  memcpy(current_round_part,"1",1);
+  memcpy(current_round_part_backup_node,"0",1);
+  memset(server_message,0,strnlen(server_message,BUFFER_SIZE));
+  memcpy(server_message,"",1);
 
- /* // get the wallets public address
+  // get the wallets public address
   printf("Getting the public address\n\n");
   if (get_public_address(0) == 1)
   {  
@@ -230,7 +230,7 @@ int main(int parameters_count, char* parameters[])
     mongoc_uri_destroy(uri_thread_pool);
     mongoc_cleanup();
     exit(0);
-  }*/
+  }
   
   // check if the program needs to run the test
   if (parameters_count == 2)
@@ -250,6 +250,16 @@ int main(int parameters_count, char* parameters[])
     mongoc_cleanup();
     exit(0);
   }
+
+  // get the current consensus node
+  current_consensus_node_settings = get_current_consensus_node();
+  if (current_consensus_node_settings == 0)
+  {
+
+  }
+
+  // start the new round by sending all of the block verifiers the CONSENSUS_NODE_TO_NODES_MAIN_NODE_PUBLIC_ADDRESS message and the main node the CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND message
+
 
   // start the server
   if (create_server(1) == 0)

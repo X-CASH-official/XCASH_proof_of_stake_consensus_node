@@ -31,6 +31,14 @@ Functions
 -----------------------------------------------------------------------------------------------------------
 */
 
+/*
+-----------------------------------------------------------------------------------------------------------
+Name: get_current_consensus_node
+Description: Checks if the consensus node is the current consensus node
+Return: 1 if the consensus node is the current consensus node, otherwise 0.
+-----------------------------------------------------------------------------------------------------------
+*/
+
 int get_current_consensus_node()
 {
   // Variables
@@ -70,6 +78,8 @@ int get_current_consensus_node()
   #undef MESSAGE
   #undef GET_CURRENT_CONSENSUS_NODE_ERROR
 }
+
+
 
 /*
 -----------------------------------------------------------------------------------------------------------
