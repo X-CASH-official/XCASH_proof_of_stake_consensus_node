@@ -255,10 +255,52 @@ int main(int parameters_count, char* parameters[])
   current_consensus_node_settings = get_current_consensus_node();
   if (current_consensus_node_settings == 0)
   {
-
+    // start the check_if_consensus_node_is_offline_timer
+    if (pthread_create(&check_if_consensus_node_is_offline_timer_thread_id, NULL, &check_if_consensus_node_is_offline_timer, NULL) != 0)
+    {
+      color_print("Could not start the check_if_consensus_node_is_offline_timer\n","red");
+      mongoc_client_destroy(database_client);
+      mongoc_client_pool_destroy(database_client_thread_pool);
+      mongoc_uri_destroy(uri_thread_pool);
+      mongoc_cleanup();
+      exit(0);
+    }    
+    if (pthread_detach(check_if_consensus_node_is_offline_timer_thread_id) != 0)
+    {
+      color_print("Could not set the check_if_consensus_node_is_offline_timer in detach mode\n","red");
+      mongoc_client_destroy(database_client);
+      mongoc_client_pool_destroy(database_client_thread_pool);
+      mongoc_uri_destroy(uri_thread_pool);
+      mongoc_cleanup();
+      exit(0);
+    }
   }
+  else
+  {
+    // start the xcash_proof_of_stake_timer
+    if (pthread_create(&xcash_proof_of_stake_timer_thread_id, NULL, &check_if_consensus_node_is_offline_timer, NULL) != 0)
+    {
+      color_print("Could not start the check_if_consensus_node_is_offline_timer\n","red");
+      mongoc_client_destroy(database_client);
+      mongoc_client_pool_destroy(database_client_thread_pool);
+      mongoc_uri_destroy(uri_thread_pool);
+      mongoc_cleanup();
+      exit(0);
+    }    
+    if (pthread_detach(xcash_proof_of_stake_timer_thread_id) != 0)
+    {
+      color_print("Could not set the check_if_consensus_node_is_offline_timer in detach mode\n","red");
+      mongoc_client_destroy(database_client);
+      mongoc_client_pool_destroy(database_client_thread_pool);
+      mongoc_uri_destroy(uri_thread_pool);
+      mongoc_cleanup();
+      exit(0);
+    }
+    // start the new round by sending all of the block verifiers the CONSENSUS_NODE_TO_NODES_MAIN_NODE_PUBLIC_ADDRESS message and the main node the CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND message
+  }
+  
 
-  // start the new round by sending all of the block verifiers the CONSENSUS_NODE_TO_NODES_MAIN_NODE_PUBLIC_ADDRESS message and the main node the CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND message
+  
 
 
   // start the server

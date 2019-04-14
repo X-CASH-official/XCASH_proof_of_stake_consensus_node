@@ -83,6 +83,224 @@ int get_current_consensus_node()
 
 /*
 -----------------------------------------------------------------------------------------------------------
+Name: get_block_verifiers_list
+Description: Gets the top 100 delegates (the block verifiers) from the database
+Return: Returns 1 if successfull, otherwise 0
+-----------------------------------------------------------------------------------------------------------
+*/
+
+int get_block_verifiers_list()
+{
+  // Constants
+  const bson_t* current_document;
+
+  // Variables
+  mongoc_client_t* database_client_thread;
+  mongoc_collection_t* collection;
+  mongoc_cursor_t* document_settings;
+  bson_t* document = NULL;  
+  char* message;
+  char* message_copy1;
+  char* message_copy2;
+  char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* settings = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  size_t count = 0;
+  size_t field_name_length;
+
+  // define macros
+  #define DATABASE_COLLECTION "delegates"
+
+  #define pointer_reset_all \
+  free(data); \
+  data = NULL; \
+  free(settings); \
+  settings = NULL; 
+
+  #define GET_BLOCK_VERIFIERS_LIST_ERROR(settings) \
+  color_print(settings,"red"); \
+  pointer_reset_all; \
+  bson_destroy(document); \
+  mongoc_cursor_destroy(document_settings); \
+  mongoc_collection_destroy(collection); \
+  return 0;
+
+
+  // check if the memory needed was allocated on the heap successfully
+  if (data == NULL || settings == NULL)
+  {
+    if (data != NULL)
+    {
+      pointer_reset(data);
+    }
+    if (settings != NULL)
+    {
+      pointer_reset(settings);
+    }
+    return 0;
+  }  
+  
+  // set the collection
+  collection = mongoc_client_get_collection(database_client, DATABASE_NAME, DATABASE_COLLECTION);
+
+  document = bson_new();
+  if (!document)
+  {
+    GET_BLOCK_VERIFIERS_LIST_ERROR("Could not create the document for the database\nFunction: get_block_verifiers_list");
+  }
+
+  document_settings = mongoc_collection_find_with_opts(collection, document, NULL, NULL);
+  while (mongoc_cursor_next(document_settings, &current_document))
+  {    
+      message = bson_as_canonical_extended_json(current_document, NULL);
+      memset(data,0,strnlen(data,BUFFER_SIZE));
+      memcpy(data,message,strnlen(message,BUFFER_SIZE));
+      bson_free(message); 
+
+      if (strstr(data,"\"delegate_number\" : \"1\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"2\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"3\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"4\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"5\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"6\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"7\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"8\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"9\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"10\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"11\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"12\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"13\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"14\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"15\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"16\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"17\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"18\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"19\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"20\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"21\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"22\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"23\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"24\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"25\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"26\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"27\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"28\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"29\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"30\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"31\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"32\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"33\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"34\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"35\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"36\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"37\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"38\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"39\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"40\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"41\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"42\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"43\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"44\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"45\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"46\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"47\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"48\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"49\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"50\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"51\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"52\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"53\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"54\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"55\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"56\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"57\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"58\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"59\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"60\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"61\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"62\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"63\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"64\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"65\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"66\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"67\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"68\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"69\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"70\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"71\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"72\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"73\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"74\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"75\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"76\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"77\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"78\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"79\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"80\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"81\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"82\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"83\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"84\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"85\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"86\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"87\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"88\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"89\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"90\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"91\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"92\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"93\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"94\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"95\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"96\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"97\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"98\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"99\"") != NULL ||
+          strstr(data,"\"delegate_number\" : \"100\"") != NULL)
+      {        
+        // parse the delegate_name
+        memset(settings,0,strnlen(settings,BUFFER_SIZE));
+        memcpy(settings,", \"delegate_name\" : \"",21);
+        message_copy1 = strstr(data,settings) + 21;
+        message_copy2 = strstr(message_copy1,"\"");
+        memcpy(block_verifiers_list.block_verifiers_name[count],message_copy1,message_copy2 - message_copy1);
+        // parse the public_address
+        memset(settings,0,strnlen(settings,BUFFER_SIZE));
+        memcpy(settings,", \"public_address\" : \"",22);
+        message_copy1 = strstr(data,settings) + 22;
+        message_copy2 = strstr(message_copy1,"\"");
+        memcpy(block_verifiers_list.block_verifiers_public_address[count],message_copy1,message_copy2 - message_copy1);
+        // parse the IP_address
+        memset(settings,0,strnlen(settings,BUFFER_SIZE));
+        memcpy(settings,", \"IP_address\" : \"",18);
+        message_copy1 = strstr(data,settings) + 18;
+        message_copy2 = strstr(message_copy1,"\"");
+        memcpy(block_verifiers_list.block_verifiers_IP_address[count],message_copy1,message_copy2 - message_copy1);
+        count++;
+      }
+      // check if that is the total amount of documents to read
+      if (count == BLOCK_VERIFIERS_AMOUNT)
+      {
+        break;
+      }   
+  }
+
+  // check to make sure all of the block verifiers were read from the database
+  if (count != BLOCK_VERIFIERS_AMOUNT)
+  {
+    GET_BLOCK_VERIFIERS_LIST_ERROR("Could not get all of the block verifiers from the database\nFunction: get_block_verifiers_list");
+  }
+
+  return 1;
+
+  #undef DATABASE_COLLECTION
+  #undef pointer_reset_all
+  #undef GET_BLOCK_VERIFIERS_LIST_ERROR
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
 Name: server_received_data_xcash_proof_of_stake_test_data
 Description: Runs the code when the server receives the xcash_proof_of_stake_test_data message
 Parameters:

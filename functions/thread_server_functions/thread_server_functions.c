@@ -134,3 +134,57 @@ void* mainnode_timeout_thread(void* parameters)
   kill((intptr_t)data->process_id, SIGTERM);
   return NULL;
 }
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
+Name: check_if_consensus_node_is_offline_timer
+Description: Checks if the current conensus node is offline
+Return: NULL
+-----------------------------------------------------------------------------------------------------------
+*/
+
+void* check_if_consensus_node_is_offline_timer()
+{ 
+  // Variables
+  char* string = (char*)calloc(BUFFER_SIZE,sizeof(char));
+
+  // check if the memory needed was allocated on the heap successfully
+  if (string == NULL)
+  {
+    return 0;
+  }
+
+  sleep(TOTAL_CONNECTION_TIME_SETTINGS); 
+
+  pointer_reset(string);
+  pthread_exit((void *)(intptr_t)1);
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
+Name: xcash_proof_of_stake_timer
+Description: Checks if the consensus node needs to add a block to the network
+Return: NULL
+-----------------------------------------------------------------------------------------------------------
+*/
+
+void* xcash_proof_of_stake_timer()
+{ 
+  // Variables
+  char* string = (char*)calloc(BUFFER_SIZE,sizeof(char));
+
+  // check if the memory needed was allocated on the heap successfully
+  if (string == NULL)
+  {
+    return 0;
+  }
+
+  sleep(TOTAL_CONNECTION_TIME_SETTINGS); 
+
+  pointer_reset(string);
+  pthread_exit((void *)(intptr_t)1);
+}
