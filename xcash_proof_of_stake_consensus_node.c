@@ -56,7 +56,6 @@ int main(int parameters_count, char* parameters[])
   // iniltize the global variables
   xcash_wallet_public_address = (char*)calloc(BUFFER_SIZE,sizeof(char)); 
   consensus_node_add_blocks_to_network = (char*)calloc(BUFFER_SIZE,sizeof(char));
-  block_validation_xcash_proof_of_stake_settings_node = (char*)calloc(BUFFER_SIZE,sizeof(char));
   current_consensus_nodes_IP_address = (char*)calloc(BUFFER_SIZE,sizeof(char)); 
   main_nodes_public_address = (char*)calloc(BUFFER_SIZE,sizeof(char)); 
   server_message = (char*)calloc(BUFFER_SIZE,sizeof(char)); 
@@ -67,7 +66,7 @@ int main(int parameters_count, char* parameters[])
   current_round_part_backup_node = (char*)calloc(BUFFER_SIZE,sizeof(char));
 
   // check if the memory needed was allocated on the heap successfully
-  if (xcash_wallet_public_address == NULL || consensus_node_add_blocks_to_network == NULL || block_validation_xcash_proof_of_stake_settings_node == NULL || current_consensus_nodes_IP_address == NULL || main_nodes_public_address == NULL || server_message == NULL || vote_round_change_timeout == NULL || vote_next_round_true == NULL || vote_next_round_false == NULL || current_round_part == NULL || current_round_part_backup_node == NULL)
+  if (xcash_wallet_public_address == NULL || consensus_node_add_blocks_to_network == NULL || current_consensus_nodes_IP_address == NULL || main_nodes_public_address == NULL || server_message == NULL || vote_round_change_timeout == NULL || vote_next_round_true == NULL || vote_next_round_false == NULL || current_round_part == NULL || current_round_part_backup_node == NULL)
   {
     if (xcash_wallet_public_address != NULL)
     {
@@ -76,10 +75,6 @@ int main(int parameters_count, char* parameters[])
     if (consensus_node_add_blocks_to_network != NULL)
     {
       pointer_reset(consensus_node_add_blocks_to_network);
-    }
-    if (block_validation_xcash_proof_of_stake_settings_node != NULL)
-    {
-      pointer_reset(block_validation_xcash_proof_of_stake_settings_node);
     }
     if (current_consensus_nodes_IP_address != NULL)
     {
@@ -116,9 +111,12 @@ int main(int parameters_count, char* parameters[])
     return 0;
   } 
 
-  // set the xcash_proof_of_stake_timer_settings and the check_if_consensus_node_is_offline_timer_settings
-  xcash_proof_of_stake_timer_settings = 0;
+  // set the check_if_consensus_node_needs_to_add_a_block_to_the_network_timer_settings and the check_if_consensus_node_is_offline_timer_settings
+  check_if_consensus_node_needs_to_add_a_block_to_the_network_timer_settings = 0;
   check_if_consensus_node_is_offline_timer_settings = 0;
+
+  // set the consensus_node_add_blocks_to_network to 0
+  memcpy(consensus_node_add_blocks_to_network,"0",1);
 
   // initialize the block_verifiers_list struct 
   for (count = 0; count < BLOCK_VERIFIERS_AMOUNT; count++)
@@ -132,6 +130,7 @@ int main(int parameters_count, char* parameters[])
   for (count = 0; count < BLOCK_VALIDATION_NODES_AMOUNT; count++)
   {
     block_validation_nodes_list.block_validation_nodes_public_address[count] = (char*)calloc(XCASH_WALLET_LENGTH+1,sizeof(char));
+    block_validation_nodes_list.block_validation_nodes_IP_address[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
   }
 
   // initialize the VRF_data_block_verifiers struct 
@@ -201,6 +200,8 @@ int main(int parameters_count, char* parameters[])
   // Variables
   char* data = (char*)calloc(BUFFER_SIZE,sizeof(char)); 
 
+
+
   // write the message
   color_print("X-CASH Proof Of Stake - Consensus Node, Version 1.0.0\n","green");
 
@@ -251,11 +252,23 @@ int main(int parameters_count, char* parameters[])
     exit(0);
   }
 
+  // get the block verifiers list
+  if (get_block_verifiers_list() == 0)
+  {
+    color_print("Could not get the current block verifiers list\n","red");
+    mongoc_client_destroy(database_client);
+    mongoc_client_pool_destroy(database_client_thread_pool);
+    mongoc_uri_destroy(uri_thread_pool);
+    mongoc_cleanup();
+    exit(0);
+  }
+
   // get the current consensus node
   current_consensus_node_settings = get_current_consensus_node();
   if (current_consensus_node_settings == 0)
   {
     // start the check_if_consensus_node_is_offline_timer
+    check_if_consensus_node_is_offline_timer_settings = 1;
     if (pthread_create(&check_if_consensus_node_is_offline_timer_thread_id, NULL, &check_if_consensus_node_is_offline_timer, NULL) != 0)
     {
       color_print("Could not start the check_if_consensus_node_is_offline_timer\n","red");
@@ -276,9 +289,10 @@ int main(int parameters_count, char* parameters[])
     }
   }
   else
-  {
-    // start the xcash_proof_of_stake_timer
-    if (pthread_create(&xcash_proof_of_stake_timer_thread_id, NULL, &check_if_consensus_node_is_offline_timer, NULL) != 0)
+  {    
+    // start the check_if_consensus_node_needs_to_add_a_block_to_the_network_timer
+    check_if_consensus_node_needs_to_add_a_block_to_the_network_timer_settings = 1;
+    if (pthread_create(&check_if_consensus_node_needs_to_add_a_block_to_the_network_timer_thread_id, NULL, &check_if_consensus_node_needs_to_add_a_block_to_the_network_timer, NULL) != 0)
     {
       color_print("Could not start the check_if_consensus_node_is_offline_timer\n","red");
       mongoc_client_destroy(database_client);
@@ -287,7 +301,7 @@ int main(int parameters_count, char* parameters[])
       mongoc_cleanup();
       exit(0);
     }    
-    if (pthread_detach(xcash_proof_of_stake_timer_thread_id) != 0)
+    if (pthread_detach(check_if_consensus_node_needs_to_add_a_block_to_the_network_timer_thread_id) != 0)
     {
       color_print("Could not set the check_if_consensus_node_is_offline_timer in detach mode\n","red");
       mongoc_client_destroy(database_client);

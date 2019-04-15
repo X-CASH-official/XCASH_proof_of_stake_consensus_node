@@ -5,12 +5,18 @@
 #include <unistd.h>
 #include <signal.h>
 #include <pthread.h>
+#include <mongoc/mongoc.h>
+#include <bson/bson.h>
 
 #include "define_macro_functions.h"
 #include "define_macros.h"
+#include "variables.h"
 #include "structures.h"
 
 #include "define_macros_functions.h"
+#include "database_functions.h"
+#include "network_functions.h"
+#include "network_security_functions.h"
 #include "thread_server_functions.h"
 
 /*
@@ -147,44 +153,174 @@ Return: NULL
 
 void* check_if_consensus_node_is_offline_timer()
 { 
+  // Constants
+  const size_t CONSENSUS_NODES_IP_ADDRESS_LENGTH = strnlen(CONSENSUS_NODES_IP_ADDRESS,BUFFER_SIZE);
+
   // Variables
-  char* string = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* message = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  int count = 0;
 
   // check if the memory needed was allocated on the heap successfully
-  if (string == NULL)
-  {
+  if (message == NULL)
+  {   
     return 0;
   }
 
-  sleep(TOTAL_CONNECTION_TIME_SETTINGS); 
+  // define macros
+  #define DATABASE_COLLECTION "consensus_node"
+  #define MESSAGE "{\"username\":\"xcash\"}"
 
-  pointer_reset(string);
+  #define CHECK_IF_CONSENSUS_NODE_IS_OFFLINE_ERROR(settings) \
+  color_print(settings,"red"); \
+  pointer_reset(message); \
+  return 0;
+
+  for (;;)
+  {
+    sleep(60);
+
+    while (check_if_consensus_node_is_offline_timer_settings == 1)
+    {
+      // check if the current consensus node is online
+      if (send_data_socket(CONSENSUS_BACKUP_NODES_IP_ADDRESS,SEND_DATA_PORT,"","Check if the current consensus node is online",0) == 0)
+      {
+        count++;
+      }
+      else
+      {
+        count = 0;
+      }
+
+      if (count == 5)
+      {
+        // the current consensus node is offline, so change the consensus nodes
+        // update the current consensus node in the database      
+        memcpy(message,"{\"current_consensus_node_IP_address\":\"",38);
+        memcpy(message+38,CONSENSUS_NODES_IP_ADDRESS,CONSENSUS_NODES_IP_ADDRESS_LENGTH);
+        memcpy(message+38+CONSENSUS_NODES_IP_ADDRESS_LENGTH,"\"}",2);
+
+        if (update_document_from_collection(DATABASE_NAME, DATABASE_COLLECTION, MESSAGE, message, 0) == 0)
+        {
+          CHECK_IF_CONSENSUS_NODE_IS_OFFLINE_ERROR("Could not update the consensus node in the database\nFunction: check_if_consensus_node_is_offline_timer\nSend Message: CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CHANGE");
+        }
+        // create the message
+        memset(message,0,strnlen(message,BUFFER_SIZE));
+        memcpy(message,"{\r\n \"message_settings\": \"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CHANGE\",\r\n \"consensus_node_IP_address\": \"",120);
+        memcpy(message+120,CONSENSUS_NODES_IP_ADDRESS,CONSENSUS_NODES_IP_ADDRESS_LENGTH);
+        memcpy(message+120+CONSENSUS_NODES_IP_ADDRESS_LENGTH,"\",\r\n}",5);
+
+        // sign the message
+        if (sign_data(message,0) == 0)
+        {
+          CHECK_IF_CONSENSUS_NODE_IS_OFFLINE_ERROR("Could not sign_data\nFunction: check_if_consensus_node_is_offline_timer\nSend Message: CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CHANGE");
+        }
+
+        // send the message to all block verifiers
+        for (count = 0; count < BLOCK_VERIFIERS_AMOUNT; count++)
+        {   
+          send_data_socket(block_verifiers_list.block_verifiers_IP_address[count],SEND_DATA_PORT,message,"sending CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CHANGE to the block verifiers",0);
+        }
+     
+        // stop the check_if_consensus_node_is_offline_timer
+        check_if_consensus_node_is_offline_timer_settings = 0;
+
+        // start the check_if_consensus_node_needs_to_add_a_block_to_the_network_timer
+        check_if_consensus_node_needs_to_add_a_block_to_the_network_timer_settings = 1;
+      }      
+    }
+  }
+
+  pointer_reset(message);
   pthread_exit((void *)(intptr_t)1);
+
+  #undef DATABASE_COLLECTION
+  #undef MESSAGE
+  #undef CHECK_IF_CONSENSUS_NODE_IS_OFFLINE_ERROR
 }
 
 
 
 /*
 -----------------------------------------------------------------------------------------------------------
-Name: xcash_proof_of_stake_timer
+Name: check_if_consensus_node_needs_to_add_a_block_to_the_network_timer
 Description: Checks if the consensus node needs to add a block to the network
 Return: NULL
 -----------------------------------------------------------------------------------------------------------
 */
 
-void* xcash_proof_of_stake_timer()
+void* check_if_consensus_node_needs_to_add_a_block_to_the_network_timer()
 { 
   // Variables
-  char* string = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* message = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  int count;
 
   // check if the memory needed was allocated on the heap successfully
-  if (string == NULL)
-  {
+  if (message == NULL)
+  {   
     return 0;
   }
 
-  sleep(TOTAL_CONNECTION_TIME_SETTINGS); 
+  // define macros
+  #define MESSAGE "{\r\n \"message_settings\": \"CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_RECEIVE_XCASH_PROOF_OF_STAKE_SETTINGS\",\r\n}"
 
-  pointer_reset(string);
+  #define CHECK_IF_CONSENSUS_NODE_NEEDS_TO_ADD_A_BLOCK_TO_THE_NETWORK_ERROR(settings) \
+  color_print(settings,"red"); \
+  pointer_reset(message); \
+  return 0;
+
+  for (;;)
+  {
+    sleep(NETWORK_BLOCK_TIME);
+
+    while (check_if_consensus_node_needs_to_add_a_block_to_the_network_timer_settings == 1)
+    {
+      // create the message
+      memcpy(message,MESSAGE,107);
+
+      // sign the message
+      if (sign_data(message,0) == 0)
+      {
+        CHECK_IF_CONSENSUS_NODE_NEEDS_TO_ADD_A_BLOCK_TO_THE_NETWORK_ERROR("Could not sign_data\nFunction: xcash_proof_of_stake_timer\nReceived Message: BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS\nSend Message: CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_RECEIVE_XCASH_PROOF_OF_STAKE_SETTINGS");
+      }
+
+      // send a message to any block validation node to check if it needs to add a block to the network
+      memset(consensus_node_add_blocks_to_network,0,strnlen(consensus_node_add_blocks_to_network,BUFFER_SIZE));
+      for (count = 0; count < BLOCK_VALIDATION_NODES_AMOUNT; count++)
+      {
+        if (send_and_receive_data_socket(consensus_node_add_blocks_to_network,block_validation_nodes_list.block_validation_nodes_IP_address[count],SEND_DATA_PORT,message,RECEIVE_DATA_TIMEOUT_SETTINGS,"Checking if the consensus node needs to add a block to the network",0) == 0)
+        {
+          CHECK_IF_CONSENSUS_NODE_NEEDS_TO_ADD_A_BLOCK_TO_THE_NETWORK_ERROR("Could not send or receive data\nFunction: xcash_proof_of_stake_timer\nReceived Message: BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS\nSend Message: CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_RECEIVE_XCASH_PROOF_OF_STAKE_SETTINGS");
+        }
+      }
+
+      if (memcmp(consensus_node_add_blocks_to_network,"1",1) == 0)
+      {
+        // stop all of the running timers
+        check_if_consensus_node_is_offline_timer_settings = 0;
+
+        // let all of the block verifiers know that the consensus node will be adding the blocks to the network
+        if (send_consensus_node_needs_to_add_a_block_to_the_network_message() == 0)
+        {
+          CHECK_IF_CONSENSUS_NODE_NEEDS_TO_ADD_A_BLOCK_TO_THE_NETWORK_ERROR("Could not send xcash proof of stake function\nFunction: xcash_proof_of_stake_timer\nReceived Message: BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS\nSend Message: CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_RECEIVE_XCASH_PROOF_OF_STAKE_SETTINGS");
+        }
+
+        // add a block to the network
+        if (consensus_node_create_new_block() == 0)
+        {
+          CHECK_IF_CONSENSUS_NODE_NEEDS_TO_ADD_A_BLOCK_TO_THE_NETWORK_ERROR("The consensus node could not create a block\nFunction: xcash_proof_of_stake_timer\nReceived Message: BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS\nSend Message: CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_RECEIVE_XCASH_PROOF_OF_STAKE_SETTINGS");
+        }      
+      }
+      else
+      {
+        // start all of the running timers
+        check_if_consensus_node_needs_to_add_a_block_to_the_network_timer_settings = 1;
+      }
+    }
+  }
+
+  pointer_reset(message);
   pthread_exit((void *)(intptr_t)1);
+
+  #undef MESSAGE
+  #undef CHECK_IF_CONSENSUS_NODE_NEEDS_TO_ADD_A_BLOCK_TO_THE_NETWORK
 }

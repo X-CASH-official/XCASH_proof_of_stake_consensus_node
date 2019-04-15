@@ -18,6 +18,7 @@ Using define statements instead of constants for increased efficiency
 #define NODES_UPDATED_TIME_FILE_NAME "nodes_updated_time.txt" // The last time the node has updated the list of nodes from the consensus node
 #define NODES_PUBLIC_ADDRESS_LIST_FILE_NAME "nodes_public_address_list.txt" // The current enabled nodes public address list
 #define NODES_NAME_LIST_FILE_NAME "nodes_name_list.txt" // The current enabled nodes name list
+#define NETWORK_BLOCK_TIME 120 // The network block time for the network in seconds (2 minutes)
 #define BLOCK_VALIDATION_NODES_AMOUNT 1 // The total amount of block validation nodes
 #define BLOCK_VERIFIERS_AMOUNT 100 // The amount of block verifiers in a round
 #define BLOCK_VERIFIERS_NAME_TOTAL_LENGTH 100 // The maximum length of the block verifiers name

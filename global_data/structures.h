@@ -17,6 +17,7 @@ struct block_verifiers_list {
 
 struct block_validation_nodes_list {
     char* block_validation_nodes_public_address[BLOCK_VALIDATION_NODES_AMOUNT];
+    char* block_validation_nodes_IP_address[BLOCK_VALIDATION_NODES_AMOUNT];
 };
 
 struct VRF_data_block_verifiers {
