@@ -301,6 +301,57 @@ int get_block_verifiers_list()
 
 /*
 -----------------------------------------------------------------------------------------------------------
+Name: send_consensus_node_needs_to_add_a_block_to_the_network_message
+Description: sends the CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CREATE_NEW_BLOCK_MESSAGE message to the nodes and main node
+Return: 1 if the consensus node is the current consensus node, otherwise 0.
+-----------------------------------------------------------------------------------------------------------
+*/
+
+int send_consensus_node_needs_to_add_a_block_to_the_network_message()
+{
+  // Variables
+  char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  size_t count;
+
+  // define macros
+  #define SEND_CONSENSUS_NODE_NEEDS_TO_ADD_A_BLOCK_TO_THE_NETWORK_ERROR(settings) \
+  color_print(settings,"red"); \
+  pointer_reset(data); \
+  return 0;
+
+
+  // check if the memory needed was allocated on the heap successfully
+  if (data == NULL)
+  {
+    return 0;
+  }
+
+  // create the message
+  memcpy(data,"{\r\n \"message_settings\": \"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CREATE_NEW_BLOCK_MESSAGE\",\r\n}",108);
+
+  // sign_data
+  if (sign_data(data,0) == 0)
+  { 
+    SEND_CONSENSUS_NODE_NEEDS_TO_ADD_A_BLOCK_TO_THE_NETWORK_ERROR("Could not sign_data\nFunction: send_consensus_node_needs_to_add_a_block_to_the_network_message\nSend Message: CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CREATE_NEW_BLOCK_MESSAGE");
+  }
+
+  // send the CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CREATE_NEW_BLOCK_MESSAGE message to the nodes and main node
+  for (count = 0; count < BLOCK_VERIFIERS_AMOUNT; count++)
+  {
+    send_data_socket(block_verifiers_list.block_verifiers_IP_address[count],SEND_DATA_PORT,data,"sending CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CREATE_NEW_BLOCK_MESSAGE message to the nodes and main node",0);
+  }
+
+  return 1;
+
+  #undef DATABASE_COLLECTION
+  #undef MESSAGE
+  #undef SEND_CONSENSUS_NODE_NEEDS_TO_ADD_A_BLOCK_TO_THE_NETWORK_ERROR
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
 Name: server_received_data_xcash_proof_of_stake_test_data
 Description: Runs the code when the server receives the xcash_proof_of_stake_test_data message
 Parameters:
