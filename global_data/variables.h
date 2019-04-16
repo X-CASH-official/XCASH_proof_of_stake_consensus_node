@@ -20,6 +20,7 @@ struct block_verifiers_list block_verifiers_list; // The list of the enabled nod
 struct block_validation_nodes_list block_validation_nodes_list; // The list of block validation nodes public address
 struct VRF_data_block_verifiers VRF_data_block_verifiers; // The list of all block verifiers received data from the main node
 struct VRF_data VRF_data; // The list of all of the VRF data to send to the block producer.
+struct blockchain_data blockchain_data; // The data for a new block to be added to the network.
 char* consensus_node_add_blocks_to_network; // 1 if the consensus node should add new blocks to the network, otherwise 0
 char* current_consensus_nodes_IP_address; // The current consensus nodes IP address
 int current_consensus_node_settings; // 1 if the consensus node is the current consensus node, otherwise 0
