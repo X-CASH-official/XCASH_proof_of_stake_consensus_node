@@ -12,5 +12,6 @@ int server_receive_data_socket_consensus_node_to_node(const int CLIENT_SOCKET, p
 int get_current_consensus_node();
 int get_block_verifiers_list();
 int send_consensus_node_needs_to_add_a_block_to_the_network_message();
+int consensus_node_create_new_block();
 int create_server(const int MESSAGE_SETTINGS);
 #endif

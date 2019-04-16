@@ -85,6 +85,7 @@ int get_block_template(char *result, const int HTTP_SETTINGS)
 }
 
 
+
 /*
 -----------------------------------------------------------------------------------------------------------
 Name: get_current_block_height

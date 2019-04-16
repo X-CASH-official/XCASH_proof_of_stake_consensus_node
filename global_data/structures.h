@@ -152,22 +152,22 @@ struct blockchain_data {
     size_t stealth_address_output_data_length; // The amount of characters of the stealth_address_output_data
     char* extra_bytes_size_data; // The extra_bytes_size
     size_t extra_bytes_size; // Variant decoded extra_bytes_size
-    size_t extra_bytes_size_length; // The amount of characters of the extra_bytes_size
+    size_t extra_bytes_size_data_length; // The amount of characters of the extra_bytes_size
     char* transaction_public_key_tag_data; // The transaction_public_key_tag
-    size_t transaction_public_key_tag_length; // The amount of characters of the transaction_public_key_tag
+    size_t transaction_public_key_tag_data_length; // The amount of characters of the transaction_public_key_tag
     char* transaction_public_key_data; // The transaction_public_key
-    size_t transaction_public_key_length; // The amount of characters of the transaction_public_key
+    size_t transaction_public_key_data_length; // The amount of characters of the transaction_public_key
     char* extra_nonce_tag_data; // The extra_nonce_tag
-    size_t extra_nonce_tag_length; // The amount of characters of the extra_nonce_tag
+    size_t extra_nonce_tag_data_length; // The amount of characters of the extra_nonce_tag
     char* reserve_bytes_size_data; // The reserve_bytes_size
     size_t reserve_bytes_size; // Variant decoded reserve_bytes_size
-    size_t reserve_bytes_size_length; // The amount of characters of the reserve_bytes_size
+    size_t reserve_bytes_size_data_length; // The amount of characters of the reserve_bytes_size
     struct blockchain_reserve_bytes blockchain_reserve_bytes; // A blockchain_reserve_bytes struct that holds all of the reserve bytes
     char* ringct_version_data; // The ringct_version
-    size_t ringct_version_length; // The amount of characters of the ringct_version
+    size_t ringct_version_data_length; // The amount of characters of the ringct_version
     char* transaction_amount_data; // The transaction_amount
     size_t transaction_amount; // Variant decoded transaction_amount
-    size_t transaction_amount_length; // The amount of characters of the transaction_amount
+    size_t transaction_amount_data_length; // The amount of characters of the transaction_amount
     char* transactions[1000000]; // All of the transactions in the block.
 };
 

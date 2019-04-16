@@ -352,6 +352,21 @@ int send_consensus_node_needs_to_add_a_block_to_the_network_message()
 
 /*
 -----------------------------------------------------------------------------------------------------------
+Name: consensus_node_create_new_block
+Description: The consensus node will add a new block to the network
+Return: 1 if successfull, otherwise 0.
+-----------------------------------------------------------------------------------------------------------
+*/
+
+int consensus_node_create_new_block()
+{
+  return 1;
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
 Name: server_received_data_xcash_proof_of_stake_test_data
 Description: Runs the code when the server receives the xcash_proof_of_stake_test_data message
 Parameters:
