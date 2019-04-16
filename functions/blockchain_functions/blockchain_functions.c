@@ -489,6 +489,62 @@ Return: 0 if an error has occured, 1 if successfull
 int blockchain_data_to_network_block_string(char* result)
 {
   // Variables
+  size_t count = 0;
+  size_t number = 0;
+
+  memset(result,0,strnlen(result,BUFFER_SIZE));
+  memcpy(result,blockchain_data.network_version_data,blockchain_data.network_version_data_length);
+  count += blockchain_data.network_version_data_length;
+  memcpy(result+count,blockchain_data.timestamp_data,blockchain_data.timestamp_data_length);
+  count += blockchain_data.timestamp_data_length;
+  memcpy(result+count,blockchain_data.previous_block_hash_data,blockchain_data.previous_block_hash_data_length);
+  count += blockchain_data.previous_block_hash_data_length;
+  memcpy(result+count,blockchain_data.nonce_data,blockchain_data.nonce_data_length);
+  count += blockchain_data.nonce_data_length;
+  memcpy(result+count,blockchain_data.block_reward_transaction_version_data,blockchain_data.block_reward_transaction_version_data_length);
+  count += blockchain_data.block_reward_transaction_version_data_length;
+  memcpy(result+count,blockchain_data.unlock_block_data,blockchain_data.unlock_block_data_length);
+  count += blockchain_data.unlock_block_data_length;
+  memcpy(result+count,blockchain_data.block_reward_input_data,blockchain_data.block_reward_input_data_length);
+  count += blockchain_data.block_reward_input_data_length;
+  memcpy(result+count,blockchain_data.vin_type_data,blockchain_data.vin_type_data_length);
+  count += blockchain_data.vin_type_data_length;
+  memcpy(result+count,blockchain_data.block_height_data,blockchain_data.block_height_data_length);
+  count += blockchain_data.block_height_data_length;
+  memcpy(result+count,blockchain_data.block_reward_output_data,blockchain_data.block_reward_output_data_length);
+  count += blockchain_data.block_reward_output_data_length;
+  memcpy(result+count,blockchain_data.block_reward_data,blockchain_data.block_reward_data_length);
+  count += blockchain_data.block_reward_data_length;
+  memcpy(result+count,blockchain_data.stealth_address_output_tag_data,blockchain_data.stealth_address_output_tag_data_length);
+  count += blockchain_data.stealth_address_output_tag_data_length;  
+  memcpy(result+count,blockchain_data.stealth_address_output_data,blockchain_data.stealth_address_output_data_length);
+  count += blockchain_data.stealth_address_output_data_length;  
+  memcpy(result+count,blockchain_data.extra_bytes_size_data,blockchain_data.extra_bytes_size_data_length);
+  count += blockchain_data.extra_bytes_size_data_length;  
+  memcpy(result+count,blockchain_data.transaction_public_key_tag_data,blockchain_data.transaction_public_key_tag_data_length);
+  count += blockchain_data.transaction_public_key_tag_data_length;  
+  memcpy(result+count,blockchain_data.transaction_public_key_data,blockchain_data.transaction_public_key_data_length);
+  count += blockchain_data.transaction_public_key_data_length;  
+  memcpy(result+count,blockchain_data.extra_nonce_tag_data,blockchain_data.extra_nonce_tag_data_length);
+  count += blockchain_data.extra_nonce_tag_data_length;  
+  memcpy(result+count,blockchain_data.reserve_bytes_size_data,blockchain_data.reserve_bytes_size_data_length);
+  count += blockchain_data.reserve_bytes_size_data_length;
+
+  // blockchain_reserve_bytes
+
+  
+  memcpy(result+count,blockchain_data.ringct_version_data,blockchain_data.ringct_version_data_length);
+  count += blockchain_data.ringct_version_data_length;  
+  memcpy(result+count,blockchain_data.transaction_amount_data,blockchain_data.transaction_amount_data_length);
+  count += blockchain_data.transaction_amount_data_length;
+  
+  // get all of the transactions
+  for (number = 0; number < blockchain_data.transaction_amount; number++)
+  {
+    memcpy(result+count,blockchain_data.transactions[number],64);
+    count += 64;
+  }
+  return 1;
 }
 
 
