@@ -141,9 +141,16 @@ int network_block_string_to_blockchain_data(char* data)
 
   // define macros
   #define BLOCKCHAIN_RESERVED_BYTES_START "7c424c4f434b434841494e5f52455345525645445f42595445535f53544152547c"
+
+  #define pointer_reset_all \
+  free(current_block_height); \
+  current_block_height = NULL; \
+  free(data2); \
+  data2 = NULL;
+
   #define NETWORK_BLOCK_STRING_TO_BLOCKCHAIN_DATA_ERROR(settings) \
   color_print(settings,"red"); \
-  pointer_reset(data2); \
+  pointer_reset_all; \
   return 0; 
 
   // check if the memory needed was allocated on the heap successfully
@@ -471,6 +478,7 @@ int network_block_string_to_blockchain_data(char* data)
   return 1;
 
   #undef BLOCKCHAIN_RESERVED_BYTES_START
+  #undef pointer_reset_all
   #undef NETWORK_BLOCK_STRING_TO_BLOCKCHAIN_DATA_ERROR
 }
 
@@ -478,7 +486,7 @@ int network_block_string_to_blockchain_data(char* data)
 
 /*
 -----------------------------------------------------------------------------------------------------------
-Name: network_block_string to_network_block_data
+Name: blockchain_data_to_network_block_string
 Description: Converts a blockchain_data struct to a network_block_string
 Parameters:
   result - The network block data string
@@ -537,7 +545,7 @@ int blockchain_data_to_network_block_string(char* result)
   count += blockchain_data.ringct_version_data_length;  
   memcpy(result+count,blockchain_data.transaction_amount_data,blockchain_data.transaction_amount_data_length);
   count += blockchain_data.transaction_amount_data_length;
-  
+
   // get all of the transactions
   for (number = 0; number < blockchain_data.transaction_amount; number++)
   {
