@@ -167,22 +167,22 @@ int main(int parameters_count, char* parameters[])
 
   // initialize the blockchain_data struct 
   blockchain_data.network_version_data = (char*)calloc(5,sizeof(char));
-  blockchain_data.timestamp_data = (char*)calloc(5,sizeof(char));
-  blockchain_data.previous_block_hash_data = (char*)calloc(5,sizeof(char));
-  blockchain_data.nonce_data = (char*)calloc(5,sizeof(char));
-  blockchain_data.block_reward_transaction_version_data = (char*)calloc(5,sizeof(char));
-  blockchain_data.unlock_block_data = (char*)calloc(5,sizeof(char));
-  blockchain_data.block_reward_input_data = (char*)calloc(5,sizeof(char));
-  blockchain_data.vin_type_data = (char*)calloc(5,sizeof(char));
-  blockchain_data.block_height_data = (char*)calloc(5,sizeof(char));
-  blockchain_data.block_reward_output_data = (char*)calloc(5,sizeof(char));
-  blockchain_data.block_reward_data = (char*)calloc(5,sizeof(char));
-  blockchain_data.stealth_address_output_tag_data = (char*)calloc(5,sizeof(char));
-  blockchain_data.stealth_address_output_data = (char*)calloc(5,sizeof(char));
+  blockchain_data.timestamp_data = (char*)calloc(11,sizeof(char));
+  blockchain_data.previous_block_hash_data = (char*)calloc(65,sizeof(char));
+  blockchain_data.nonce_data = (char*)calloc(9,sizeof(char));
+  blockchain_data.block_reward_transaction_version_data = (char*)calloc(3,sizeof(char));
+  blockchain_data.unlock_block_data = (char*)calloc(9,sizeof(char));
+  blockchain_data.block_reward_input_data = (char*)calloc(3,sizeof(char));
+  blockchain_data.vin_type_data = (char*)calloc(3,sizeof(char));
+  blockchain_data.block_height_data = (char*)calloc(9,sizeof(char));
+  blockchain_data.block_reward_output_data = (char*)calloc(3,sizeof(char));
+  blockchain_data.block_reward_data = (char*)calloc(15,sizeof(char));
+  blockchain_data.stealth_address_output_tag_data = (char*)calloc(3,sizeof(char));
+  blockchain_data.stealth_address_output_data = (char*)calloc(65,sizeof(char));
   blockchain_data.extra_bytes_size_data = (char*)calloc(5,sizeof(char));
-  blockchain_data.transaction_public_key_tag_data = (char*)calloc(5,sizeof(char));
-  blockchain_data.transaction_public_key_data = (char*)calloc(5,sizeof(char));
-  blockchain_data.extra_nonce_tag_data = (char*)calloc(5,sizeof(char));
+  blockchain_data.transaction_public_key_tag_data = (char*)calloc(3,sizeof(char));
+  blockchain_data.transaction_public_key_data = (char*)calloc(65,sizeof(char));
+  blockchain_data.extra_nonce_tag_data = (char*)calloc(3,sizeof(char));
   blockchain_data.reserve_bytes_size_data = (char*)calloc(5,sizeof(char));
   blockchain_data.blockchain_reserve_bytes.block_producer_delegates_name_data = (char*)calloc(41,sizeof(char));
   blockchain_data.blockchain_reserve_bytes.block_producer_delegates_name = (char*)calloc(21,sizeof(char));
