@@ -15,5 +15,7 @@ int send_consensus_node_needs_to_add_a_block_to_the_network_message();
 int consensus_node_create_new_block();
 int calculate_main_nodes_role();
 int mainode_consensus();
+int send_data_socket_consensus_node_to_node();
+int send_data_socket_consensus_node_to_mainnode();
 int create_server(const int MESSAGE_SETTINGS);
 #endif

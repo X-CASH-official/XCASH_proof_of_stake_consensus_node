@@ -165,7 +165,6 @@ int get_previous_block_template(char *result, const int HTTP_SETTINGS)
 }
 
 
-
 /*
 -----------------------------------------------------------------------------------------------------------
 Name: submit_block_template

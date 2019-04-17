@@ -81,7 +81,7 @@ void* total_connection_time_thread(void* parameters)
   }
   pointer_reset(string);
   kill((intptr_t)data->process_id, SIGKILL);  
-  return NULL;
+  pthread_exit((void *)(intptr_t)1);
 }
 
 
@@ -139,7 +139,22 @@ void* mainnode_timeout_thread(void* parameters)
   }
   pointer_reset(string);
   kill((intptr_t)data->process_id, SIGTERM);
-  return NULL;
+  pthread_exit((void *)(intptr_t)1);
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
+Name: receive_votes_from_nodes_timeout_thread
+Description: Counts the votes.
+Return: NULL
+-----------------------------------------------------------------------------------------------------------
+*/
+
+void* receive_votes_from_nodes_timeout_thread()
+{  
+  pthread_exit((void *)(intptr_t)1);
 }
 
 

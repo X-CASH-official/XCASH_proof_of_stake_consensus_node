@@ -17,8 +17,10 @@
 #include "variables.h"
 
 #include "define_macros_functions.h"
+#include "blockchain_functions.h"
 #include "database_functions.h"
 #include "file_functions.h"
+#include "network_daemon_functions.h"
 #include "network_functions.h"
 #include "network_security_functions.h"
 #include "server_functions.h"
@@ -344,8 +346,6 @@ int send_consensus_node_needs_to_add_a_block_to_the_network_message()
 
   return 1;
 
-  #undef DATABASE_COLLECTION
-  #undef MESSAGE
   #undef SEND_CONSENSUS_NODE_NEEDS_TO_ADD_A_BLOCK_TO_THE_NETWORK_ERROR
 }
 
@@ -547,6 +547,7 @@ int consensus_node_create_new_block()
 
   return 1;
 
+  #undef pointer_reset_all
   #undef CONSENSUS_NODE_CREATE_NEW_BLOCK_ERROR
 }
 
@@ -555,7 +556,7 @@ int consensus_node_create_new_block()
 /*
 -----------------------------------------------------------------------------------------------------------
 Name: calculate_main_nodes_role
-Description: calculate the new main nodes roles from the previous network block
+Description: Calculate the new main nodes roles from the previous network block
 Return: 1 if successfull, otherwise 0.
 -----------------------------------------------------------------------------------------------------------
 */
@@ -597,7 +598,7 @@ int calculate_main_nodes_role()
   // convert the network_block_string to blockchain_data
   if (network_block_string_to_blockchain_data(data) == 0)
   {
-    CONSENSUS_NODE_CREATE_NEW_BLOCK_ERROR("Could not convert the network_block_string to blockchain_data\nFunction: consensus_node_create_new_block\nReceive Message: BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK\nSend Message: CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK");
+    CALCULATE_MAIN_NODES_ROLE_ERROR("Could not convert the network_block_string to blockchain_data\nFunction: calculate_main_nodes_role");
   }
 
   // read the VRF beta string for round part 3 and calculate the main nodes role
@@ -606,10 +607,23 @@ int calculate_main_nodes_role()
   // update the main nodes role in the database
   
 
+  // set the current_round_part and current_round_part_backup_node
+  memset(current_round_part,0,strnlen(current_round_part,BUFFER_SIZE));
+  memset(current_round_part_backup_node,0,strnlen(current_round_part_backup_node,BUFFER_SIZE));
+  memcpy(current_round_part,"1",1);
+  memcpy(current_round_part_backup_node,"0",1);
+
+  // set the current_round_part and current_round_part_backup_node in the database
+  if (update_document_from_collection(DATABASE_NAME,"current_round",MESSAGE,"{\"current_round_part\":\"1\"}",0) == 0 || update_document_from_collection(DATABASE_NAME,"current_round",MESSAGE,"{\"current_round_part_backup_node\":\"0\"}",0) == 0)
+  {
+    CALCULATE_MAIN_NODES_ROLE_ERROR("Could not update the current_round_part and current_round_part_backup_node in the database\nFunction: calculate_main_nodes_role");
+  }
+
   return 1;
 
   #undef DATABASE_COLLECTION
   #undef MESSAGE
+  #undef pointer_reset_all
   #undef CALCULATE_MAIN_NODES_ROLE_ERROR
 }
 
@@ -685,7 +699,7 @@ int mainode_consensus()
   {
     memcpy(data,"block_producer_IP_address_",26);
   }
-  memcpy(data+strnlen(data),current_round_part_backup_node,1);
+  memcpy(data+strnlen(data,BUFFER_SIZE),current_round_part_backup_node,1);
 
   // get the main nodes IP address and check if it is online  
   if (read_document_field_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,data,data2,0) == 0)
@@ -741,7 +755,7 @@ int mainode_consensus()
   memcpy(data2,"\"}",2);
   if (update_document_from_collection(DATABASE_NAME,"current_round",MESSAGE,data,0) == 0 || update_document_from_collection(DATABASE_NAME,"current_round",MESSAGE,data2,0) == 0)
   {
-    CALCULATE_MAIN_NODES_ROLE_ERROR("Could not update the current_round_part and current_round_part_backup_node in the database\nFunction: mainode_consensus");
+    MAINNODE_CONSENSUS_ERROR("Could not update the current_round_part and current_round_part_backup_node in the database\nFunction: mainode_consensus");
   }
 
   pointer_reset_all;
@@ -750,7 +764,37 @@ int mainode_consensus()
   #undef DATABASE_COLLECTION
   #undef MESSAGE
   #undef pointer_reset_all
-  #undef CALCULATE_MAIN_NODES_ROLE_ERROR
+  #undef MAINNODE_CONSENSUS_ERROR
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
+Name: send_data_socket_consensus_node_to_node
+Description: Sends the CONSENSUS_NODE_TO_NODES_MAIN_NODE_PUBLIC_ADDRESS message to the block verifiers to let them know the main nodes public address for the current part of the round
+Return: 1 if successfull, otherwise 0.
+-----------------------------------------------------------------------------------------------------------
+*/
+
+int send_data_socket_consensus_node_to_node()
+{
+ 
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
+Name: send_data_socket_consensus_node_to_mainnode
+Description: Sends the CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND message to the main node to let the main node know to start the part of the round
+Return: 1 if successfull, otherwise 0.
+-----------------------------------------------------------------------------------------------------------
+*/
+
+int send_data_socket_consensus_node_to_mainnode()
+{
+  
 }
 
 
