@@ -100,16 +100,15 @@ Return: 0 if an error has occured, 1 if successfull
 -----------------------------------------------------------------------------------------------------------
 */
 
-int verify_blockchain_network_transactions(char* data[], const int MESSAGE_SETTINGS)
+int verify_blockchain_network_transactions(char* transactions[], const size_t AMOUNT_OF_TRANSACTIONS, const int MESSAGE_SETTINGS)
 {
   // Constants
   const char* HTTP_HEADERS[] = {"Content-Type: application/json","Accept: application/json"}; 
   const size_t HTTP_HEADERS_LENGTH = sizeof(HTTP_HEADERS)/sizeof(HTTP_HEADERS[0]);
-  const size_t DATA_LENGTH = sizeof(data)/sizeof(data[0]);
 
   // Variables
   char* message = (char*)calloc(BUFFER_SIZE,sizeof(char));
-  char* data2 = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
   size_t count;
   size_t counter = 0;
 
@@ -117,19 +116,19 @@ int verify_blockchain_network_transactions(char* data[], const int MESSAGE_SETTI
   #define pointer_reset_all \
   free(message); \
   message = NULL; \
-  free(data2); \
-  data2 = NULL; \
+  free(data); \
+  data = NULL; \
 
   // check if the memory needed was allocated on the heap successfully
-  if (message == NULL || data2 == NULL)
+  if (message == NULL || data == NULL)
   {
     if (message != NULL)
     {
       pointer_reset(message);
     }
-    if (data2 != NULL)
+    if (data != NULL)
     {
-      pointer_reset(data2);
+      pointer_reset(data);
     }
     return 0;
   }
@@ -137,18 +136,18 @@ int verify_blockchain_network_transactions(char* data[], const int MESSAGE_SETTI
   // create the message
   memcpy(message,"{\"txs_hashes\":[",15);
   counter += 15;
-  for (count = 0; count < DATA_LENGTH; count++)
+  for (count = 0; count < AMOUNT_OF_TRANSACTIONS; count++)
   {
     memcpy(message+counter,"\"",1);
     counter++;
-    memcpy(message+counter,data[count],strnlen(data[count,BUFFER_SIZE]));
-    counter += strnlen(data[count,BUFFER_SIZE]);
+    memcpy(message+counter,transactions[count],strnlen(transactions[count],BUFFER_SIZE));
+    counter += strnlen(transactions[count],BUFFER_SIZE);
     memcpy(message+counter,"\",",2);
     counter += 2;
   }
   memcpy(message+counter-1,"]}",2);
 
-  if (send_http_request(data2,"127.0.0.1","/get_transactions",XCASH_DAEMON_PORT,"POST", HTTP_HEADERS, HTTP_HEADERS_LENGTH,message,RECEIVE_DATA_TIMEOUT_SETTINGS,"",MESSAGE_SETTINGS) <= 0)
+  if (send_http_request(data,"127.0.0.1","/get_transactions",XCASH_DAEMON_PORT,"POST", HTTP_HEADERS, HTTP_HEADERS_LENGTH,message,RECEIVE_DATA_TIMEOUT_SETTINGS,"",MESSAGE_SETTINGS) <= 0)
   {  
     pointer_reset_all;   
     return 0;
@@ -156,7 +155,7 @@ int verify_blockchain_network_transactions(char* data[], const int MESSAGE_SETTI
 
   // verify the blockchain_network_transactions
   // if the results contain missed_tx or "in_pool": false then the transactions are not verified  
-  if (strstr(data2,"missed_tx") != NULL || strstr(data2,"\"in_pool\": false") != NULL)
+  if (strstr(data,"missed_tx") != NULL || strstr(data,"\"in_pool\": false") != NULL)
   {
     pointer_reset_all;   
     return 0;

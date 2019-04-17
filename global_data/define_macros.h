@@ -19,9 +19,9 @@ Using define statements instead of constants for increased efficiency
 #define NODES_PUBLIC_ADDRESS_LIST_FILE_NAME "nodes_public_address_list.txt" // The current enabled nodes public address list
 #define NODES_NAME_LIST_FILE_NAME "nodes_name_list.txt" // The current enabled nodes name list
 #define NETWORK_BLOCK_TIME 120 // The network block time for the network in seconds (2 minutes)
-#define NETWORK_VERSION 0000 // the network version
-#define BLOCK_PRODUCER_NETWORK_BLOCK_NONCE 00000000 // the network block nonce used when the block producer creates the block
-#define CONSENSUS_NODE_NETWORK_BLOCK_NONCE 11111111 // the network block nonce used when the consensus node creates the block
+#define NETWORK_VERSION "0000" // the network version
+#define BLOCK_PRODUCER_NETWORK_BLOCK_NONCE "00000000" // the network block nonce used when the block producer creates the block
+#define CONSENSUS_NODE_NETWORK_BLOCK_NONCE "11111111" // the network block nonce used when the consensus node creates the block
 #define BLOCK_VALIDATION_NODES_AMOUNT 1 // The total amount of block validation nodes
 #define BLOCK_VERIFIERS_AMOUNT 100 // The amount of block verifiers in a round
 #define BLOCK_VERIFIERS_NAME_TOTAL_LENGTH 100 // The maximum length of the block verifiers name
