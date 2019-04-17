@@ -554,6 +554,69 @@ int consensus_node_create_new_block()
 
 /*
 -----------------------------------------------------------------------------------------------------------
+Name: calculate_main_nodes_role
+Description: calculate the new main nodes roles from the previous network block
+Return: 1 if successfull, otherwise 0.
+-----------------------------------------------------------------------------------------------------------
+*/
+
+int calculate_main_nodes_role()
+{
+  // Variables
+  char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  size_t count;
+
+  // define macros
+  #define DATABASE_COLLECTION "nodes"
+  #define MESSAGE "{\"username\":\"xcash\"}"
+
+  #define pointer_reset_all \
+  free(data); \
+  data = NULL; \
+  free(settings); \
+  settings = NULL; 
+
+  #define CALCULATE_MAIN_NODES_ROLE_ERROR(settings) \
+  color_print(settings,"red"); \
+  pointer_reset(data); \
+  return 0;
+
+
+  // check if the memory needed was allocated on the heap successfully
+  if (data == NULL)
+  {
+    return 0;
+  }
+
+  // get the previous block template
+  if (get_previous_block_template(data,0) == 0)
+  {
+    CALCULATE_MAIN_NODES_ROLE_ERROR("Could not get the previous block template\nFunction: calculate_main_nodes_role");
+  }
+
+  // convert the network_block_string to blockchain_data
+  if (network_block_string_to_blockchain_data(data) == 0)
+  {
+    CONSENSUS_NODE_CREATE_NEW_BLOCK_ERROR("Could not convert the network_block_string to blockchain_data\nFunction: consensus_node_create_new_block\nReceive Message: BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK\nSend Message: CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK");
+  }
+
+  // read the VRF beta string for round part 3 and calculate the main nodes role
+
+
+  // update the main nodes role in the database
+  
+
+  return 1;
+
+  #undef DATABASE_COLLECTION
+  #undef MESSAGE
+  #undef CALCULATE_MAIN_NODES_ROLE_ERROR
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
 Name: server_received_data_xcash_proof_of_stake_test_data
 Description: Runs the code when the server receives the xcash_proof_of_stake_test_data message
 Parameters:

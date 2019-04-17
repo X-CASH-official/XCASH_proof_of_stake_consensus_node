@@ -13,5 +13,6 @@ int get_current_consensus_node();
 int get_block_verifiers_list();
 int send_consensus_node_needs_to_add_a_block_to_the_network_message();
 int consensus_node_create_new_block();
+int calculate_main_nodes_role();
 int create_server(const int MESSAGE_SETTINGS);
 #endif
