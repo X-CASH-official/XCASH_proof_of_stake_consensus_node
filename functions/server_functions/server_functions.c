@@ -617,6 +617,146 @@ int calculate_main_nodes_role()
 
 /*
 -----------------------------------------------------------------------------------------------------------
+Name: mainode_consensus
+Description: Calculate the current_round_part and current_round_part_backup_node
+Return: 1 if successfull, otherwise 0.
+-----------------------------------------------------------------------------------------------------------
+*/
+
+int mainode_consensus()
+{
+ // Variables
+  char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* data2 = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  size_t count;
+
+  // define macros
+  #define DATABASE_COLLECTION "nodes"
+  #define MESSAGE "{\"username\":\"xcash\"}"
+
+  // define macros
+  #define pointer_reset_all \
+  free(data); \
+  data = NULL; \
+  free(data2); \
+  data2 = NULL;
+
+  #define MAINNODE_CONSENSUS_ERROR(settings) \
+  color_print(settings,"red"); \
+  pointer_reset_all; \
+  return 0;
+
+
+  // check if the memory needed was allocated on the heap successfully
+  if (data == NULL || data2 == NULL)
+  {
+    if (data != NULL)
+    {
+      pointer_reset(data);
+    }
+    if (data2 != NULL)
+    {
+      pointer_reset(data2);
+    }
+    return 0;
+  }
+
+  // read the current_round_part and current_round_part_backup_node from the database
+  if (read_document_field_from_collection(DATABASE_NAME,"current_round",MESSAGE,"current_round_part",current_round_part,0) == 0 || read_document_field_from_collection(DATABASE_NAME,"current_round",MESSAGE,"current_round_part_backup_node",current_round_part_backup_node,0) == 0)
+  {
+     MAINNODE_CONSENSUS_ERROR("Could not read the current_round_part or the current_round_part_backup_node from the database\nFunction: mainode_consensus");
+  }
+
+  start:
+
+  // reset the variables
+  memset(data,0,strnlen(data,BUFFER_SIZE));
+  memset(data2,0,strnlen(data2,BUFFER_SIZE));
+
+  if (memcmp(current_round_part,"1",1) == 0 || memcmp(current_round_part,"3",1) == 0)
+  {
+    memcpy(data,"vrf_public_and_secret_key_IP_address_",37);
+  }
+  else if (memcmp(current_round_part,"2",1) == 0)
+  {
+    memcpy(data,"vrf_random_data_IP_address_",27);
+  }
+  else if (memcmp(current_round_part,"4",1) == 0)
+  {
+    memcpy(data,"block_producer_IP_address_",26);
+  }
+  memcpy(data+strnlen(data),current_round_part_backup_node,1);
+
+  // get the main nodes IP address and check if it is online  
+  if (read_document_field_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,data,data2,0) == 0)
+  {
+    MAINNODE_CONSENSUS_ERROR("Could not read the main nodes IP address from the database\nFunction: mainode_consensus");
+  }
+
+  // check if the main node is online
+  if (send_data_socket(data2,SEND_DATA_PORT,"","check if main node is online",0) == 0)
+  {
+    if (memcmp(current_round_part_backup_node,"0",1) == 0)
+    {
+      memcpy(current_round_part_backup_node,"1",1);
+    }
+    else if (memcmp(current_round_part_backup_node,"1",1) == 0)
+    {
+      memcpy(current_round_part_backup_node,"2",1);
+    }
+    else if (memcmp(current_round_part_backup_node,"2",1) == 0)
+    {
+      memcpy(current_round_part_backup_node,"3",1);
+    }
+    else if (memcmp(current_round_part_backup_node,"3",1) == 0)
+    {
+      memcpy(current_round_part_backup_node,"4",1);
+    }
+    else if (memcmp(current_round_part_backup_node,"4",1) == 0)
+    {
+      memcpy(current_round_part_backup_node,"5",1);
+    }
+    else if (memcmp(current_round_part_backup_node,"5",1) == 0)
+    {
+      pointer_reset_all;
+      return 0;
+    }
+    memset(data,0,strnlen(data,BUFFER_SIZE));
+    memcpy(data,"The main node is offline, so switching to the next backup main node.\ncurrent_round_part = ",90);
+    memcpy(data+90,current_round_part,1);
+    memcpy(data+91,"\ncurrent_round_part_backup_node = ",34);
+    memcpy(data+125,current_round_part_backup_node,1);
+    color_print(data,"red");
+    goto start;
+  }
+
+  // set the current_round_part and current_round_part_backup_node in the database
+  memset(data,0,strnlen(data,BUFFER_SIZE));
+  memset(data2,0,strnlen(data2,BUFFER_SIZE));
+  memcpy(data,"{\"current_round_part\":\"",23);
+  memcpy(data,current_round_part,1);
+  memcpy(data,"\"}",2);
+  memcpy(data2,"{\"current_round_part_backup_node\":\"",38);
+  memcpy(data2,current_round_part_backup_node,1);
+  memcpy(data2,"\"}",2);
+  if (update_document_from_collection(DATABASE_NAME,"current_round",MESSAGE,data,0) == 0 || update_document_from_collection(DATABASE_NAME,"current_round",MESSAGE,data2,0) == 0)
+  {
+    CALCULATE_MAIN_NODES_ROLE_ERROR("Could not update the current_round_part and current_round_part_backup_node in the database\nFunction: mainode_consensus");
+  }
+
+  pointer_reset_all;
+  return 1;
+
+  #undef DATABASE_COLLECTION
+  #undef MESSAGE
+  #undef pointer_reset_all
+  #undef CALCULATE_MAIN_NODES_ROLE_ERROR
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
 Name: server_received_data_xcash_proof_of_stake_test_data
 Description: Runs the code when the server receives the xcash_proof_of_stake_test_data message
 Parameters:
