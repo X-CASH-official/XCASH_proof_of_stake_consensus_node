@@ -90,6 +90,82 @@ int get_block_template(char *result, char* reserve_bytes_length, const int HTTP_
 }
 
 
+
+/*
+-----------------------------------------------------------------------------------------------------------
+Name: get_previous_block_template
+Description: Gets the previous_block template
+Parameters:
+  result - The result to store the previous block_blob in
+  MESSAGE_SETTINGS - 1 to print the messages, otherwise 0. This is used for the testing flag to not print any success or error messages
+Return: 0 if an error has occured, 1 if successfull
+-----------------------------------------------------------------------------------------------------------
+*/
+
+int get_previous_block_template(char *result, const int HTTP_SETTINGS)
+{
+  // Constants
+  const char* HTTP_HEADERS[] = {"Content-Type: application/json","Accept: application/json"}; 
+  const size_t HTTP_HEADERS_LENGTH = sizeof(HTTP_HEADERS)/sizeof(HTTP_HEADERS[0]);
+
+  // Variables
+  char* message = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
+
+  // define macros
+  #define pointer_reset_all \
+  free(message); \
+  message = NULL; \
+  free(data); \
+  data = NULL; \
+
+  // check if the memory needed was allocated on the heap successfully
+  if (message == NULL || data == NULL)
+  {
+    if (message != NULL)
+    {
+      pointer_reset(message);
+    }
+    if (data != NULL)
+    {
+      pointer_reset(data);
+    }
+    return 0;
+  }
+
+  // get the current block height
+  if (get_current_block_height(data, 0) == 0)
+  {
+    pointer_reset_all;
+    return 0;
+  }
+
+  // create the message
+  memcpy(message,"{\"jsonrpc\":\"2.0\",\"id\":\"0\",\"method\":\"get_block\",\"params\":{\"height\":\"",68);
+  memcpy(message+68,data,strnlen(data,BUFFER_SIZE));
+  memcpy(message+68+strnlen(data,BUFFER_SIZE),"\"}}",3);
+  memset(data,0,strnlen(data,BUFFER_SIZE));
+
+  if (send_http_request(data,"127.0.0.1","/json_rpc",XCASH_DAEMON_PORT,"POST", HTTP_HEADERS, HTTP_HEADERS_LENGTH,message,RECEIVE_DATA_TIMEOUT_SETTINGS,"get block template",HTTP_SETTINGS) <= 0)
+  {  
+    pointer_reset_all;
+    return 0;
+  }
+  
+  if (parse_json_data(data,"blob",result) == 0)
+  {
+    pointer_reset_all;
+    return 0;
+  }
+  
+  pointer_reset_all; 
+  return 1;
+  
+  #undef pointer_reset_all
+}
+
+
+
 /*
 -----------------------------------------------------------------------------------------------------------
 Name: submit_block_template
