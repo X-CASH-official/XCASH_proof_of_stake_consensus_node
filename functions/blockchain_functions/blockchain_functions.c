@@ -286,7 +286,7 @@ int network_block_string_to_blockchain_data(char* data)
   // get the current block height
   if (get_current_block_height(current_block_height, 0) == 0)
   {
-    NETWORK_BLOCK_STRING_TO_BLOCKCHAIN_DATA_ERROR("Invalid network_block_string\nFunction: network_block_string_to_blockchain_data");
+    NETWORK_BLOCK_STRING_TO_BLOCKCHAIN_DATA_ERROR("Could not get the current block height\nFunction: network_block_string_to_blockchain_data");
   }
   sscanf(current_block_height, "%zu", &number);
   number += 61;
@@ -568,4 +568,204 @@ Return: 0 if an error has occured or it is not verified, 1 if successfull
 int verify_network_block_data()
 {
   // Variables
+  size_t count;
+  size_t number;
+  char* previous_block_hash = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* current_block_height = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* data2 = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* data3;
+
+  // define macros
+  #define BLOCK_REWARD_TRANSACTION_VERSION "02"
+  #define BLOCK_REWARD_INPUT "01"
+  #define VIN_TYPE "ff"
+  #define BLOCK_REWARD_OUTPUT "01"
+  #define STEALTH_ADDRESS_OUTPUT_TAG "02"
+  #define TRANSACTION_PUBLIC_KEY_TAG "01"
+  #define EXTRA_NONCE_TAG "02"
+  #define RINGCT_VERSION "01"
+
+  #define pointer_reset_all \
+  free(previous_block_hash); \
+  previous_block_hash = NULL; \
+  free(current_block_height); \
+  current_block_height = NULL; \
+  free(data2); \
+  data2 = NULL;
+
+  #define VERIFY_NETWORK_BLOCK_DATA_ERROR(settings) \
+  color_print(settings,"red"); \
+  pointer_reset_all; \
+  return 0; 
+
+  // check if the memory needed was allocated on the heap successfully
+  if (previous_block_hash == NULL || current_block_height == NULL || data2 == NULL)
+  {
+    if (previous_block_hash != NULL)
+    {
+      pointer_reset(previous_block_hash);
+    }
+    if (current_block_height != NULL)
+    {
+      pointer_reset(current_block_height);
+    }
+    if (data2 != NULL)
+    {
+      pointer_reset(data2);
+    }
+    return 0;
+  } 
+
+  // network_version
+  if (blockchain_data.network_version_data_length != 4 || memcmp(blockchain_data.network_version_data,NETWORK_VERSION,4) != 0)
+  {
+    NETWORK_BLOCK_STRING_TO_BLOCKCHAIN_DATA_ERROR("Invalid network_block_string\nInvalid network_version\nFunction: verify_network_block_data");
+  } 
+
+  // timestamp
+  if (blockchain_data.timestamp_data_length != 10)
+  {
+    NETWORK_BLOCK_STRING_TO_BLOCKCHAIN_DATA_ERROR("Invalid network_block_string\nInvalid timestamp\nFunction: verify_network_block_data");
+  }
+
+  // previous_block_hash
+  if (get_previous_block_hash(previous_block_hash,0) == 0)
+  {
+    NETWORK_BLOCK_STRING_TO_BLOCKCHAIN_DATA_ERROR("Could not get the previous block hash\nFunction: verify_network_block_data");
+  }
+  if (blockchain_data.previous_block_hash_data_length != 64 || memcmp(blockchain_data.previous_block_hash_data,previous_block_hash,64) != 0)
+  {
+    NETWORK_BLOCK_STRING_TO_BLOCKCHAIN_DATA_ERROR("Invalid network_block_string\nInvalid previous block hash\nFunction: verify_network_block_data");
+  }  
+
+  // nonce
+  if (blockchain_data.nonce_data_length != 8 || (memcmp(blockchain_data.nonce_data,BLOCK_PRODUCER_NETWORK_BLOCK_NONCE,8) != 0 && memcmp(blockchain_data.nonce_data,CONSENSUS_NODE_NETWORK_BLOCK_NONCE,8) != 0))
+  {
+    NETWORK_BLOCK_STRING_TO_BLOCKCHAIN_DATA_ERROR("Invalid network_block_string\nInvalid network block nonce\nFunction: verify_network_block_data");
+  }
+
+  // block_reward_transaction_version
+  if (blockchain_data.block_reward_transaction_version_data_length != 2 || memcmp(blockchain_data.block_reward_transaction_version_data,BLOCK_REWARD_TRANSACTION_VERSION,2) != 0)
+  {
+    NETWORK_BLOCK_STRING_TO_BLOCKCHAIN_DATA_ERROR("Invalid network_block_string\nInvalid block_reward_transaction_version\nFunction: verify_network_block_data");
+  }
+
+  // unlock_block
+  if (get_current_block_height(current_block_height,0) == 0)
+  {
+    NETWORK_BLOCK_STRING_TO_BLOCKCHAIN_DATA_ERROR("Could not get the current block height\nFunction: verify_network_block_data");
+  }
+  sscanf(current_block_height, "%zu", &number);
+  if ((blockchain_data.unlock_block <= 2097091 && blockchain_data.unlock_block_data_length != 6) || (blockchain_data.unlock_block > 2097091 && blockchain_data.unlock_block_data_length != 8) || blockchain_data.unlock_block != number+61)
+  {
+    NETWORK_BLOCK_STRING_TO_BLOCKCHAIN_DATA_ERROR("Invalid network_block_string\nInvalid unlock_block\nFunction: verify_network_block_data");
+  }
+
+  // block_reward_input
+  if (blockchain_data.unlock_block_data_length != 2 || memcmp(blockchain_data.unlock_block_data,BLOCK_REWARD_INPUT,2) != 0)
+  {
+    NETWORK_BLOCK_STRING_TO_BLOCKCHAIN_DATA_ERROR("Invalid network_block_string\nInvalid block_reward_input\nFunction: verify_network_block_data");
+  }
+
+  // vin_type
+  if (blockchain_data.vin_type_data_length != 2 || memcmp(blockchain_data.vin_type_data,VIN_TYPE,2) != 0)
+  {
+    NETWORK_BLOCK_STRING_TO_BLOCKCHAIN_DATA_ERROR("Invalid network_block_string\nInvalid vin_type\nFunction: verify_network_block_data");
+  }
+
+  // block_height
+  if ((blockchain_data.block_height <= 2097151 && blockchain_data.block_height_data_length != 6) || (blockchain_data.block_height > 2097151 && blockchain_data.block_height_data_length != 8) || blockchain_data.block_height != number+1)
+  {
+    NETWORK_BLOCK_STRING_TO_BLOCKCHAIN_DATA_ERROR("Invalid network_block_string\nInvalid block_height\nFunction: verify_network_block_data");
+  }
+
+  // block_reward_output
+  if (blockchain_data.block_reward_output_data_length != 2 || memcmp(blockchain_data.block_reward_output_data,BLOCK_REWARD_OUTPUT,2) != 0)
+  {
+    NETWORK_BLOCK_STRING_TO_BLOCKCHAIN_DATA_ERROR("Invalid network_block_string\nInvalid block_reward_output\nFunction: verify_network_block_data");
+  }
+
+  // block_reward
+  if ((blockchain_data.block_reward <= 34359738367 && blockchain_data.block_reward_data_length != 10) || (blockchain_data.block_reward > 34359738367 && blockchain_data.block_reward <= 4398046511104 && blockchain_data.block_reward_data_length != 12) || (blockchain_data.block_reward > 4398046511104 && blockchain_data.block_reward <= 562949953421312 && blockchain_data.block_reward_data_length != 14) || (blockchain_data.block_reward > 562949953421312 && blockchain_data.block_reward <= 72057594037927936 && blockchain_data.block_reward_data_length != 16) || (blockchain_data.block_reward > 72057594037927936 && blockchain_data.block_reward_data_length != 18))
+  {
+    NETWORK_BLOCK_STRING_TO_BLOCKCHAIN_DATA_ERROR("Invalid block_reward\nInvalid block_height\nFunction: verify_network_block_data");
+  }
+
+  // stealth_address_output_tag
+  if (blockchain_data.stealth_address_output_tag_data_length != 2 || memcmp(blockchain_data.stealth_address_output_tag_data,STEALTH_ADDRESS_OUTPUT_TAG,2) != 0)
+  {
+    NETWORK_BLOCK_STRING_TO_BLOCKCHAIN_DATA_ERROR("Invalid network_block_string\nInvalid stealth_address_output_tag\nFunction: verify_network_block_data");
+  }
+
+  // stealth_address_output
+  if (blockchain_data.stealth_address_output_data_length != 64)
+  {
+    NETWORK_BLOCK_STRING_TO_BLOCKCHAIN_DATA_ERROR("Invalid network_block_string\nInvalid stealth_address_output\nFunction: verify_network_block_data");
+  }
+
+  // extra_bytes_size
+  if (blockchain_data.extra_bytes_size_data_length != 2 || blockchain_data.extra_bytes_size < 2146 || blockchain_data.extra_bytes_size > 2420 || ((blockchain_data.transaction_public_key_tag_data_length + blockchain_data.transaction_public_key_data_length + blockchain_data.extra_nonce_tag_data_length + blockchain_data.reserve_bytes_size_data_length + blockchain_data.reserve_bytes_size) / 2) != blockchain_data.extra_bytes_size)
+  {
+    NETWORK_BLOCK_STRING_TO_BLOCKCHAIN_DATA_ERROR("Invalid block_reward\nInvalid extra_bytes_size\nFunction: verify_network_block_data");
+  }
+
+  // transaction_public_key_tag
+  if (blockchain_data.transaction_public_key_tag_data_length != 2 || memcmp(blockchain_data.transaction_public_key_tag_data,TRANSACTION_PUBLIC_KEY_TAG,2) != 0)
+  {
+    NETWORK_BLOCK_STRING_TO_BLOCKCHAIN_DATA_ERROR("Invalid network_block_string\nInvalid transaction_public_key_tag\nFunction: verify_network_block_data");
+  }
+
+  // transaction_public_key
+  if (blockchain_data.transaction_public_key_data_length != 64)
+  {
+    NETWORK_BLOCK_STRING_TO_BLOCKCHAIN_DATA_ERROR("Invalid transaction_public_key\nInvalid transaction_public_key\nFunction: verify_network_block_data");
+  }
+
+  // extra_nonce_tag
+  if (blockchain_data.extra_nonce_tag_data_length != 2 || memcmp(blockchain_data.extra_nonce_tag_data,EXTRA_NONCE_TAG,2) != 0)
+  {
+    NETWORK_BLOCK_STRING_TO_BLOCKCHAIN_DATA_ERROR("Invalid network_block_string\nInvalid extra_nonce_tag\nFunction: verify_network_block_data");
+  }
+
+  // reserve_bytes_size
+  if (blockchain_data.reserve_bytes_size_data_length != 4 || blockchain_data.reserve_bytes_size < 2110 || blockchain_data.reserve_bytes_size > 2384)
+  {
+    NETWORK_BLOCK_STRING_TO_BLOCKCHAIN_DATA_ERROR("Invalid block_reward\nInvalid reserve_bytes_size\nFunction: verify_network_block_data");
+  }
+
+  // blockchain_reserve_bytes
+
+
+
+  // ringct_version
+  if (blockchain_data.ringct_version_data_length != 2 || memcmp(blockchain_data.ringct_version_data,RINGCT_VERSION,2) != 0)
+  {
+    NETWORK_BLOCK_STRING_TO_BLOCKCHAIN_DATA_ERROR("Invalid network_block_string\nInvalid ringct_version\nFunction: verify_network_block_data");
+  }
+
+  // transaction_amount
+  if ((blockchain_data.transaction_amount <= 255 && blockchain_data.transaction_amount_data_length != 2) || (blockchain_data.transaction_amount > 255 && blockchain_data.transaction_amount <= 16383 && blockchain_data.transaction_amount_data_length != 4) || (blockchain_data.transaction_amount > 16383 && blockchain_data.transaction_amount_data_length != 6))
+  {
+    NETWORK_BLOCK_STRING_TO_BLOCKCHAIN_DATA_ERROR("Invalid network_block_string\nInvalid transaction_amount\nFunction: verify_network_block_data");
+  }
+
+  // transactions
+  if (verify_blockchain_network_transactions(blockchain_data.transactions,0) == 0)
+  {
+    NETWORK_BLOCK_STRING_TO_BLOCKCHAIN_DATA_ERROR("Invalid network_block_string\nInvalid transactions\nFunction: verify_network_block_data");
+  }
+
+  pointer_reset_all;
+  return 1;
+
+  #undef BLOCK_REWARD_TRANSACTION_VERSION
+  #undef BLOCK_REWARD_INPUT
+  #undef VIN_TYPE
+  #undef BLOCK_REWARD_OUTPUT
+  #undef STEALTH_ADDRESS_OUTPUT_TAG
+  #undef TRANSACTION_PUBLIC_KEY_TAG
+  #undef EXTRA_NONCE_TAG
+  #undef RINGCT_VERSION
+  #undef pointer_reset_all
+  #undef VERIFY_NETWORK_BLOCK_DATA_ERROR
 }
