@@ -25,6 +25,8 @@ Functions
 Name: get_block_template
 Description: Gets the block template for creating a new block
 Parameters:
+  result - The result to store the block_blob in
+  reserve_bytes_length - The amount of reserve bytes to create in the block template
   MESSAGE_SETTINGS - 1 to print the messages, otherwise 0. This is used for the testing flag to not print any success or error messages
 Return: 0 if an error has occured, 1 if successfull
 -----------------------------------------------------------------------------------------------------------
@@ -86,7 +88,6 @@ int get_block_template(char *result, char* reserve_bytes_length, const int HTTP_
   
   #undef pointer_reset_all
 }
-
 
 
 /*

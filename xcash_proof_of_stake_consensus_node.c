@@ -230,6 +230,9 @@ int main(int parameters_count, char* parameters[])
     blockchain_data.transactions[count] = (char*)calloc(65,sizeof(char));
   }
 
+  // Add each block validation nodes data to the block_validation_nodes_list struct
+  
+
   // initialize the database connection
   mongoc_init();
 
