@@ -779,7 +779,125 @@ Return: 1 if successfull, otherwise 0.
 
 int send_data_socket_consensus_node_to_node()
 {
- 
+  // Variables
+  char* message = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* data2 = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* data3 = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  size_t count;
+
+  // define macros
+  #define DATABASE_COLLECTION "current_round"
+  #define MESSAGE "{\"username\":\"xcash\"}"
+
+  #define pointer_reset_all \
+  free(message); \
+  message = NULL; \
+  free(data); \
+  data = NULL; \
+  free(data2); \
+  data2 = NULL; \
+  free(data3); \
+  data3 = NULL;
+
+  #define SEND_DATA_SOCKET_CONSENSUS_NODE_TO_NODE_ERROR(settings) \
+  color_print(settings,"red"); \
+  pointer_reset_all; \
+  return 0;
+
+  // check if the memory needed was allocated on the heap successfully
+  if (message == NULL || data == NULL || data2 == NULL || data3 == NULL)
+  {
+    if (message != NULL)
+    {
+      pointer_reset(message);
+    }
+    if (data != NULL)
+    {
+      pointer_reset(data);
+    }
+    if (data2 != NULL)
+    {
+      pointer_reset(data2);
+    }
+    if (data3 != NULL)
+    {
+      pointer_reset(data3);
+    }
+    return 0;
+  }
+
+  // read the current_round_part and current_round_part_backup_node from the database
+  if (read_document_field_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,"current_round_part",current_round_part,0) == 0 || read_document_field_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,"current_round_part_backup_node",current_round_part_backup_node,0) == 0)
+  {
+     SEND_DATA_SOCKET_CONSENSUS_NODE_TO_NODE_ERROR("Could not read the current_round_part or the current_round_part_backup_node from the database\nFunction: send_data_socket_consensus_node_to_node\nSend Message: CONSENSUS_NODE_TO_NODES_MAIN_NODE_PUBLIC_ADDRESS");
+  }
+
+  if (memcmp(current_round_part,"1",1) == 0 || memcmp(current_round_part,"3",1) == 0)
+  {
+    memcpy(data,"vrf_public_and_secret_key_public_address_",41);
+  }
+  else if (memcmp(current_round_part,"2",1) == 0)
+  {
+    memcpy(data,"vrf_random_data_public_address_",31);
+  }
+  else if (memcmp(current_round_part,"4",1) == 0)
+  {
+    memcpy(data,"block_producer_public_address_",30);
+  }
+  memcpy(data+strnlen(data,BUFFER_SIZE),current_round_part_backup_node,1);
+
+  // get the main nodes public address from the database 
+  if (read_document_field_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,data,data2,0) == 0)
+  {
+    SEND_DATA_SOCKET_CONSENSUS_NODE_TO_NODE_ERROR("Could not read the main nodes data from the database\nFunction: send_data_socket_consensus_node_to_node\nSend Message: CONSENSUS_NODE_TO_NODES_MAIN_NODE_PUBLIC_ADDRESS");
+  }
+
+  memset(data,0,strnlen(data,BUFFER_SIZE));
+  if (memcmp(current_round_part,"1",1) == 0 || memcmp(current_round_part,"3",1) == 0)
+  {
+    memcpy(data,"vrf_public_and_secret_key_IP_address_",37);
+  }
+  else if (memcmp(current_round_part,"2",1) == 0)
+  {
+    memcpy(data,"vrf_random_data_IP_address_",27);
+  }
+  else if (memcmp(current_round_part,"4",1) == 0)
+  {
+    memcpy(data,"block_producer_IP_address_",26);
+  }
+  memcpy(data+strnlen(data,BUFFER_SIZE),current_round_part_backup_node,1);
+
+  // get the main nodes IP address from the database 
+  if (read_document_field_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,data,data3,0) == 0)
+  {
+    SEND_DATA_SOCKET_CONSENSUS_NODE_TO_NODE_ERROR("Could not read the main nodes data from the database\nFunction: send_data_socket_consensus_node_to_node\nSend Message: CONSENSUS_NODE_TO_NODES_MAIN_NODE_PUBLIC_ADDRESS");
+  }
+
+  // create the message
+  memcpy(message,"{\r\n \"message_settings\": \"CONSENSUS_NODE_TO_NODES_MAIN_NODE_PUBLIC_ADDRESS\",\r\n \"main_nodes_public_address\": \"",108);
+  memcpy(message+108,data2,XCASH_WALLET_LENGTH);
+  memcpy(message+108+XCASH_WALLET_LENGTH,"\",\r\n}",5);
+
+  // sign_data
+  if (sign_data(message,0) == 0)
+  { 
+    SEND_DATA_SOCKET_CONSENSUS_NODE_TO_NODE_ERROR("Could not sign_data\nFunction: send_data_socket_consensus_node_to_node\nSend Message: CONSENSUS_NODE_TO_NODES_MAIN_NODE_PUBLIC_ADDRESS");
+  }
+
+  // send the message to all block verifiers
+  for (count = 0; count < BLOCK_VERIFIERS_AMOUNT; count++)
+  {
+    send_data_socket(data3,SEND_DATA_PORT,message,"sending CONSENSUS_NODE_TO_NODES_MAIN_NODE_PUBLIC_ADDRESS to the block verifiers",0);
+  }
+
+  pointer_reset_all;
+  return 1;
+
+  #undef DATABASE_COLLECTION
+  #undef MESSAGE
+  #undef pointer_reset_all
+  #undef SEND_DATA_SOCKET_CONSENSUS_NODE_TO_NODE_ERROR
 }
 
 
