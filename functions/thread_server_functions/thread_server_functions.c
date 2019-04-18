@@ -157,7 +157,6 @@ Return: NULL
 void* receive_votes_from_nodes_timeout_thread()
 {  
   // Variables
-  char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
   size_t count;
   size_t count2;
   size_t counter;
@@ -170,15 +169,7 @@ void* receive_votes_from_nodes_timeout_thread()
 
   #define RECEIVE_VOTES_FROM_NODES_TIMEOUT_THREAD_ERROR(settings) \
   color_print(settings,"red"); \
-  pointer_reset(data); \
-  return 0;
-
-  // check if the memory needed was allocated on the heap successfully
-  if (data == NULL)
-  {
-    color_print("Could not allocate the memory needed on the heap","red");
-    exit(0);
-  }
+  return 0;  
 
   // wait for the BLOCK_VERIFIERS_TOTAL_VOTE_TIME
   sleep(BLOCK_VERIFIERS_TOTAL_VOTE_TIME);
@@ -428,26 +419,8 @@ void* receive_votes_from_nodes_timeout_thread()
       }
     }
 
-    // update the current_round_part and current_round_part_backup_node in the database
-    if (memcmp(current_round_part,"1",1) == 0)
-    {
-      memcpy(data,"{\"current_round_part\":\"2\"}",26);
-    }
-    else if (memcmp(current_round_part,"2",1) == 0)
-    {
-      memcpy(data,"{\"current_round_part\":\"3\"}",26);
-    }
-    else if (memcmp(current_round_part,"3",1) == 0)
-    {
-      memcpy(data,"{\"current_round_part\":\"4\"}",26);
-    }
-    else if (memcmp(current_round_part,"4",1) == 0)
-    {
-      memcpy(data,"{\"current_round_part\":\"1\"}",26);
-    }
-
     // set the current_round_part and current_round_part_backup_node in the database
-    if (update_document_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,data,0) == 0 || update_document_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,"{\"current_round_part_backup_node\":\"0\"}",0) == 0)
+    if (update_document_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,"{\"current_round_part\":\"0\"}",0) == 0 || update_document_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,"{\"current_round_part_backup_node\":\"0\"}",0) == 0)
     {
       RECEIVE_VOTES_FROM_NODES_TIMEOUT_THREAD_ERROR("Could not update the current_round_part and current_round_part_backup_node in the database\nFunction: receive_votes_from_nodes_timeout_thread");
     }    

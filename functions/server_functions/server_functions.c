@@ -1743,7 +1743,78 @@ Return: 0 if an error has occured, 1 if successfull
 
 int start_new_part_of_round()
 {
-  
+  // Variables
+  char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  size_t count;
+
+  // define macros
+  #define DATABASE_COLLECTION "current_round"
+  #define MESSAGE "{\"username\":\"xcash\"}"
+
+  #define START_NEW_PART_OF_ROUND_ERROR(settings) \
+  color_print(settings,"red"); \
+  pointer_reset(data); \
+  return 0;
+
+  // check if the memory needed was allocated on the heap successfully
+  if (data == NULL)
+  {
+    color_print("Could not allocate the memory needed on the heap","red");
+    exit(0);
+  }
+
+  // create the message
+  memcpy(data,"{\r\n \"message_settings\": \"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEW_PART_OF_ROUND\",\r\n}",86);
+
+  // sign_data
+  if (sign_data(data,0) == 0)
+  { 
+    START_NEW_PART_OF_ROUND_ERROR("Could not sign_data\nFunction: start_new_part_of_round\nSend Message: CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEW_PART_OF_ROUND");
+  }
+
+  // send the CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEW_PART_OF_ROUND message to the nodes and main node
+  for (count = 0; count < BLOCK_VERIFIERS_AMOUNT; count++)
+  {
+    send_data_socket(block_verifiers_list.block_verifiers_IP_address[count],SEND_DATA_PORT,data,"sending CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEW_PART_OF_ROUND message to the nodes and main node",0);
+  }
+
+  // read the current_round_part and current_round_part_backup_node from the database
+  memset(current_round_part,0,strnlen(current_round_part,BUFFER_SIZE));
+  memset(current_round_part_backup_node,0,strnlen(current_round_part_backup_node,BUFFER_SIZE));
+  if (read_document_field_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,"current_round_part",current_round_part,0) == 0 || read_document_field_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,"current_round_part_backup_node",current_round_part_backup_node,0) == 0)
+  {
+     START_NEW_PART_OF_ROUND_ERROR("Could not read the current_round_part or the current_round_part_backup_node from the database\nFunction: start_new_part_of_round\nSend Message: CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEW_PART_OF_ROUND");
+  }
+
+  // update the current_round_part and current_round_part_backup_node in the database
+  if (memcmp(current_round_part,"1",1) == 0)
+  {
+    memcpy(data,"{\"current_round_part\":\"2\"}",26);
+  }
+  else if (memcmp(current_round_part,"2",1) == 0)
+  {
+    memcpy(data,"{\"current_round_part\":\"3\"}",26);
+  }
+  else if (memcmp(current_round_part,"3",1) == 0)
+  {
+    memcpy(data,"{\"current_round_part\":\"4\"}",26);
+  }
+  else if (memcmp(current_round_part,"4",1) == 0)
+  {
+    memcpy(data,"{\"current_round_part\":\"1\"}",26);
+  }
+
+  // set the current_round_part and current_round_part_backup_node in the database
+  if (update_document_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,data,0) == 0 || update_document_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,"{\"current_round_part_backup_node\":\"0\"}",0) == 0)
+  {
+    START_NEW_PART_OF_ROUND_ERROR("Could not update the current_round_part and current_round_part_backup_node in the database\nFunction: start_new_part_of_round\nSend Message: CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEW_PART_OF_ROUND");
+  }
+
+  return 1;
+
+  #undef DATABASE_COLLECTION
+  #undef MESSAGE
+  #undef START_NEW_PART_OF_ROUND_ERROR
 }
 
 
