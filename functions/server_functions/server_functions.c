@@ -1514,8 +1514,68 @@ Return: 0 if an error has occured, 1 if successfull
 
 int server_receive_data_socket_main_node_timeout_from_node(const int CLIENT_SOCKET, char* message)
 {
-  //
+  // Variables
+  char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* data2 = (char*)calloc(BUFFER_SIZE,sizeof(char));
+
+  // define macros
+  #define pointer_reset_all \
+  free(data); \
+  data = NULL; \
+  free(data2); \
+  data2 = NULL;
+
+  #define SERVER_RECEIVE_DATA_SOCKET_MAIN_NODE_TIMEOUT_FROM_NODE_ERROR(settings) \
+  color_print(settings,"red"); \
+  pointer_reset_all; \
+  return 0;
+
+  // check if the memory needed was allocated on the heap successfully
+  if (data == NULL || data2 == NULL)
+  {
+    if (data != NULL)
+    {
+      pointer_reset(data);
+    }
+    if (data2 != NULL)
+    {
+      pointer_reset(data2);
+    }
+    return 0;
+  }
+
+  // verify the data
+  if (verify_data(message,0,1,1) == 0)
+  {
+    SERVER_RECEIVE_DATA_SOCKET_MAIN_NODE_TIMEOUT_FROM_NODE_ERROR("Could not sign_data\nFunction: server_receive_data_socket_main_node_timeout_from_node\nReceive Message: NODES_TO_CONSENSUS_NODE_MAIN_NODE_SOCKET_TIMEOUT_ROUND_CHANGE");
+    return 0;
+  }
+
+  // parse the message
+  if (parse_json_data(message,"public_address",data) == 0)
+  {
+    SERVER_RECEIVE_DATA_SOCKET_MAIN_NODE_TIMEOUT_FROM_NODE_ERROR("Could not parse data\nFunction: server_receive_data_socket_main_node_timeout_from_node\nReceive Message: NODES_TO_CONSENSUS_NODE_MAIN_NODE_SOCKET_TIMEOUT_ROUND_CHANGE");
+  }
+
+  // check if the block verifier has already voted
+  if (verify_block_verifier_vote(data) == 0)
+  {
+    memcpy(data2,"The vote is not valid from public address ",42);
+    memcpy(data2+42,data,strnlen(data,BUFFER_SIZE));
+    memcpy(data2+42+strnlen(data,BUFFER_SIZE),"\nFunction: server_receive_data_socket_main_node_timeout_from_node\nReceive Message: NODES_TO_CONSENSUS_NODE_MAIN_NODE_SOCKET_TIMEOUT_ROUND_CHANGE",144);
+    SERVER_RECEIVE_DATA_SOCKET_MAIN_NODE_TIMEOUT_FROM_NODE_ERROR(data2);
+  }
+
+  // add one vote and the public address to the mainnode_timeout struct
+  memcpy(mainnode_timeout.block_verifiers_public_address[mainnode_timeout.vote_round_change_timeout],data,XCASH_WALLET_LENGTH);
+  mainnode_timeout.vote_round_change_timeout++;
+
+  return 1;
+
+  #undef pointer_reset_all
+  #undef SERVER_RECEIVE_DATA_SOCKET_MAIN_NODE_TIMEOUT_FROM_NODE_ERROR
 }
+
 
 
 /*
