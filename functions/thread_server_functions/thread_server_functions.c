@@ -53,7 +53,8 @@ void* total_connection_time_thread(void* parameters)
   // check if the memory needed was allocated on the heap successfully
   if (string == NULL)
   {
-    return 0;
+    color_print("Could not allocate the memory needed on the heap","red");
+    exit(0);
   }
 
   sleep(TOTAL_CONNECTION_TIME_SETTINGS);    
@@ -111,7 +112,8 @@ void* mainnode_timeout_thread(void* parameters)
   // check if the memory needed was allocated on the heap successfully
   if (string == NULL)
   {
-    return 0;
+    color_print("Could not allocate the memory needed on the heap","red");
+    exit(0);
   }
 
   sleep(TOTAL_CONNECTION_TIME_SETTINGS_MAIN_NODE_TIMEOUT);  
@@ -174,6 +176,7 @@ void* receive_votes_from_nodes_timeout_thread()
   // check if the memory needed was allocated on the heap successfully
   if (data == NULL)
   {
+    color_print("Could not allocate the memory needed on the heap","red");
     exit(0);
   }
 
@@ -507,7 +510,8 @@ void* check_if_consensus_node_is_offline_timer()
   // check if the memory needed was allocated on the heap successfully
   if (message == NULL)
   {   
-    return 0;
+    color_print("Could not allocate the memory needed on the heap","red");
+    exit(0);
   }
 
   // define macros
@@ -601,7 +605,8 @@ void* check_if_consensus_node_needs_to_add_a_block_to_the_network_timer()
   // check if the memory needed was allocated on the heap successfully
   if (message == NULL)
   {   
-    return 0;
+    color_print("Could not allocate the memory needed on the heap","red");
+    exit(0);
   }
 
   // define macros

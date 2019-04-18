@@ -324,7 +324,8 @@ int read_document_field_from_collection(const char* DATABASE, const char* COLLEC
     {
       pointer_reset(settings);
     }
-    return 0;
+    color_print("Could not allocate the memory needed on the heap","red");
+    exit(0);
   } 
 
   // check if we need to create a database connection, or use the global database connection
@@ -533,7 +534,8 @@ int read_document_all_fields_from_collection(const char* DATABASE, const char* C
   // check if the memory needed was allocated on the heap successfully
   if (data == NULL)
   {
-    return 0;
+    color_print("Could not allocate the memory needed on the heap","red");
+    exit(0);
   } 
 
    // check if we need to create a database connection, or use the global database connection
@@ -635,7 +637,8 @@ int read_multiple_documents_all_fields_from_collection(const char* DATABASE, con
   // check if the memory needed was allocated on the heap successfully
   if (data == NULL)
   {
-    return 0;
+    color_print("Could not allocate the memory needed on the heap","red");
+    exit(0);
   }
 
    // check if we need to create a database connection, or use the global database connection
@@ -744,7 +747,8 @@ int update_document_from_collection(const char* DATABASE, const char* COLLECTION
   // check if the memory needed was allocated on the heap successfully
   if (data2 == NULL)
   {
-    return 0;
+    color_print("Could not allocate the memory needed on the heap","red");
+    exit(0);
   } 
 
    // check if we need to create a database connection, or use the global database connection
@@ -838,7 +842,8 @@ int update_all_documents_from_collection(const char* DATABASE, const char* COLLE
   // check if the memory needed was allocated on the heap successfully
   if (data2 == NULL)
   {
-    return 0;
+    color_print("Could not allocate the memory needed on the heap","red");
+    exit(0);
   } 
 
    // check if we need to create a database connection, or use the global database connection
@@ -1231,7 +1236,8 @@ int update_delegates_online_status(const char* DATABASE, const char* COLLECTION,
     {
       pointer_reset(IP_address);
     }
-    return 0;
+    color_print("Could not allocate the memory needed on the heap","red");
+    exit(0);
   } 
 
    // check if we need to create a database connection, or use the global database connection

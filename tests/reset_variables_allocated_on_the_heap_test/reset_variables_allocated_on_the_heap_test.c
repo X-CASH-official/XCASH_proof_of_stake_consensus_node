@@ -52,7 +52,8 @@ size_t get_program_memory_usage(char* process_id_file)
 
   if (data == NULL)
   {
-    return 0;
+    color_print("Could not allocate the memory needed on the heap","red");
+    exit(0);
   }
 
   // read the current system memory usage
@@ -134,7 +135,8 @@ int reset_variables_allocated_on_the_heap_test()
     {
       pointer_reset(settings);
     }
-    return 0;
+    color_print("Could not allocate the memory needed on the heap","red");
+    exit(0);
   }
 
   // reset the variables
@@ -147,6 +149,12 @@ int reset_variables_allocated_on_the_heap_test()
   {
     database_data.item[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
     database_data.value[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
+    
+    if (database_data.item[count] == NULL || database_data.value[count] == NULL)
+    {
+      color_print("Could not allocate the memory needed on the heap","red");
+      exit(0);
+    }
   }
 
   memcpy(database_data.item[0],"username",8);
@@ -188,6 +196,12 @@ int reset_variables_allocated_on_the_heap_test()
     {
       database_multiple_documents_fields.item[count][counter] = (char*)calloc(BUFFER_SIZE,sizeof(char));
       database_multiple_documents_fields.value[count][counter] = (char*)calloc(BUFFER_SIZE,sizeof(char));
+
+      if (database_multiple_documents_fields.item[count][counter] == NULL || database_multiple_documents_fields.value[count][counter] == NULL)
+      {
+        color_print("Could not allocate the memory needed on the heap","red");
+        exit(0);
+      }
     }
   }
 
@@ -262,6 +276,12 @@ int reset_variables_allocated_on_the_heap_test()
   {
     data[count] = (char*)calloc(BUFFER_SIZE,sizeof(char)); 
     settings[count] = (char*)calloc(BUFFER_SIZE,sizeof(char)); 
+
+    if (data[count] == NULL || settings[count] == NULL)
+    {
+      color_print("Could not allocate the memory needed on the heap","red");
+      exit(0);
+    }
   }  
 
   // create the the arrays

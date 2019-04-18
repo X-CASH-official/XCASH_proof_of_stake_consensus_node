@@ -60,7 +60,8 @@ void test()
     {
       pointer_reset(data_test);
     }
-    return;
+    color_print("Could not allocate the memory needed on the heap","red");
+    exit(0);
   } 
 
   // run the tests

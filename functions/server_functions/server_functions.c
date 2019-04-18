@@ -60,7 +60,8 @@ int get_current_consensus_node()
   // check if the memory needed was allocated on the heap successfully
   if (data == NULL)
   {
-    return 0;
+    color_print("Could not allocate the memory needed on the heap","red");
+    exit(0);
   }
 
   // read the current_consensus_node_IP_address from the consensus_node collection
@@ -139,7 +140,8 @@ int get_block_verifiers_list()
     {
       pointer_reset(settings);
     }
-    return 0;
+    color_print("Could not allocate the memory needed on the heap","red");
+    exit(0);
   }  
   
   // set the collection
@@ -334,7 +336,8 @@ int send_consensus_node_needs_to_add_a_block_to_the_network_message()
   // check if the memory needed was allocated on the heap successfully
   if (data == NULL)
   {
-    return 0;
+    color_print("Could not allocate the memory needed on the heap","red");
+    exit(0);
   }
 
   // create the message
@@ -413,7 +416,8 @@ int consensus_node_create_new_block()
     {
       pointer_reset(message);
     }
-    return 0;
+    color_print("Could not allocate the memory needed on the heap","red");
+    exit(0);
   }
 
   start:
@@ -602,7 +606,8 @@ int calculate_main_nodes_role()
   // check if the memory needed was allocated on the heap successfully
   if (data == NULL)
   {
-    return 0;
+    color_print("Could not allocate the memory needed on the heap","red");
+    exit(0);
   }
 
   // get the previous block template
@@ -687,7 +692,8 @@ int mainode_consensus()
     {
       pointer_reset(data2);
     }
-    return 0;
+    color_print("Could not allocate the memory needed on the heap","red");
+    exit(0);
   }
 
   // read the current_round_part and current_round_part_backup_node from the database
@@ -840,7 +846,8 @@ int send_data_socket_consensus_node_to_node()
     {
       pointer_reset(data3);
     }
-    return 0;
+    color_print("Could not allocate the memory needed on the heap","red");
+    exit(0);
   }
 
   // read the current_round_part and current_round_part_backup_node from the database
@@ -973,7 +980,8 @@ int send_data_socket_consensus_node_to_mainnode()
     {
       pointer_reset(data3);
     }
-    return 0;
+    color_print("Could not allocate the memory needed on the heap","red");
+    exit(0);
   }
 
   // read the current_round_part and current_round_part_backup_node from the database
@@ -1210,7 +1218,8 @@ int server_receive_data_socket_node_to_consensus_node_send_current_consensus_nod
     {
       pointer_reset(data2);
     }
-    return 0;
+    color_print("Could not allocate the memory needed on the heap","red");
+    exit(0);
   }
 
   // read the current_round_part and current_round_part_backup_node from the database
@@ -1326,7 +1335,8 @@ int server_receive_data_socket_node_to_consensus_node_send_updated_node_list(con
     {
       pointer_reset(nodes_IP_address_list);
     }
-    return 0;
+    color_print("Could not allocate the memory needed on the heap","red");
+    exit(0);
   }
 
   // read the current_round_part and current_round_part_backup_node from the database
@@ -1565,7 +1575,8 @@ int server_receive_data_socket_main_node_timeout_from_node(char* message)
     {
       pointer_reset(data2);
     }
-    return 0;
+    color_print("Could not allocate the memory needed on the heap","red");
+    exit(0);
   }
 
   // read the current_round_part and current_round_part_backup_node from the database
@@ -1650,7 +1661,8 @@ int server_receive_data_socket_node_to_node_vote(char* message)
     {
       pointer_reset(data2);
     }
-    return 0;
+    color_print("Could not allocate the memory needed on the heap","red");
+    exit(0);
   }
 
   // read the current_round_part and current_round_part_backup_node from the database
@@ -1823,7 +1835,8 @@ int create_server(const int MESSAGE_SETTINGS)
 
   if (string == NULL)
   {
-    return 0;
+    color_print("Could not allocate the memory needed on the heap","red");
+    exit(0);
   } 
     
   /* Create the socket  
