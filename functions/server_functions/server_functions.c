@@ -1451,6 +1451,23 @@ int server_receive_data_socket_node_to_consensus_node_send_updated_node_list(con
 
 /*
 -----------------------------------------------------------------------------------------------------------
+Name: server_receive_data_socket_main_node_timeout_from_node
+Description: Runs the code when the server receives the NODES_TO_CONSENSUS_NODE_MAIN_NODE_SOCKET_TIMEOUT_ROUND_CHANGE message
+Parameters:
+  CLIENT_SOCKET - The socket to send data to
+  message - The message
+Return: 0 if an error has occured, 1 if successfull
+-----------------------------------------------------------------------------------------------------------
+*/
+
+int server_receive_data_socket_main_node_timeout_from_node(const int CLIENT_SOCKET, char* message)
+{
+  //
+}
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
 Name: create_server
 Description: Creates the server
 Parameters:
@@ -1709,9 +1726,9 @@ int create_server(const int MESSAGE_SETTINGS)
              SERVER_ERROR(1);
            }
          }
-         else if (strstr(buffer,"\"message_settings\": \"NODE_TO_CONSENSUS_NODE_SEND_UPDATED_NODE_LIST\"") != NULL && strncmp(server_message,"NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS",BUFFER_SIZE) == 0)
+         else if (strstr(buffer,"\"message_settings\": \"NODES_TO_CONSENSUS_NODE_MAIN_NODE_SOCKET_TIMEOUT_ROUND_CHANGE\"") != NULL && strncmp(server_message,"NODES_TO_CONSENSUS_NODE_MAIN_NODE_SOCKET_TIMEOUT_ROUND_CHANGE",BUFFER_SIZE) == 0)
          {
-           if (server_receive_data_socket_node_to_consensus_node_send_current_consensus_node_IP_address(CLIENT_SOCKET,buffer) == 0)
+           if (server_receive_data_socket_main_node_timeout_from_node(CLIENT_SOCKET,buffer) == 0)
            {
              SERVER_ERROR(1);
            }
