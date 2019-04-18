@@ -59,14 +59,11 @@ int main(int parameters_count, char* parameters[])
   current_consensus_nodes_IP_address = (char*)calloc(BUFFER_SIZE,sizeof(char)); 
   main_nodes_public_address = (char*)calloc(BUFFER_SIZE,sizeof(char)); 
   server_message = (char*)calloc(BUFFER_SIZE,sizeof(char)); 
-  vote_round_change_timeout = (char*)calloc(BUFFER_SIZE,sizeof(char)); 
-  vote_next_round_true = (char*)calloc(BUFFER_SIZE,sizeof(char)); 
-  vote_next_round_false = (char*)calloc(BUFFER_SIZE,sizeof(char)); 
   current_round_part = (char*)calloc(BUFFER_SIZE,sizeof(char)); 
   current_round_part_backup_node = (char*)calloc(BUFFER_SIZE,sizeof(char));
 
   // check if the memory needed was allocated on the heap successfully
-  if (xcash_wallet_public_address == NULL || consensus_node_add_blocks_to_network == NULL || current_consensus_nodes_IP_address == NULL || main_nodes_public_address == NULL || server_message == NULL || vote_round_change_timeout == NULL || vote_next_round_true == NULL || vote_next_round_false == NULL || current_round_part == NULL || current_round_part_backup_node == NULL)
+  if (xcash_wallet_public_address == NULL || consensus_node_add_blocks_to_network == NULL || current_consensus_nodes_IP_address == NULL || main_nodes_public_address == NULL || server_message == NULL || current_round_part == NULL || current_round_part_backup_node == NULL)
   {
     if (xcash_wallet_public_address != NULL)
     {
@@ -87,18 +84,6 @@ int main(int parameters_count, char* parameters[])
     if (server_message != NULL)
     {
       pointer_reset(server_message);
-    }
-    if (vote_round_change_timeout != NULL)
-    {
-      pointer_reset(vote_round_change_timeout);
-    }
-    if (vote_next_round_true != NULL)
-    {
-      pointer_reset(vote_next_round_true);
-    }
-    if (vote_next_round_false != NULL)
-    {
-      pointer_reset(vote_next_round_false);
     }
     if (current_round_part != NULL)
     {

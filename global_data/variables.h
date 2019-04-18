@@ -30,9 +30,9 @@ pthread_t check_if_consensus_node_is_offline_timer_thread_id; // The thread ID f
 int check_if_consensus_node_needs_to_add_a_block_to_the_network_timer_settings; // 1 if the check_if_consensus_node_needs_to_add_a_block_to_the_network_timer is running, otherwise 0
 int check_if_consensus_node_is_offline_timer_settings; // 1 if the check_if_consensus_node_is_offline_timer is running, otherwise 0
 char* server_message; // The message the server should run. It will ignore any other messages.
-char* vote_round_change_timeout; // The amount of nodes that voted for a round change because the main node did not send any data
-char* vote_next_round_true; // The amount of nodes that voted true for a part of a round
-char* vote_next_round_false; // The amount of nodes that voted false for a part of a round
+size_t vote_round_change_timeout; // The amount of nodes that voted for a round change because the main node did not send any data
+size_t vote_next_round_true; // The amount of nodes that voted true for a part of a round
+size_t vote_next_round_false; // The amount of nodes that voted false for a part of a round
 char* current_round_part; // The current round part (1-4)
 char* current_round_part_backup_node; // The current main node in the current round part (0-5)
 #endif
