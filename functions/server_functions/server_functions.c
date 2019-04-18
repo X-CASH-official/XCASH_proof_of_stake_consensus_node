@@ -912,7 +912,207 @@ Return: 1 if successfull, otherwise 0.
 
 int send_data_socket_consensus_node_to_mainnode()
 {
+  // Variables
+  char* message = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* data2 = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* data3 = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  size_t count;
+
+  // define macros
+  #define MESSAGE "{\"username\":\"xcash\"}"
+
+  #define pointer_reset_all \
+  free(message); \
+  message = NULL; \
+  free(data); \
+  data = NULL; \
+  free(data2); \
+  data2 = NULL; \
+  free(data3); \
+  data3 = NULL;
+
+  #define SEND_DATA_SOCKET_CONSENSUS_NODE_TO_MAINNODE_ERROR(settings) \
+  color_print(settings,"red"); \
+  pointer_reset_all; \
+  return 0;
+
+  // check if the memory needed was allocated on the heap successfully
+  if (message == NULL || data == NULL || data2 == NULL || data3 == NULL)
+  {
+    if (message != NULL)
+    {
+      pointer_reset(message);
+    }
+    if (data != NULL)
+    {
+      pointer_reset(data);
+    }
+    if (data2 != NULL)
+    {
+      pointer_reset(data2);
+    }
+    if (data3 != NULL)
+    {
+      pointer_reset(data3);
+    }
+    return 0;
+  }
+
+  // read the current_round_part and current_round_part_backup_node from the database
+  if (read_document_field_from_collection(DATABASE_NAME,"current_round",MESSAGE,"current_round_part",current_round_part,0) == 0 || read_document_field_from_collection(DATABASE_NAME,"current_round",MESSAGE,"current_round_part_backup_node",current_round_part_backup_node,0) == 0)
+  {
+     SEND_DATA_SOCKET_CONSENSUS_NODE_TO_MAINNODE_ERROR("Could not read the current_round_part or the current_round_part_backup_node from the database\nFunction: send_data_socket_consensus_node_to_mainnode\nSend Message: CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND");
+  }
+
+  if (memcmp(current_round_part,"1",1) == 0 || memcmp(current_round_part,"3",1) == 0)
+  {
+    memcpy(data,"vrf_public_and_secret_key_IP_address_",37);
+  }
+  else if (memcmp(current_round_part,"2",1) == 0)
+  {
+    memcpy(data,"vrf_random_data_IP_address_",27);
+  }
+  else if (memcmp(current_round_part,"4",1) == 0)
+  {
+    memcpy(data,"block_producer_IP_address_",26);
+  }
+  memcpy(data+strnlen(data,BUFFER_SIZE),current_round_part_backup_node,1);
+
+  // get the main nodes IP address from the database 
+  if (read_document_field_from_collection(DATABASE_NAME,"nodes",MESSAGE,data,data2,0) == 0)
+  {
+    SEND_DATA_SOCKET_CONSENSUS_NODE_TO_MAINNODE_ERROR("Could not read the main nodes data from the database\nFunction: send_data_socket_consensus_node_to_mainnode\nSend Message: CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND");
+  }
+
+  if (memcmp(current_round_part,"4",1) == 0)
+  {
+    // read all of the VRF data from the database
+    memset(data,0,strnlen(data,BUFFER_SIZE));
+    count = 0;
+    if (read_document_field_from_collection(DATABASE_NAME,"nodes",MESSAGE,"vrf_public_key_round_part_1",data,0) == 0)
+    {
+      SEND_DATA_SOCKET_CONSENSUS_NODE_TO_MAINNODE_ERROR("Could not read the VRF data from the database\nFunction: send_data_socket_consensus_node_to_mainnode\nSend Message: CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND");
+    }
+    memcpy(data3+count,data,strnlen(data,BUFFER_SIZE));
+    count += strnlen(data,BUFFER_SIZE);
+
+    memset(data,0,strnlen(data,BUFFER_SIZE));
+    if (read_document_field_from_collection(DATABASE_NAME,"nodes",MESSAGE,"vrf_alpha_string_round_part_1",data,0) == 0)
+    {
+      SEND_DATA_SOCKET_CONSENSUS_NODE_TO_MAINNODE_ERROR("Could not read the VRF data from the database\nFunction: send_data_socket_consensus_node_to_mainnode\nSend Message: CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND");
+    }
+    memcpy(data3+count,data,strnlen(data,BUFFER_SIZE));
+    count += strnlen(data,BUFFER_SIZE);
+
+    memset(data,0,strnlen(data,BUFFER_SIZE));
+    if (read_document_field_from_collection(DATABASE_NAME,"nodes",MESSAGE,"vrf_proof_round_part_1",data,0) == 0)
+    {
+      SEND_DATA_SOCKET_CONSENSUS_NODE_TO_MAINNODE_ERROR("Could not read the VRF data from the database\nFunction: send_data_socket_consensus_node_to_mainnode\nSend Message: CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND");
+    }
+    memcpy(data3+count,data,strnlen(data,BUFFER_SIZE));
+    count += strnlen(data,BUFFER_SIZE);
+    
+    memset(data,0,strnlen(data,BUFFER_SIZE));
+    if (read_document_field_from_collection(DATABASE_NAME,"nodes",MESSAGE,"vrf_beta_string_round_part_1",data,0) == 0)
+    {
+      SEND_DATA_SOCKET_CONSENSUS_NODE_TO_MAINNODE_ERROR("Could not read the VRF data from the database\nFunction: send_data_socket_consensus_node_to_mainnode\nSend Message: CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND");
+    }
+    memcpy(data3+count,data,strnlen(data,BUFFER_SIZE));
+    count += strnlen(data,BUFFER_SIZE);
+
+    memset(data,0,strnlen(data,BUFFER_SIZE));
+    if (read_document_field_from_collection(DATABASE_NAME,"nodes",MESSAGE,"vrf_public_key_round_part_2",data,0) == 0)
+    {
+      SEND_DATA_SOCKET_CONSENSUS_NODE_TO_MAINNODE_ERROR("Could not read the VRF data from the database\nFunction: send_data_socket_consensus_node_to_mainnode\nSend Message: CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND");
+    }
+    memcpy(data3+count,data,strnlen(data,BUFFER_SIZE));
+    count += strnlen(data,BUFFER_SIZE);
+
+    memset(data,0,strnlen(data,BUFFER_SIZE));
+    if (read_document_field_from_collection(DATABASE_NAME,"nodes",MESSAGE,"vrf_alpha_string_round_part_2",data,0) == 0)
+    {
+      SEND_DATA_SOCKET_CONSENSUS_NODE_TO_MAINNODE_ERROR("Could not read the VRF data from the database\nFunction: send_data_socket_consensus_node_to_mainnode\nSend Message: CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND");
+    }
+    memcpy(data3+count,data,strnlen(data,BUFFER_SIZE));
+    count += strnlen(data,BUFFER_SIZE);
+
+    memset(data,0,strnlen(data,BUFFER_SIZE));
+    if (read_document_field_from_collection(DATABASE_NAME,"nodes",MESSAGE,"vrf_proof_round_part_2",data,0) == 0)
+    {
+      SEND_DATA_SOCKET_CONSENSUS_NODE_TO_MAINNODE_ERROR("Could not read the VRF data from the database\nFunction: send_data_socket_consensus_node_to_mainnode\nSend Message: CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND");
+    }
+    memcpy(data3+count,data,strnlen(data,BUFFER_SIZE));
+    count += strnlen(data,BUFFER_SIZE);
+    
+    memset(data,0,strnlen(data,BUFFER_SIZE));
+    if (read_document_field_from_collection(DATABASE_NAME,"nodes",MESSAGE,"vrf_beta_string_round_part_2",data,0) == 0)
+    {
+      SEND_DATA_SOCKET_CONSENSUS_NODE_TO_MAINNODE_ERROR("Could not read the VRF data from the database\nFunction: send_data_socket_consensus_node_to_mainnode\nSend Message: CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND");
+    }
+    memcpy(data3+count,data,strnlen(data,BUFFER_SIZE));
+    count += strnlen(data,BUFFER_SIZE);
+
+    memset(data,0,strnlen(data,BUFFER_SIZE));
+    if (read_document_field_from_collection(DATABASE_NAME,"nodes",MESSAGE,"vrf_public_key_round_part_3",data,0) == 0)
+    {
+      SEND_DATA_SOCKET_CONSENSUS_NODE_TO_MAINNODE_ERROR("Could not read the VRF data from the database\nFunction: send_data_socket_consensus_node_to_mainnode\nSend Message: CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND");
+    }
+    memcpy(data3+count,data,strnlen(data,BUFFER_SIZE));
+    count += strnlen(data,BUFFER_SIZE);
+
+    memset(data,0,strnlen(data,BUFFER_SIZE));
+    if (read_document_field_from_collection(DATABASE_NAME,"nodes",MESSAGE,"vrf_alpha_string_round_part_3",data,0) == 0)
+    {
+      SEND_DATA_SOCKET_CONSENSUS_NODE_TO_MAINNODE_ERROR("Could not read the VRF data from the database\nFunction: send_data_socket_consensus_node_to_mainnode\nSend Message: CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND");
+    }
+    memcpy(data3+count,data,strnlen(data,BUFFER_SIZE));
+    count += strnlen(data,BUFFER_SIZE);
+
+    memset(data,0,strnlen(data,BUFFER_SIZE));
+    if (read_document_field_from_collection(DATABASE_NAME,"nodes",MESSAGE,"vrf_proof_round_part_3",data,0) == 0)
+    {
+      SEND_DATA_SOCKET_CONSENSUS_NODE_TO_MAINNODE_ERROR("Could not read the VRF data from the database\nFunction: send_data_socket_consensus_node_to_mainnode\nSend Message: CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND");
+    }
+    memcpy(data3+count,data,strnlen(data,BUFFER_SIZE));
+    count += strnlen(data,BUFFER_SIZE);
+    
+    memset(data,0,strnlen(data,BUFFER_SIZE));
+    if (read_document_field_from_collection(DATABASE_NAME,"nodes",MESSAGE,"vrf_beta_string_round_part_3",data,0) == 0)
+    {
+      SEND_DATA_SOCKET_CONSENSUS_NODE_TO_MAINNODE_ERROR("Could not read the VRF data from the database\nFunction: send_data_socket_consensus_node_to_mainnode\nSend Message: CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND");
+    }
+    memcpy(data3+count,data,strnlen(data,BUFFER_SIZE));
+    count += strnlen(data,BUFFER_SIZE);
+
+    // create the message
+    memcpy(message,"{\r\n \"message_settings\": \"CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND\",\r\n \"message\": \"",90);
+    memcpy(message+90,current_round_part,1);
+    memcpy(message+91,"\",\r\n \"VRF_block_blob\": \"",24);
+    memcpy(message+115,data3,strnlen(data3,BUFFER_SIZE));
+    memcpy(message+115+strnlen(data3,BUFFER_SIZE),"\",\r\n}",5);
+  }
+  else
+  {
+    // create the message
+    memcpy(message,"{\r\n \"message_settings\": \"CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND\",\r\n \"message\": \"4\",\r\n \"VRF_block_blob\": \"\",\r\n}",120);
+  }
+
+  // sign_data
+  if (sign_data(message,0) == 0)
+  { 
+    SEND_DATA_SOCKET_CONSENSUS_NODE_TO_MAINNODE_ERROR("Could not sign_data\nFunction: send_data_socket_consensus_node_to_mainnode\nSend Message: CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND");
+  }
+
+  // send the message to the main node
+  send_data_socket(data2,SEND_DATA_PORT,message,"sending CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND to the block verifiers",0);
   
+  pointer_reset_all;
+  return 1;
+
+  #undef MESSAGE
+  #undef pointer_reset_all
+  #undef SEND_DATA_SOCKET_CONSENSUS_NODE_TO_MAINNODE_ERROR
 }
 
 
