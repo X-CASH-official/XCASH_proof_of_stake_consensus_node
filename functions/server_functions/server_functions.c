@@ -1709,6 +1709,68 @@ int server_receive_data_socket_node_to_node_vote(char* message)
 
 /*
 -----------------------------------------------------------------------------------------------------------
+Name: send_round_change
+Description: sends the CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_ROUND_CHANGE message to each block verifier
+-----------------------------------------------------------------------------------------------------------
+*/
+
+void send_round_change()
+{
+  
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
+Name: start_new_part_of_round
+Description: Starts the new part of the round
+Return: 0 if an error has occured, 1 if successfull
+-----------------------------------------------------------------------------------------------------------
+*/
+
+int start_new_part_of_round()
+{
+  
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
+Name: start_next_round
+Description: Starts the new part of the round
+Parameters:
+   SETTINGS - 1 to run the consensus_node_create_new_block to start the next round, otherwise just send the messages to start the next round
+Return: 0 if an error has occured, 1 if successfull
+-----------------------------------------------------------------------------------------------------------
+*/
+
+int start_next_round(const int SETTINGS)
+{
+  
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
+Name: update_block_producer_eligibility
+Description: Sets the update_block_producer_eligibility field to false for all block verifiers that voted for the invalid vote
+Parameters:
+   SETTINGS - 0 to set all block verifiers that voted for the mainnode_timeout to false, 1 to set all block verifiers that voted for the vote_next_round_false to false, 2 to set all block verifiers that voted for the vote_next_round_true to false.
+-----------------------------------------------------------------------------------------------------------
+*/
+
+void update_block_producer_eligibility(const int SETTINGS)
+{
+  
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
 Name: create_server
 Description: Creates the server
 Parameters:

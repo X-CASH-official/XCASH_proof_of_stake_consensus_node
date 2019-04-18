@@ -21,5 +21,9 @@ int server_receive_data_socket_node_to_consensus_node_send_updated_node_list(con
 int verify_block_verifier_vote(char* public_address);
 int server_receive_data_socket_main_node_timeout_from_node(char* message);
 int server_receive_data_socket_node_to_node_vote(char* message);
+void send_round_change();
+int start_new_part_of_round();
+int start_next_round(const int SETTINGS);
+void update_block_producer_eligibility(const int SETTINGS);
 int create_server(const int MESSAGE_SETTINGS);
 #endif

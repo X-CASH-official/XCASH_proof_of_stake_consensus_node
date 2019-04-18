@@ -154,11 +154,335 @@ Return: NULL
 
 void* receive_votes_from_nodes_timeout_thread()
 {  
+  // Variables
+  char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  size_t count;
+  size_t count2;
+  size_t counter;
+  int settings = 0;
+  int settings2 = 0;
+
+  // define macros
+  #define DATABASE_COLLECTION "current_round"
+  #define MESSAGE "{\"username\":\"xcash\"}"
+
+  #define RECEIVE_VOTES_FROM_NODES_TIMEOUT_THREAD_ERROR(settings) \
+  color_print(settings,"red"); \
+  pointer_reset(data); \
+  return 0;
+
+  // check if the memory needed was allocated on the heap successfully
+  if (data == NULL)
+  {
+    exit(0);
+  }
+
+  // wait for the BLOCK_VERIFIERS_TOTAL_VOTE_TIME
+  sleep(BLOCK_VERIFIERS_TOTAL_VOTE_TIME);
+
+  // read the current_round_part and current_round_part_backup_node from the database
+  memset(current_round_part,0,strnlen(current_round_part,BUFFER_SIZE));
+  memset(current_round_part_backup_node,0,strnlen(current_round_part_backup_node,BUFFER_SIZE));
+  if (read_document_field_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,"current_round_part",current_round_part,0) == 0 || read_document_field_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,"current_round_part_backup_node",current_round_part_backup_node,0) == 0)
+  {
+     RECEIVE_VOTES_FROM_NODES_TIMEOUT_THREAD_ERROR("Could not read the current_round_part or the current_round_part_backup_node from the database\nFunction: receive_votes_from_nodes_timeout_thread");
+  }
+
+  // check if the trusted nodes for at least TRUSTED_BLOCK_VERIFIERS_AMOUNT have the same result and get the VRF from the trusted nodes
+
+
+  // check the mainnode_timeout vote results
+  if (mainnode_timeout.vote_round_change_timeout >= BLOCK_VERIFIERS_VALID_AMOUNT)
+  {
+    // check if at least TRUSTED_BLOCK_VERIFIERS_AMOUNT have voted for a round change due to a main node timeout
+    for (count = 0, count2 = 0, counter = 0; count < mainnode_timeout.vote_round_change_timeout; count++)
+    {
+      for (count2 = 0; count2 < TRUSTED_BLOCK_VERIFIERS_TOTAL_AMOUNT; count2++)
+      {
+        if (memcmp(mainnode_timeout.block_verifiers_public_address[count],trusted_block_verifiers.trusted_block_verifiers_public_address[count2],XCASH_WALLET_LENGTH) == 0)
+        {
+          counter++;
+        }
+      }
+    }
+
+    if (counter >= TRUSTED_BLOCK_VERIFIERS_AMOUNT)
+    {
+      // The main node timeout is valid
+      settings = 1;      
+    }
+    else
+    {
+      // The main node timeout is invalid
+      settings = 2;
+    }
+  }
+
+
+
+  // check if the the node_to_node_vote vote results are false
+  if (mainnode_timeout.vote_round_change_timeout < BLOCK_VERIFIERS_VALID_AMOUNT && node_to_node_vote.vote_next_round_false >= BLOCK_VERIFIERS_VALID_AMOUNT)
+  {
+    // check if at least TRUSTED_BLOCK_VERIFIERS_AMOUNT have voted false
+    for (count = 0, count2 = 0, counter = 0; count < node_to_node_vote.vote_next_round_false; count++)
+    {
+      for (count2 = 0; count2 < TRUSTED_BLOCK_VERIFIERS_TOTAL_AMOUNT; count2++)
+      {
+        if (memcmp(mainnode_timeout.block_verifiers_public_address[count],trusted_block_verifiers.trusted_block_verifiers_public_address[count2],XCASH_WALLET_LENGTH) == 0)
+        {
+          counter++;
+        }
+      }
+    }
+
+    // verify the VRF data for the current part of the round and set the result to settings2
+    
+    
+    if (counter >= TRUSTED_BLOCK_VERIFIERS_AMOUNT && settings2 == 1)
+    {
+      // The vote for false is valid
+      settings = 3;
+    }
+    else
+    {
+      // The vote for false is invalid
+      settings = 4;
+    }
+  }
+
+
+
+  // check if the the node_to_node_vote vote results are true
+  if (mainnode_timeout.vote_round_change_timeout < BLOCK_VERIFIERS_VALID_AMOUNT && node_to_node_vote.vote_next_round_true >= BLOCK_VERIFIERS_VALID_AMOUNT)
+  {
+    // check if at least TRUSTED_BLOCK_VERIFIERS_AMOUNT have voted true
+    for (count = 0, count2 = 0, counter = 0; count < node_to_node_vote.vote_next_round_true; count++)
+    {
+      for (count2 = 0; count2 < TRUSTED_BLOCK_VERIFIERS_TOTAL_AMOUNT; count2++)
+      {
+        if (memcmp(mainnode_timeout.block_verifiers_public_address[count],trusted_block_verifiers.trusted_block_verifiers_public_address[count2],XCASH_WALLET_LENGTH) == 0)
+        {
+          counter++;
+        }
+      }
+    }
+
+    // verify the VRF data for the current part of the round and set the result to settings2
+    
+    
+    if (counter >= TRUSTED_BLOCK_VERIFIERS_AMOUNT && settings2 == 1)
+    {
+      // The vote for true is valid
+      settings = 5;
+    }
+    else
+    {
+      // The vote for true is invalid
+      settings = 6;
+    }
+  }
+
+
+
+  // check if no vote result was greater than BLOCK_VERIFIERS_VALID_AMOUNT
+  if (mainnode_timeout.vote_round_change_timeout < BLOCK_VERIFIERS_VALID_AMOUNT && node_to_node_vote.vote_next_round_false < BLOCK_VERIFIERS_VALID_AMOUNT && node_to_node_vote.vote_next_round_true < BLOCK_VERIFIERS_VALID_AMOUNT)
+  {
+    settings = 7;
+  }
+
+
+
+  // reset the mainnode_timeout struct
+  for (count = 0; count < BLOCK_VERIFIERS_AMOUNT; count++)
+  {
+    memset(mainnode_timeout.block_verifiers_public_address[count],0,strnlen(mainnode_timeout.block_verifiers_public_address[count],XCASH_WALLET_LENGTH+1));
+  }
+  mainnode_timeout.vote_round_change_timeout = 0;
+
+  // reset the node_to_node_vote struct
+  for (count = 0; count < BLOCK_VERIFIERS_AMOUNT; count++)
+  {
+    memset(node_to_node_vote.block_verifiers_public_address_vote_next_round_true[count],0,strnlen(node_to_node_vote.block_verifiers_public_address_vote_next_round_true[count],XCASH_WALLET_LENGTH+1));
+    memset(node_to_node_vote.block_verifiers_public_address_vote_next_round_false[count],0,strnlen(node_to_node_vote.block_verifiers_public_address_vote_next_round_false[count],XCASH_WALLET_LENGTH+1));
+  }
+  node_to_node_vote.vote_next_round_true = 0;
+  node_to_node_vote.vote_next_round_false = 0;
+
+  // reset the VRF_data and the trusted_block_verifiers_VRF_data if it is current_round_part 4
+  if (memcmp(current_round_part,"4",1) == 0)
+  {
+    memset(VRF_data.vrf_public_key_round_part_1,0,strnlen(VRF_data.vrf_public_key_round_part_1,BUFFER_SIZE));
+    memset(VRF_data.vrf_alpha_string_round_part_1,0,strnlen(VRF_data.vrf_alpha_string_round_part_1,BUFFER_SIZE));
+    memset(VRF_data.vrf_proof_round_part_1,0,strnlen(VRF_data.vrf_proof_round_part_1,BUFFER_SIZE));
+    memset(VRF_data.vrf_beta_string_round_part_1,0,strnlen(VRF_data.vrf_beta_string_round_part_1,BUFFER_SIZE));
+    memset(VRF_data.vrf_public_key_round_part_2,0,strnlen(VRF_data.vrf_public_key_round_part_2,BUFFER_SIZE));
+    memset(VRF_data.vrf_alpha_string_round_part_2,0,strnlen(VRF_data.vrf_alpha_string_round_part_2,BUFFER_SIZE));
+    memset(VRF_data.vrf_proof_round_part_2,0,strnlen(VRF_data.vrf_proof_round_part_2,BUFFER_SIZE));
+    memset(VRF_data.vrf_beta_string_round_part_2,0,strnlen(VRF_data.vrf_beta_string_round_part_2,BUFFER_SIZE));
+    memset(VRF_data.vrf_public_key_round_part_3,0,strnlen(VRF_data.vrf_public_key_round_part_3,BUFFER_SIZE));
+    memset(VRF_data.vrf_alpha_string_round_part_3,0,strnlen(VRF_data.vrf_alpha_string_round_part_3,BUFFER_SIZE));
+    memset(VRF_data.vrf_proof_round_part_3,0,strnlen(VRF_data.vrf_proof_round_part_3,BUFFER_SIZE));
+    memset(VRF_data.vrf_beta_string_round_part_3,0,strnlen(VRF_data.vrf_beta_string_round_part_3,BUFFER_SIZE)); 
+
+    for (count = 0; count < TRUSTED_BLOCK_VERIFIERS_AMOUNT; count++)
+    {
+      memset(trusted_block_verifiers_VRF_data.public_address[count],0,strnlen(trusted_block_verifiers_VRF_data.public_address[count],XCASH_WALLET_LENGTH+1));
+      memset(trusted_block_verifiers_VRF_data.vrf_public_key_round_part_1[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_public_key_round_part_1[count],BUFFER_SIZE));
+      memset(trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_1[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_1[count],BUFFER_SIZE));
+      memset(trusted_block_verifiers_VRF_data.vrf_proof_round_part_1[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_proof_round_part_1[count],BUFFER_SIZE));
+      memset(trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_1[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_1[count],BUFFER_SIZE));
+      memset(trusted_block_verifiers_VRF_data.vrf_public_key_round_part_2[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_public_key_round_part_2[count],BUFFER_SIZE));
+      memset(trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_2[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_2[count],BUFFER_SIZE));
+      memset(trusted_block_verifiers_VRF_data.vrf_proof_round_part_2[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_proof_round_part_2[count],BUFFER_SIZE));
+      memset(trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_2[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_2[count],BUFFER_SIZE));
+      memset(trusted_block_verifiers_VRF_data.vrf_public_key_round_part_3[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_public_key_round_part_3[count],BUFFER_SIZE));
+      memset(trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_3[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_3[count],BUFFER_SIZE));
+      memset(trusted_block_verifiers_VRF_data.vrf_proof_round_part_3[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_proof_round_part_3[count],BUFFER_SIZE));
+      memset(trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_3[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_3[count],BUFFER_SIZE));
+    }
+  }
+
+  // run the code for the correct settings
+  if (settings == 1)
+  {
+    // The main node timeout is valid
+
+    // change the round
+    send_round_change();
+
+    // start the part of the round over again
+    if (start_new_part_of_round() == 0)
+    {
+      // have the consensus node add a block to the network
+      consensus_node_create_new_block();
+    }
+  }
+  else if (settings == 2)
+  {
+    // The main node timeout is invalid
+
+    // set all of the block verifiers block_producer_eligibility to false that voted for the invalid result
+    update_block_producer_eligibility(0);
+
+    // start the next round, and for this round have the consensus node add the block to the network
+    if (start_next_round(1) == 0)
+    {
+      // have the consensus node add a block to the network
+      consensus_node_create_new_block();
+    }
+  }
+  else if (settings == 3)
+  {
+    // The vote for false is valid
+
+    // change the round
+    send_round_change();
+
+    // start the part of the round over again
+    if (start_new_part_of_round() == 0)
+    {
+      // have the consensus node add a block to the network
+      consensus_node_create_new_block();
+    }
+  }
+  else if (settings == 4)
+  {
+    // The vote for false is invalid
+
+    // set all of the block verifiers block_producer_eligibility to false that voted for the invalid result
+    update_block_producer_eligibility(1);
+
+    // start the next round, and for this round have the consensus node add the block to the network
+    if (start_next_round(1) == 0)
+    {
+      // have the consensus node add a block to the network
+      consensus_node_create_new_block();
+    }
+  }
+  else if (settings == 5)
+  {
+    // The vote for true is valid
+
+    if (memcmp(current_round_part,"4",1) != 0)
+    {
+      // change the round
+      send_round_change();
+
+      // start the part of the round over again
+      if (start_new_part_of_round() == 0)
+      {
+        // have the consensus node add a block to the network
+        consensus_node_create_new_block();
+      }
+    }
+    else
+    {
+      // start the next round, and for this round have the block producer block added to the network
+      if (start_next_round(0) == 0)
+      {
+        // have the consensus node add a block to the network
+        consensus_node_create_new_block();
+      }
+    }
+
+    // update the current_round_part and current_round_part_backup_node in the database
+    if (memcmp(current_round_part,"1",1) == 0)
+    {
+      memcpy(data,"{\"current_round_part\":\"2\"}",26);
+    }
+    else if (memcmp(current_round_part,"2",1) == 0)
+    {
+      memcpy(data,"{\"current_round_part\":\"3\"}",26);
+    }
+    else if (memcmp(current_round_part,"3",1) == 0)
+    {
+      memcpy(data,"{\"current_round_part\":\"4\"}",26);
+    }
+    else if (memcmp(current_round_part,"4",1) == 0)
+    {
+      memcpy(data,"{\"current_round_part\":\"1\"}",26);
+    }
+
+    // set the current_round_part and current_round_part_backup_node in the database
+    if (update_document_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,data,0) == 0 || update_document_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,"{\"current_round_part_backup_node\":\"0\"}",0) == 0)
+    {
+      RECEIVE_VOTES_FROM_NODES_TIMEOUT_THREAD_ERROR("Could not update the current_round_part and current_round_part_backup_node in the database\nFunction: receive_votes_from_nodes_timeout_thread");
+    }    
+  }
+  else if (settings == 6)
+  {
+    // The vote for true invalid
+
+    // set all of the block verifiers block_producer_eligibility to false that voted for the invalid result
+    update_block_producer_eligibility(2);
+
+    // start the next round, and for this round have the consensus node add the block to the network
+    if (start_next_round(1) == 0)
+    {
+      // have the consensus node add a block to the network
+      consensus_node_create_new_block();
+    }
+  }
+  else if (settings == 7)
+  {
+    // no vote result was greater than BLOCK_VERIFIERS_VALID_AMOUNT
+
+    // start the next round, and for this round have the consensus node add the block to the network
+    if (start_next_round(1) == 0)
+    {
+      // have the consensus node add a block to the network
+      consensus_node_create_new_block();
+    }
+  }
+
   // set the server message
   memset(server_message,0,strnlen(server_message,BUFFER_SIZE));
-  memcpy(server_message,"",0);
 
   pthread_exit((void *)(intptr_t)1);
+
+  #undef DATABASE_COLLECTION
+  #undef MESSAGE
+  #undef RECEIVE_VOTES_FROM_NODES_TIMEOUT_THREAD_ERROR
 }
 
 
