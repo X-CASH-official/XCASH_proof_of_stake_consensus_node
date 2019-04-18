@@ -20,20 +20,24 @@ struct block_validation_nodes_list {
     char* block_validation_nodes_IP_address[BLOCK_VALIDATION_NODES_AMOUNT];
 };
 
-struct VRF_data_block_verifiers {
-    char* public_address[BLOCK_VERIFIERS_AMOUNT];
-    char* vrf_public_key_round_part_1[BLOCK_VERIFIERS_AMOUNT];
-    char* vrf_alpha_string_round_part_1[BLOCK_VERIFIERS_AMOUNT];
-    char* vrf_proof_round_part_1[BLOCK_VERIFIERS_AMOUNT];
-    char* vrf_beta_string_round_part_1[BLOCK_VERIFIERS_AMOUNT];
-    char* vrf_public_key_round_part_2[BLOCK_VERIFIERS_AMOUNT];
-    char* vrf_alpha_string_round_part_2[BLOCK_VERIFIERS_AMOUNT];
-    char* vrf_proof_round_part_2[BLOCK_VERIFIERS_AMOUNT];
-    char* vrf_beta_string_round_part_2[BLOCK_VERIFIERS_AMOUNT];
-    char* vrf_public_key_round_part_3[BLOCK_VERIFIERS_AMOUNT];
-    char* vrf_alpha_string_round_part_3[BLOCK_VERIFIERS_AMOUNT];
-    char* vrf_proof_round_part_3[BLOCK_VERIFIERS_AMOUNT];
-    char* vrf_beta_string_round_part_3[BLOCK_VERIFIERS_AMOUNT];
+struct trusted_block_verifiers {
+    char* trusted_block_verifiers_public_address[TRUSTED_BLOCK_VERIFIERS_AMOUNT]; // The public address of the trusted block verifiers
+};
+
+struct trusted_block_verifiers_VRF_data {
+    char* public_address[TRUSTED_BLOCK_VERIFIERS_AMOUNT];
+    char* vrf_public_key_round_part_1[TRUSTED_BLOCK_VERIFIERS_AMOUNT];
+    char* vrf_alpha_string_round_part_1[TRUSTED_BLOCK_VERIFIERS_AMOUNT];
+    char* vrf_proof_round_part_1[TRUSTED_BLOCK_VERIFIERS_AMOUNT];
+    char* vrf_beta_string_round_part_1[TRUSTED_BLOCK_VERIFIERS_AMOUNT];
+    char* vrf_public_key_round_part_2[TRUSTED_BLOCK_VERIFIERS_AMOUNT];
+    char* vrf_alpha_string_round_part_2[TRUSTED_BLOCK_VERIFIERS_AMOUNT];
+    char* vrf_proof_round_part_2[TRUSTED_BLOCK_VERIFIERS_AMOUNT];
+    char* vrf_beta_string_round_part_2[TRUSTED_BLOCK_VERIFIERS_AMOUNT];
+    char* vrf_public_key_round_part_3[TRUSTED_BLOCK_VERIFIERS_AMOUNT];
+    char* vrf_alpha_string_round_part_3[TRUSTED_BLOCK_VERIFIERS_AMOUNT];
+    char* vrf_proof_round_part_3[TRUSTED_BLOCK_VERIFIERS_AMOUNT];
+    char* vrf_beta_string_round_part_3[TRUSTED_BLOCK_VERIFIERS_AMOUNT];
 };
 
 struct VRF_data {

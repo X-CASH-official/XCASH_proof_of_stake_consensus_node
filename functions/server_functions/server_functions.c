@@ -546,12 +546,20 @@ int consensus_node_create_new_block()
   if (pthread_create(&thread_id, NULL, &receive_votes_from_nodes_timeout_thread, NULL) != 0)
   {
     CONSENSUS_NODE_CREATE_NEW_BLOCK_ERROR("Could not start the receive_votes_from_nodes_timeout\nFunction: consensus_node_create_new_block\nReceive Message: BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK\nSend Message: CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK");
+    // add another block to the network since the next round could not be started
+    goto start_current_round_part;
   }
   // set the thread to detach once completed, since we do not need to use anything it will return
   if (pthread_detach(thread_id) != 0)
   {
     CONSENSUS_NODE_CREATE_NEW_BLOCK_ERROR("Could not start the receive_votes_from_nodes_timeout\nFunction: consensus_node_create_new_block\nReceive Message: BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK\nSend Message: CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK");
+    // add another block to the network since the next round could not be started
+    goto start_current_round_part;
   }
+
+  // set the server message
+  memset(server_message,0,strnlen(server_message,BUFFER_SIZE));
+  memcpy(server_message,"NODES_TO_CONSENSUS_NODE_MAIN_NODE_SOCKET_TIMEOUT_ROUND_CHANGE|NODES_TO_CONSENSUS_NODE_VOTE_RESULTS",98);
 
   return 1;
 
@@ -683,6 +691,8 @@ int mainode_consensus()
   }
 
   // read the current_round_part and current_round_part_backup_node from the database
+  memset(current_round_part,0,strnlen(current_round_part,BUFFER_SIZE));
+  memset(current_round_part_backup_node,0,strnlen(current_round_part_backup_node,BUFFER_SIZE));
   if (read_document_field_from_collection(DATABASE_NAME,"current_round",MESSAGE,"current_round_part",current_round_part,0) == 0 || read_document_field_from_collection(DATABASE_NAME,"current_round",MESSAGE,"current_round_part_backup_node",current_round_part_backup_node,0) == 0)
   {
      MAINNODE_CONSENSUS_ERROR("Could not read the current_round_part or the current_round_part_backup_node from the database\nFunction: mainode_consensus");
@@ -834,6 +844,8 @@ int send_data_socket_consensus_node_to_node()
   }
 
   // read the current_round_part and current_round_part_backup_node from the database
+  memset(current_round_part,0,strnlen(current_round_part,BUFFER_SIZE));
+  memset(current_round_part_backup_node,0,strnlen(current_round_part_backup_node,BUFFER_SIZE));
   if (read_document_field_from_collection(DATABASE_NAME,"current_round",MESSAGE,"current_round_part",current_round_part,0) == 0 || read_document_field_from_collection(DATABASE_NAME,"current_round",MESSAGE,"current_round_part_backup_node",current_round_part_backup_node,0) == 0)
   {
      SEND_DATA_SOCKET_CONSENSUS_NODE_TO_NODE_ERROR("Could not read the current_round_part or the current_round_part_backup_node from the database\nFunction: send_data_socket_consensus_node_to_node\nSend Message: CONSENSUS_NODE_TO_NODES_MAIN_NODE_PUBLIC_ADDRESS");
@@ -965,6 +977,8 @@ int send_data_socket_consensus_node_to_mainnode()
   }
 
   // read the current_round_part and current_round_part_backup_node from the database
+  memset(current_round_part,0,strnlen(current_round_part,BUFFER_SIZE));
+  memset(current_round_part_backup_node,0,strnlen(current_round_part_backup_node,BUFFER_SIZE));
   if (read_document_field_from_collection(DATABASE_NAME,"current_round",MESSAGE,"current_round_part",current_round_part,0) == 0 || read_document_field_from_collection(DATABASE_NAME,"current_round",MESSAGE,"current_round_part_backup_node",current_round_part_backup_node,0) == 0)
   {
      SEND_DATA_SOCKET_CONSENSUS_NODE_TO_MAINNODE_ERROR("Could not read the current_round_part or the current_round_part_backup_node from the database\nFunction: send_data_socket_consensus_node_to_mainnode\nSend Message: CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND");
@@ -1200,6 +1214,8 @@ int server_receive_data_socket_node_to_consensus_node_send_current_consensus_nod
   }
 
   // read the current_round_part and current_round_part_backup_node from the database
+  memset(current_round_part,0,strnlen(current_round_part,BUFFER_SIZE));
+  memset(current_round_part_backup_node,0,strnlen(current_round_part_backup_node,BUFFER_SIZE));
   if (read_document_field_from_collection(DATABASE_NAME,"current_round",MESSAGE,"current_round_part",current_round_part,0) == 0 || read_document_field_from_collection(DATABASE_NAME,"current_round",MESSAGE,"current_round_part_backup_node",current_round_part_backup_node,0) == 0)
   {
      SERVER_RECEIVE_DATA_SOCKET_NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS_ERROR("Could not read the current_round_part or the current_round_part_backup_node from the database\nFunction: server_receive_data_socket_node_to_consensus_node_send_current_consensus_node_IP_address\nReceive Message: NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS\nSend Message: CONSENSUS_NODE_TO_NODE_RECEIVE_CURRENT_CONSENSUS_NODE_IP_ADDRESS");
@@ -1311,6 +1327,14 @@ int server_receive_data_socket_node_to_consensus_node_send_updated_node_list(con
       pointer_reset(nodes_IP_address_list);
     }
     return 0;
+  }
+
+  // read the current_round_part and current_round_part_backup_node from the database
+  memset(current_round_part,0,strnlen(current_round_part,BUFFER_SIZE));
+  memset(current_round_part_backup_node,0,strnlen(current_round_part_backup_node,BUFFER_SIZE));
+  if (read_document_field_from_collection(DATABASE_NAME,"current_round",MESSAGE,"current_round_part",current_round_part,0) == 0 || read_document_field_from_collection(DATABASE_NAME,"current_round",MESSAGE,"current_round_part_backup_node",current_round_part_backup_node,0) == 0)
+  {
+     SERVER_RECEIVE_DATA_SOCKET_NODE_TO_CONSENSUS_NODE_SEND_UPDATED_NODE_LIST_ERROR("Could not read the current_round_part or the current_round_part_backup_node from the database\nFunction: server_receive_data_socket_node_to_consensus_node_send_updated_node_list\nReceive Message: NODE_TO_CONSENSUS_NODE_SEND_UPDATED_NODE_LIST\nSend Message: CONSENSUS_NODE_TO_NODE_RECEIVE_UPDATED_NODE_LIST");
   }
 
   // verify the data
@@ -1512,7 +1536,7 @@ Return: 0 if an error has occured, 1 if successfull
 -----------------------------------------------------------------------------------------------------------
 */
 
-int server_receive_data_socket_main_node_timeout_from_node(const int CLIENT_SOCKET, char* message)
+int server_receive_data_socket_main_node_timeout_from_node(char* message)
 {
   // Variables
   char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
@@ -1542,6 +1566,14 @@ int server_receive_data_socket_main_node_timeout_from_node(const int CLIENT_SOCK
       pointer_reset(data2);
     }
     return 0;
+  }
+
+  // read the current_round_part and current_round_part_backup_node from the database
+  memset(current_round_part,0,strnlen(current_round_part,BUFFER_SIZE));
+  memset(current_round_part_backup_node,0,strnlen(current_round_part_backup_node,BUFFER_SIZE));
+  if (read_document_field_from_collection(DATABASE_NAME,"current_round",MESSAGE,"current_round_part",current_round_part,0) == 0 || read_document_field_from_collection(DATABASE_NAME,"current_round",MESSAGE,"current_round_part_backup_node",current_round_part_backup_node,0) == 0)
+  {
+     SERVER_RECEIVE_DATA_SOCKET_MAIN_NODE_TIMEOUT_FROM_NODE_ERROR("Could not read the current_round_part or the current_round_part_backup_node from the database\nFunction: server_receive_data_socket_main_node_timeout_from_node\nReceive Message: NODES_TO_CONSENSUS_NODE_MAIN_NODE_SOCKET_TIMEOUT_ROUND_CHANGE");
   }
 
   // verify the data
@@ -1574,6 +1606,103 @@ int server_receive_data_socket_main_node_timeout_from_node(const int CLIENT_SOCK
 
   #undef pointer_reset_all
   #undef SERVER_RECEIVE_DATA_SOCKET_MAIN_NODE_TIMEOUT_FROM_NODE_ERROR
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
+Name: server_receive_data_socket_node_to_node_vote
+Description: Runs the code when the server receives the NODES_TO_CONSENSUS_NODE_VOTE_RESULTS message
+Parameters:
+  CLIENT_SOCKET - The socket to send data to
+  message - The message
+Return: 0 if an error has occured, 1 if successfull
+-----------------------------------------------------------------------------------------------------------
+*/
+
+int server_receive_data_socket_node_to_node_vote(char* message)
+{
+  // Variables
+  char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* data2 = (char*)calloc(BUFFER_SIZE,sizeof(char));
+
+  // define macros
+  #define pointer_reset_all \
+  free(data); \
+  data = NULL; \
+  free(data2); \
+  data2 = NULL;
+
+  #define SERVER_RECEIVE_DATA_SOCKET_NOTE_TO_NODE_VOTE_ERROR(settings) \
+  color_print(settings,"red"); \
+  pointer_reset_all; \
+  return 0;
+
+  // check if the memory needed was allocated on the heap successfully
+  if (data == NULL || data2 == NULL)
+  {
+    if (data != NULL)
+    {
+      pointer_reset(data);
+    }
+    if (data2 != NULL)
+    {
+      pointer_reset(data2);
+    }
+    return 0;
+  }
+
+  // read the current_round_part and current_round_part_backup_node from the database
+  memset(current_round_part,0,strnlen(current_round_part,BUFFER_SIZE));
+  memset(current_round_part_backup_node,0,strnlen(current_round_part_backup_node,BUFFER_SIZE));
+  if (read_document_field_from_collection(DATABASE_NAME,"current_round",MESSAGE,"current_round_part",current_round_part,0) == 0 || read_document_field_from_collection(DATABASE_NAME,"current_round",MESSAGE,"current_round_part_backup_node",current_round_part_backup_node,0) == 0)
+  {
+     SERVER_RECEIVE_DATA_SOCKET_NOTE_TO_NODE_VOTE_ERROR("Could not read the current_round_part or the current_round_part_backup_node from the database\nFunction: server_receive_data_socket_node_to_node_vote\nReceive Message: NODES_TO_CONSENSUS_NODE_VOTE_RESULTS");
+  }
+
+  // verify the data
+  if (verify_data(message,0,1,1) == 0)
+  {
+    SERVER_RECEIVE_DATA_SOCKET_NOTE_TO_NODE_VOTE_ERROR("Could not sign_data\nFunction: server_receive_data_socket_node_to_node_vote\nReceive Message: NODES_TO_CONSENSUS_NODE_VOTE_RESULTS");
+    return 0;
+  }
+
+  // parse the message
+  if (parse_json_data(message,"public_address",data) == 0 || parse_json_data(message,"vote_result",data2) == 0)
+  {
+    SERVER_RECEIVE_DATA_SOCKET_NOTE_TO_NODE_VOTE_ERROR("Could not parse data\nFunction: server_receive_data_socket_node_to_node_vote\nReceive Message: NODES_TO_CONSENSUS_NODE_VOTE_RESULTS");
+  }
+
+  // check if the block verifier has already voted
+  if (verify_block_verifier_vote(data) == 0)
+  {
+    memset(data2,0,strnlen(data2,BUFFER_SIZE));
+    memcpy(data2,"The vote is not valid from public address ",42);
+    memcpy(data2+42,data,strnlen(data,BUFFER_SIZE));
+    memcpy(data2+42+strnlen(data,BUFFER_SIZE),"\nFunction: server_receive_data_socket_node_to_node_vote\nReceive Message: NODES_TO_CONSENSUS_NODE_VOTE_RESULTS",144);
+    SERVER_RECEIVE_DATA_SOCKET_NOTE_TO_NODE_VOTE_ERROR(data2);
+  }
+
+  // add one vote and the public address to the node_to_node_vote struct
+  if (memcmp(data2,"TRUE",4) == 0)
+  {
+    memcpy(node_to_node_vote.block_verifiers_public_address_vote_next_round_true[node_to_node_vote.vote_next_round_true],data,XCASH_WALLET_LENGTH);
+    node_to_node_vote.vote_next_round_true++;
+  }
+  else if (memcmp(data2,"FALSE",5) == 0)
+  {
+    memcpy(node_to_node_vote.block_verifiers_public_address_vote_next_round_false[node_to_node_vote.vote_next_round_false],data,XCASH_WALLET_LENGTH);
+    node_to_node_vote.vote_next_round_false++;
+  }
+
+  // if the block verifiers public address is a trusted block verifier, add the VRF data to the trusted_block_verifiers_VRF_data
+  
+
+  return 1;
+
+  #undef pointer_reset_all
+  #undef SERVER_RECEIVE_DATA_SOCKET_NOTE_TO_NODE_VOTE_ERROR
 }
 
 
@@ -1819,31 +1948,33 @@ int create_server(const int MESSAGE_SETTINGS)
          // check if a certain type of message has been received         
          if (strstr(buffer,"\"message_settings\": \"XCASH_PROOF_OF_STAKE_TEST_DATA\"") != NULL && strncmp(server_message,"XCASH_PROOF_OF_STAKE_TEST_DATA",BUFFER_SIZE) == 0)
          {
-           if (server_received_data_xcash_proof_of_stake_test_data(CLIENT_SOCKET,buffer) == 0)
-           {
-             SERVER_ERROR(1);
-           }
+           // close the forked process when done
+           server_received_data_xcash_proof_of_stake_test_data(CLIENT_SOCKET,buffer);
+           SERVER_ERROR(1);
          }
          else if (strstr(buffer,"\"message_settings\": \"NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS\"") != NULL)
          {
-           if (server_receive_data_socket_node_to_consensus_node_send_current_consensus_node_IP_address(CLIENT_SOCKET,buffer) == 0)
-           {
-             SERVER_ERROR(1);
-           }
+           // close the forked process when done
+           server_receive_data_socket_node_to_consensus_node_send_current_consensus_node_IP_address(CLIENT_SOCKET,buffer);
+           SERVER_ERROR(1);
          }
          else if (strstr(buffer,"\"message_settings\": \"NODE_TO_CONSENSUS_NODE_SEND_UPDATED_NODE_LIST\"") != NULL)
          {
-           if (server_receive_data_socket_node_to_consensus_node_send_updated_node_list(CLIENT_SOCKET,buffer) == 0)
-           {
-             SERVER_ERROR(1);
-           }
+           // close the forked process when done
+           server_receive_data_socket_node_to_consensus_node_send_updated_node_list(CLIENT_SOCKET,buffer);
+           SERVER_ERROR(1);
          }
-         else if (strstr(buffer,"\"message_settings\": \"NODES_TO_CONSENSUS_NODE_MAIN_NODE_SOCKET_TIMEOUT_ROUND_CHANGE\"") != NULL && strncmp(server_message,"NODES_TO_CONSENSUS_NODE_MAIN_NODE_SOCKET_TIMEOUT_ROUND_CHANGE",BUFFER_SIZE) == 0)
+         else if (strstr(buffer,"\"message_settings\": \"NODES_TO_CONSENSUS_NODE_MAIN_NODE_SOCKET_TIMEOUT_ROUND_CHANGE\"") != NULL && strstr(server_message,"NODES_TO_CONSENSUS_NODE_MAIN_NODE_SOCKET_TIMEOUT_ROUND_CHANGE") != NULL)
          {
-           if (server_receive_data_socket_main_node_timeout_from_node(CLIENT_SOCKET,buffer) == 0)
-           {
-             SERVER_ERROR(1);
-           }
+           // close the forked process when done
+           server_receive_data_socket_main_node_timeout_from_node(buffer);
+           SERVER_ERROR(1);
+         }
+         else if (strstr(buffer,"\"message_settings\": \"NODES_TO_CONSENSUS_NODE_VOTE_RESULTS\"") != NULL && strstr(server_message,"NODES_TO_CONSENSUS_NODE_VOTE_RESULTS") != NULL)
+         {
+           // close the forked process when done
+           server_receive_data_socket_node_to_node_vote(buffer);
+           SERVER_ERROR(1);
          }
          else
          {

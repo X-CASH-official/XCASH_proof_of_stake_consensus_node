@@ -22,8 +22,11 @@ Using define statements instead of constants for increased efficiency
 #define NETWORK_VERSION "0000" // the network version
 #define BLOCK_PRODUCER_NETWORK_BLOCK_NONCE "00000000" // the network block nonce used when the block producer creates the block
 #define CONSENSUS_NODE_NETWORK_BLOCK_NONCE "11111111" // the network block nonce used when the consensus node creates the block
-#define BLOCK_VALIDATION_NODES_AMOUNT 1 // The total amount of block validation nodes
+#define BLOCK_VALIDATION_NODES_TOTAL_AMOUNT 100 // The total amount of block validation nodes
+#define BLOCK_VALIDATION_NODES_AMOUNT 100 // The amount of block validation nodes needed to make the network block valid
 #define BLOCK_VERIFIERS_AMOUNT 100 // The amount of block verifiers in a round
+#define TRUSTED_BLOCK_VERIFIERS_TOTAL_AMOUNT 100 // The total amount of trusted block verifiers
+#define TRUSTED_BLOCK_VERIFIERS_AMOUNT 100 // The amount of trusted block verifiers needed to make the vote valid
 #define BLOCK_VERIFIERS_NAME_TOTAL_LENGTH 100 // The maximum length of the block verifiers name
 #define BLOCK_VERIFIERS_IP_ADDRESS_TOTAL_LENGTH 100 // The maximum length of the block verifiers IP address
 #define DATABASE_CONNECTION "mongodb://localhost:27017" // the database connection string

@@ -154,6 +154,10 @@ Return: NULL
 
 void* receive_votes_from_nodes_timeout_thread()
 {  
+  // set the server message
+  memset(server_message,0,strnlen(server_message,BUFFER_SIZE));
+  memcpy(server_message,"",0);
+
   pthread_exit((void *)(intptr_t)1);
 }
 
