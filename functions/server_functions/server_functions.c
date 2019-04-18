@@ -1459,6 +1459,50 @@ int server_receive_data_socket_node_to_consensus_node_send_updated_node_list(con
 
 /*
 -----------------------------------------------------------------------------------------------------------
+Name: verify_block_verifier_vote
+Description: Checks if the public address that voted is in the current block_verifiers_list, and checks if the block verifier has already voted
+Parameters:
+  public_address - The public address
+Return: 0 if the vote is not verified or an error has occured, 1 if the vote is verified
+-----------------------------------------------------------------------------------------------------------
+*/
+
+int verify_block_verifier_vote(char* public_address)
+{
+  // Variables
+  size_t count;
+  int settings = 0;
+
+  // check if the public address that voted is in the current block_verifiers_list
+  for (count = 0; count < BLOCK_VERIFIERS_AMOUNT; count++)
+  {
+    if (memcmp(block_verifiers_list.block_verifiers_public_address[count],public_address,XCASH_WALLET_LENGTH) == 0)
+    {
+      settings = 1;
+    }
+  }
+
+  if (settings == 0)
+  {
+    return 0;
+  }
+
+  // check if the vote is verified and if the block verifier has already voted
+  for (count = 0; count < BLOCK_VERIFIERS_AMOUNT; count++)
+  {
+    if (memcmp(mainnode_timeout.block_verifiers_public_address[count],public_address,XCASH_WALLET_LENGTH) == 0 || memcmp(node_to_node_vote.block_verifiers_public_address_vote_next_round_true[count],public_address,XCASH_WALLET_LENGTH) == 0 || memcmp(node_to_node_vote.block_verifiers_public_address_vote_next_round_false[count],public_address,XCASH_WALLET_LENGTH) == 0)
+    {
+      settings = 0;
+    }
+  }
+
+  return settings; 
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
 Name: server_receive_data_socket_main_node_timeout_from_node
 Description: Runs the code when the server receives the NODES_TO_CONSENSUS_NODE_MAIN_NODE_SOCKET_TIMEOUT_ROUND_CHANGE message
 Parameters:
