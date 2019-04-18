@@ -1,4 +1,4 @@
-#include <stdio.hh>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <netdb.h> 
@@ -149,6 +149,14 @@ int get_block_verifiers_list()
   if (!document)
   {
     GET_BLOCK_VERIFIERS_LIST_ERROR("Could not create the document for the database\nFunction: get_block_verifiers_list");
+  }
+
+  // reset the block_verifiers_list struct
+  for (count = 0; count < BLOCK_VERIFIERS_AMOUNT; count++)
+  {
+    memset(block_verifiers_list.block_verifiers_name[count],0,strnlen(block_verifiers_list.block_verifiers_name[count],BLOCK_VERIFIERS_NAME_TOTAL_LENGTH+1));
+    memset(block_verifiers_list.block_verifiers_public_address[count],0,strnlen(block_verifiers_list.block_verifiers_public_address[count],XCASH_WALLET_LENGTH+1));
+    memset(block_verifiers_list.block_verifiers_IP_address[count],0,strnlen(block_verifiers_list.block_verifiers_IP_address[count],BLOCK_VERIFIERS_IP_ADDRESS_TOTAL_LENGTH+1));
   }
 
   document_settings = mongoc_collection_find_with_opts(collection, document, NULL, NULL);
@@ -1350,8 +1358,8 @@ int server_receive_data_socket_node_to_consensus_node_send_updated_node_list(con
       }
       memcpy(nodes_name_list+count2,"\\\": \\\"",6);
       count2 += 6;
-      memcpy(nodes_name_list+count2,block_verifiers_list.block_verifiers_name[count],strnlen(block_verifiers_list.block_verifiers_name[count],BUFFER_SIZE));
-      count2 += strnlen(block_verifiers_list.block_verifiers_name[count],BUFFER_SIZE);
+      memcpy(nodes_name_list+count2,block_verifiers_list.block_verifiers_name[count],strnlen(block_verifiers_list.block_verifiers_name[count],BLOCK_VERIFIERS_NAME_TOTAL_LENGTH+1));
+      count2 += strnlen(block_verifiers_list.block_verifiers_name[count],BLOCK_VERIFIERS_NAME_TOTAL_LENGTH+1);
       memcpy(nodes_name_list+count2,"\\\",",3);
       count2 += 3;
     }
@@ -1375,8 +1383,8 @@ int server_receive_data_socket_node_to_consensus_node_send_updated_node_list(con
       }
       memcpy(nodes_public_address_list+count2,"\\\": \\\"",6);
       count2 += 6;
-      memcpy(nodes_public_address_list+count2,block_verifiers_list.block_verifiers_public_address[count],strnlen(block_verifiers_list.block_verifiers_name[count],BUFFER_SIZE));
-      count2 += strnlen(block_verifiers_list.block_verifiers_public_address[count],BUFFER_SIZE);
+      memcpy(nodes_public_address_list+count2,block_verifiers_list.block_verifiers_public_address[count],strnlen(block_verifiers_list.block_verifiers_name[count],XCASH_WALLET_LENGTH+1));
+      count2 += strnlen(block_verifiers_list.block_verifiers_public_address[count],XCASH_WALLET_LENGTH+1);
       memcpy(nodes_public_address_list+count2,"\\\",",3);
       count2 += 3;
     }
@@ -1400,8 +1408,8 @@ int server_receive_data_socket_node_to_consensus_node_send_updated_node_list(con
       }
       memcpy(nodes_IP_address_list+count2,"\\\": \\\"",6);
       count2 += 6;
-      memcpy(nodes_IP_address_list+count2,block_verifiers_list.block_verifiers_IP_address[count],strnlen(block_verifiers_list.block_verifiers_name[count],BUFFER_SIZE));
-      count2 += strnlen(block_verifiers_list.block_verifiers_IP_address[count],BUFFER_SIZE);
+      memcpy(nodes_IP_address_list+count2,block_verifiers_list.block_verifiers_IP_address[count],strnlen(block_verifiers_list.block_verifiers_name[count],BLOCK_VERIFIERS_IP_ADDRESS_TOTAL_LENGTH+1));
+      count2 += strnlen(block_verifiers_list.block_verifiers_IP_address[count],BLOCK_VERIFIERS_IP_ADDRESS_TOTAL_LENGTH+1);
       memcpy(nodes_IP_address_list+count2,"\\\",",3);
       count2 += 3;
     }

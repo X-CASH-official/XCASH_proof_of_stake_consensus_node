@@ -171,6 +171,18 @@ struct blockchain_data {
     char* transactions[1000000]; // All of the transactions in the block.
 };
 
+struct mainnode_timeout {
+    char* block_verifiers_public_address[BLOCK_VERIFIERS_AMOUNT]; // The public address of the block verifiers that voted for a round change because the main node did not send any data
+    size_t vote_round_change_timeout; // The amount of block verifiers that voted for a round change because the main node did not send any data
+};
+
+struct node_to_node_vote {
+    char* block_verifiers_public_address_vote_next_round_true[BLOCK_VERIFIERS_AMOUNT]; // The public address of the block verifiers that voted true in a round.
+    size_t vote_next_round_true; // The amount of block verifiers that voted true in a round.
+    char* block_verifiers_public_address_vote_next_round_false[BLOCK_VERIFIERS_AMOUNT]; // The public address of the block verifiers that voted true in a round.
+    size_t vote_next_round_false; // The amount of block verifiers that voted true in a round.
+};
+
 
 // database struct
 struct database_document_fields {

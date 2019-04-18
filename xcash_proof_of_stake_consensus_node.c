@@ -215,6 +215,19 @@ int main(int parameters_count, char* parameters[])
     blockchain_data.transactions[count] = (char*)calloc(65,sizeof(char));
   }
 
+  // initialize the mainnode_timeout struct 
+  for (count = 0; count < BLOCK_VERIFIERS_AMOUNT; count++)
+  {
+    mainnode_timeout.block_verifiers_public_address[count] = (char*)calloc(XCASH_WALLET_LENGTH+1,sizeof(char));
+  }
+
+  // initialize the mainnode_timeout struct 
+  for (count = 0; count < BLOCK_VERIFIERS_AMOUNT; count++)
+  {
+    node_to_node_vote.block_verifiers_public_address_vote_next_round_true[count] = (char*)calloc(XCASH_WALLET_LENGTH+1,sizeof(char));
+    node_to_node_vote.block_verifiers_public_address_vote_next_round_false[count] = (char*)calloc(XCASH_WALLET_LENGTH+1,sizeof(char));
+  }
+
   // Add each block validation nodes data to the block_validation_nodes_list struct
   
 
