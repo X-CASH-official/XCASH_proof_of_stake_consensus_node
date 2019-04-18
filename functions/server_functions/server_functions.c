@@ -1831,7 +1831,62 @@ Return: 0 if an error has occured, 1 if successfull
 
 int start_next_round(const int SETTINGS)
 {
-  
+  // Variables
+  char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  size_t count;
+
+  // define macros
+  #define DATABASE_COLLECTION "current_round"
+  #define MESSAGE "{\"username\":\"xcash\"}"
+
+  #define START_NEXT_ROUND_ERROR(settings) \
+  color_print(settings,"red"); \
+  pointer_reset(data); \
+  return 0;
+
+  // check if the memory needed was allocated on the heap successfully
+  if (data == NULL)
+  {
+    color_print("Could not allocate the memory needed on the heap","red");
+    exit(0);
+  }
+
+  // create the message
+  memcpy(data,"{\r\n \"message_settings\": \"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEXT_ROUND\",\r\n}",79);
+
+  // sign_data
+  if (sign_data(data,0) == 0)
+  { 
+    START_NEXT_ROUND_ERROR("Could not sign_data\nFunction: start_next_round\nSend Message: CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEXT_ROUND");
+  }
+
+  // send the CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEW_PART_OF_ROUND message to the nodes and main node
+  for (count = 0; count < BLOCK_VERIFIERS_AMOUNT; count++)
+  {
+    send_data_socket(block_verifiers_list.block_verifiers_IP_address[count],SEND_DATA_PORT,data,"sending CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEXT_ROUND message to the nodes and main node",0);
+  }
+ 
+  // set the current_round_part and current_round_part_backup_node in the database
+  if (update_document_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,"{\"current_round_part\":\"0\"}",0) == 0 || update_document_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,"{\"current_round_part_backup_node\":\"0\"}",0) == 0)
+  {
+    START_NEXT_ROUND_ERROR("Could not update the current_round_part and current_round_part_backup_node in the database\nFunction: start_next_round\nSend Message: CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEXT_ROUND");
+  }
+
+  // Add the block to the network
+  if (SETTINGS == 1)
+  {
+    consensus_node_create_new_block();
+  }
+  else
+  {
+    create_new_block();
+  }
+
+  return 1;
+
+  #undef DATABASE_COLLECTION
+  #undef MESSAGE
+  #undef START_NEXT_ROUND_ERROR
 }
 
 
@@ -1846,6 +1901,21 @@ Parameters:
 */
 
 void update_block_producer_eligibility(const int SETTINGS)
+{
+  
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
+Name: create_new_block
+Description: Add the block that the block producer created to the network
+Return: 1 if successfull, otherwise 0.
+-----------------------------------------------------------------------------------------------------------
+*/
+
+int create_new_block()
 {
   
 }

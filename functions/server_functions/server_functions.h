@@ -25,5 +25,6 @@ void send_round_change();
 int start_new_part_of_round();
 int start_next_round(const int SETTINGS);
 void update_block_producer_eligibility(const int SETTINGS);
+int create_new_block();
 int create_server(const int MESSAGE_SETTINGS);
 #endif
