@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include <stdio.hh>
 #include <stdlib.h>
 #include <string.h>
 #include <netdb.h> 
@@ -639,7 +639,7 @@ Return: 1 if successfull, otherwise 0.
 
 int mainode_consensus()
 {
- // Variables
+  // Variables
   char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
   char* data2 = (char*)calloc(BUFFER_SIZE,sizeof(char));
   size_t count;
@@ -648,7 +648,6 @@ int mainode_consensus()
   #define DATABASE_COLLECTION "nodes"
   #define MESSAGE "{\"username\":\"xcash\"}"
 
-  // define macros
   #define pointer_reset_all \
   free(data); \
   data = NULL; \
@@ -787,7 +786,6 @@ int send_data_socket_consensus_node_to_node()
   size_t count;
 
   // define macros
-  #define DATABASE_COLLECTION "current_round"
   #define MESSAGE "{\"username\":\"xcash\"}"
 
   #define pointer_reset_all \
@@ -828,7 +826,7 @@ int send_data_socket_consensus_node_to_node()
   }
 
   // read the current_round_part and current_round_part_backup_node from the database
-  if (read_document_field_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,"current_round_part",current_round_part,0) == 0 || read_document_field_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,"current_round_part_backup_node",current_round_part_backup_node,0) == 0)
+  if (read_document_field_from_collection(DATABASE_NAME,"current_round",MESSAGE,"current_round_part",current_round_part,0) == 0 || read_document_field_from_collection(DATABASE_NAME,"current_round",MESSAGE,"current_round_part_backup_node",current_round_part_backup_node,0) == 0)
   {
      SEND_DATA_SOCKET_CONSENSUS_NODE_TO_NODE_ERROR("Could not read the current_round_part or the current_round_part_backup_node from the database\nFunction: send_data_socket_consensus_node_to_node\nSend Message: CONSENSUS_NODE_TO_NODES_MAIN_NODE_PUBLIC_ADDRESS");
   }
@@ -848,7 +846,7 @@ int send_data_socket_consensus_node_to_node()
   memcpy(data+strnlen(data,BUFFER_SIZE),current_round_part_backup_node,1);
 
   // get the main nodes public address from the database 
-  if (read_document_field_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,data,data2,0) == 0)
+  if (read_document_field_from_collection(DATABASE_NAME,"nodes",MESSAGE,data,data2,0) == 0)
   {
     SEND_DATA_SOCKET_CONSENSUS_NODE_TO_NODE_ERROR("Could not read the main nodes data from the database\nFunction: send_data_socket_consensus_node_to_node\nSend Message: CONSENSUS_NODE_TO_NODES_MAIN_NODE_PUBLIC_ADDRESS");
   }
@@ -869,7 +867,7 @@ int send_data_socket_consensus_node_to_node()
   memcpy(data+strnlen(data,BUFFER_SIZE),current_round_part_backup_node,1);
 
   // get the main nodes IP address from the database 
-  if (read_document_field_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,data,data3,0) == 0)
+  if (read_document_field_from_collection(DATABASE_NAME,"nodes",MESSAGE,data,data3,0) == 0)
   {
     SEND_DATA_SOCKET_CONSENSUS_NODE_TO_NODE_ERROR("Could not read the main nodes data from the database\nFunction: send_data_socket_consensus_node_to_node\nSend Message: CONSENSUS_NODE_TO_NODES_MAIN_NODE_PUBLIC_ADDRESS");
   }
@@ -894,7 +892,6 @@ int send_data_socket_consensus_node_to_node()
   pointer_reset_all;
   return 1;
 
-  #undef DATABASE_COLLECTION
   #undef MESSAGE
   #undef pointer_reset_all
   #undef SEND_DATA_SOCKET_CONSENSUS_NODE_TO_NODE_ERROR
@@ -1154,6 +1151,7 @@ int server_received_data_xcash_proof_of_stake_test_data(const int CLIENT_SOCKET,
 Name: server_receive_data_socket_node_to_consensus_node_send_current_consensus_node_IP_address
 Description: Runs the code when the server receives the NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS message
 Parameters:
+  CLIENT_SOCKET - The socket to send data to
   message - The message
 Return: 0 if an error has occured, 1 if successfull
 -----------------------------------------------------------------------------------------------------------
@@ -1174,7 +1172,7 @@ int server_receive_data_socket_node_to_consensus_node_send_current_consensus_nod
   free(data2); \
   data2 = NULL;
 
-  #define SERVER_RECEIVE_DATA_SOCKET_NOTE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS_ERROR(settings) \
+  #define SERVER_RECEIVE_DATA_SOCKET_NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS_ERROR(settings) \
   color_print(settings,"red"); \
   pointer_reset_all; \
   return 0;
@@ -1196,20 +1194,20 @@ int server_receive_data_socket_node_to_consensus_node_send_current_consensus_nod
   // read the current_round_part and current_round_part_backup_node from the database
   if (read_document_field_from_collection(DATABASE_NAME,"current_round",MESSAGE,"current_round_part",current_round_part,0) == 0 || read_document_field_from_collection(DATABASE_NAME,"current_round",MESSAGE,"current_round_part_backup_node",current_round_part_backup_node,0) == 0)
   {
-     SERVER_RECEIVE_DATA_SOCKET_NOTE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS_ERROR("Could not read the current_round_part or the current_round_part_backup_node from the database\nFunction: server_receive_data_socket_node_to_consensus_node_send_current_consensus_node_IP_address\nReceive Message: NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS\nSend Message: CONSENSUS_NODE_TO_NODE_RECEIVE_CURRENT_CONSENSUS_NODE_IP_ADDRESS");
+     SERVER_RECEIVE_DATA_SOCKET_NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS_ERROR("Could not read the current_round_part or the current_round_part_backup_node from the database\nFunction: server_receive_data_socket_node_to_consensus_node_send_current_consensus_node_IP_address\nReceive Message: NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS\nSend Message: CONSENSUS_NODE_TO_NODE_RECEIVE_CURRENT_CONSENSUS_NODE_IP_ADDRESS");
   }
 
   // verify the data
   if (verify_data(message,0,1,1) == 0)
   {
-    SERVER_RECEIVE_DATA_SOCKET_NOTE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS_ERROR("Could not sign_data\nFunction: server_receive_data_socket_node_to_consensus_node_send_current_consensus_node_IP_address\nReceive Message: NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS\nSend Message: CONSENSUS_NODE_TO_NODE_RECEIVE_CURRENT_CONSENSUS_NODE_IP_ADDRESS");
+    SERVER_RECEIVE_DATA_SOCKET_NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS_ERROR("Could not sign_data\nFunction: server_receive_data_socket_node_to_consensus_node_send_current_consensus_node_IP_address\nReceive Message: NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS\nSend Message: CONSENSUS_NODE_TO_NODE_RECEIVE_CURRENT_CONSENSUS_NODE_IP_ADDRESS");
     return 0;
   }
 
   // read the current_consensus_node_IP_address from the consensus_node collection
   if (read_document_field_from_collection(DATABASE_NAME,"consensus_node",MESSAGE,"current_consensus_node_IP_address",data,0) == 0)
   {
-    SERVER_RECEIVE_DATA_SOCKET_NOTE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS_ERROR("Could not get the current consensus node from the database\nFunction: server_receive_data_socket_node_to_consensus_node_send_current_consensus_node_IP_address\nReceive Message: NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS\nSend Message: CONSENSUS_NODE_TO_NODE_RECEIVE_CURRENT_CONSENSUS_NODE_IP_ADDRESS");
+    SERVER_RECEIVE_DATA_SOCKET_NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS_ERROR("Could not get the current consensus node from the database\nFunction: server_receive_data_socket_node_to_consensus_node_send_current_consensus_node_IP_address\nReceive Message: NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS\nSend Message: CONSENSUS_NODE_TO_NODE_RECEIVE_CURRENT_CONSENSUS_NODE_IP_ADDRESS");
   }
 
   // create the message
@@ -1220,13 +1218,13 @@ int server_receive_data_socket_node_to_consensus_node_send_current_consensus_nod
   // sign_data
   if (sign_data(data2,0) == 0)
   { 
-    SERVER_RECEIVE_DATA_SOCKET_NOTE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS_ERROR("Could not sign data\nFunction: server_receive_data_socket_node_to_consensus_node_send_current_consensus_node_IP_address\nReceive Message: NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS\nSend Message: CONSENSUS_NODE_TO_NODE_RECEIVE_CURRENT_CONSENSUS_NODE_IP_ADDRESS");
+    SERVER_RECEIVE_DATA_SOCKET_NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS_ERROR("Could not sign data\nFunction: server_receive_data_socket_node_to_consensus_node_send_current_consensus_node_IP_address\nReceive Message: NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS\nSend Message: CONSENSUS_NODE_TO_NODE_RECEIVE_CURRENT_CONSENSUS_NODE_IP_ADDRESS");
   }
 
   // send the data back to the main node on the client socket, since it used the send_and_receive_data_socket
   if (send_data(CLIENT_SOCKET,data2,1) == 0)
   {
-    SERVER_RECEIVE_DATA_SOCKET_NOTE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS_ERROR("Could not send the CONSENSUS_NODE_TO_NODE_RECEIVE_CURRENT_CONSENSUS_NODE_IP_ADDRESS message to the block verifier\nFunction: server_receive_data_socket_node_to_consensus_node_send_current_consensus_node_IP_address\nReceive Message: NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS\nSend Message: CONSENSUS_NODE_TO_NODE_RECEIVE_CURRENT_CONSENSUS_NODE_IP_ADDRESS");
+    SERVER_RECEIVE_DATA_SOCKET_NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS_ERROR("Could not send the CONSENSUS_NODE_TO_NODE_RECEIVE_CURRENT_CONSENSUS_NODE_IP_ADDRESS message to the block verifier\nFunction: server_receive_data_socket_node_to_consensus_node_send_current_consensus_node_IP_address\nReceive Message: NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS\nSend Message: CONSENSUS_NODE_TO_NODE_RECEIVE_CURRENT_CONSENSUS_NODE_IP_ADDRESS");
   }
   
   pointer_reset_all;
@@ -1234,7 +1232,219 @@ int server_receive_data_socket_node_to_consensus_node_send_current_consensus_nod
 
   #undef MESSAGE
   #undef pointer_reset_all
-  #undef SERVER_RECEIVE_DATA_SOCKET_NOTE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS_ERROR
+  #undef SERVER_RECEIVE_DATA_SOCKET_NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS_ERROR
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
+Name: server_receive_data_socket_node_to_consensus_node_send_updated_node_list
+Description: Runs the code when the server receives the NODE_TO_CONSENSUS_NODE_SEND_UPDATED_NODE_LIST message
+Parameters:
+  CLIENT_SOCKET - The socket to send data to
+  message - The message
+Return: 0 if an error has occured, 1 if successfull
+-----------------------------------------------------------------------------------------------------------
+*/
+
+int server_receive_data_socket_node_to_consensus_node_send_updated_node_list(const int CLIENT_SOCKET, char* message)
+{
+  // Variables
+  char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* data2 = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* nodes_name_list = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* nodes_public_address_list = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* nodes_IP_address_list = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  size_t count;
+  size_t count2;
+
+  // define macros
+  #define MESSAGE "{\"username\":\"xcash\"}"
+
+  #define pointer_reset_all \
+  free(data); \
+  data = NULL; \
+  free(data2); \
+  data2 = NULL; \
+  free(nodes_name_list); \
+  nodes_name_list = NULL; \
+  free(nodes_public_address_list); \
+  nodes_public_address_list = NULL; \
+  free(nodes_IP_address_list); \
+  nodes_IP_address_list = NULL;
+
+  #define SERVER_RECEIVE_DATA_SOCKET_NODE_TO_CONSENSUS_NODE_SEND_UPDATED_NODE_LIST_ERROR(settings) \
+  color_print(settings,"red"); \
+  pointer_reset_all; \
+  return 0;
+
+  // check if the memory needed was allocated on the heap successfully
+  if (data == NULL || data2 == NULL || nodes_name_list == NULL || nodes_public_address_list == NULL || nodes_IP_address_list == NULL)
+  {
+    if (data != NULL)
+    {
+      pointer_reset(data);
+    }
+    if (data2 != NULL)
+    {
+      pointer_reset(data2);
+    }
+    if (nodes_name_list != NULL)
+    {
+      pointer_reset(nodes_name_list);
+    }
+    if (nodes_public_address_list != NULL)
+    {
+      pointer_reset(nodes_public_address_list);
+    }
+    if (nodes_IP_address_list != NULL)
+    {
+      pointer_reset(nodes_IP_address_list);
+    }
+    return 0;
+  }
+
+  // verify the data
+  if (verify_data(message,0,1,1) == 0)
+  {
+    SERVER_RECEIVE_DATA_SOCKET_NODE_TO_CONSENSUS_NODE_SEND_UPDATED_NODE_LIST_ERROR("Could not sign_data\nFunction: server_receive_data_socket_node_to_consensus_node_send_updated_node_list\nReceive Message: NODE_TO_CONSENSUS_NODE_SEND_UPDATED_NODE_LIST\nSend Message: CONSENSUS_NODE_TO_NODE_RECEIVE_UPDATED_NODE_LIST");
+    return 0;
+  }
+
+  // parse the message
+  if (parse_json_data(message,"message",data) == 0)
+  {
+    SERVER_RECEIVE_DATA_SOCKET_NODE_TO_CONSENSUS_NODE_SEND_UPDATED_NODE_LIST_ERROR("Could not parse data\nFunction: server_receive_data_socket_node_to_consensus_node_send_updated_node_list\nReceive Message: NODE_TO_CONSENSUS_NODE_SEND_UPDATED_NODE_LIST\nSend Message: CONSENSUS_NODE_TO_NODE_RECEIVE_UPDATED_NODE_LIST");
+  }
+
+  // read the nodes_updated_time from the consensus_node collection
+  if (read_document_field_from_collection(DATABASE_NAME,"consensus_node",MESSAGE,"nodes_updated_time",data2,0) == 0)
+  {
+    SERVER_RECEIVE_DATA_SOCKET_NODE_TO_CONSENSUS_NODE_SEND_UPDATED_NODE_LIST_ERROR("Could not get the current consensus node from the database\nFunction: server_receive_data_socket_node_to_consensus_node_send_updated_node_list\nReceive Message: NODE_TO_CONSENSUS_NODE_SEND_UPDATED_NODE_LIST\nSend Message: CONSENSUS_NODE_TO_NODE_RECEIVE_UPDATED_NODE_LIST");
+  }
+
+  // check if the block verifier needs to have an updated block verifiers list
+  sscanf(data, "%zu", &count);
+  sscanf(data2, "%zu", &count2);
+  if (count < count2)
+  {
+    memset(data,0,strnlen(data,BUFFER_SIZE));
+    memset(data2,0,strnlen(data2,BUFFER_SIZE));
+
+    // create the nodes_name_list
+    memcpy(nodes_name_list,"{",1);
+    count2 = 0;
+    for (count = 0; count < BLOCK_VERIFIERS_AMOUNT; count++)
+    {
+      memcpy(nodes_name_list+count2,"\r\n \\\"node",9);
+      count2 += 9;
+      sprintf(nodes_name_list+count2,"%zu",count);
+      if (count < 10)
+      {
+        count2++;
+      }
+      else
+      {
+        count2 += 2;
+      }
+      memcpy(nodes_name_list+count2,"\\\": \\\"",6);
+      count2 += 6;
+      memcpy(nodes_name_list+count2,block_verifiers_list.block_verifiers_name[count],strnlen(block_verifiers_list.block_verifiers_name[count],BUFFER_SIZE));
+      count2 += strnlen(block_verifiers_list.block_verifiers_name[count],BUFFER_SIZE);
+      memcpy(nodes_name_list+count2,"\\\",",3);
+      count2 += 3;
+    }
+    memcpy(nodes_name_list+count2,"\r\n}",3);
+
+    // create the nodes_public_address_list
+    memcpy(nodes_public_address_list,"{",1);
+    count2 = 0;
+    for (count = 0; count < BLOCK_VERIFIERS_AMOUNT; count++)
+    {
+      memcpy(nodes_public_address_list+count2,"\r\n \\\"node",9);
+      count2 += 9;
+      sprintf(nodes_public_address_list+count2,"%zu",count);
+      if (count < 10)
+      {
+        count2++;
+      }
+      else
+      {
+        count2 += 2;
+      }
+      memcpy(nodes_public_address_list+count2,"\\\": \\\"",6);
+      count2 += 6;
+      memcpy(nodes_public_address_list+count2,block_verifiers_list.block_verifiers_public_address[count],strnlen(block_verifiers_list.block_verifiers_name[count],BUFFER_SIZE));
+      count2 += strnlen(block_verifiers_list.block_verifiers_public_address[count],BUFFER_SIZE);
+      memcpy(nodes_public_address_list+count2,"\\\",",3);
+      count2 += 3;
+    }
+    memcpy(nodes_public_address_list+count2,"\r\n}",3);
+
+    // create the nodes_IP_address_list
+    memcpy(nodes_IP_address_list,"{",1);
+    count2 = 0;
+    for (count = 0; count < BLOCK_VERIFIERS_AMOUNT; count++)
+    {
+      memcpy(nodes_IP_address_list+count2,"\r\n \\\"node",9);
+      count2 += 9;
+      sprintf(nodes_IP_address_list+count2,"%zu",count);
+      if (count < 10)
+      {
+        count2++;
+      }
+      else
+      {
+        count2 += 2;
+      }
+      memcpy(nodes_IP_address_list+count2,"\\\": \\\"",6);
+      count2 += 6;
+      memcpy(nodes_IP_address_list+count2,block_verifiers_list.block_verifiers_IP_address[count],strnlen(block_verifiers_list.block_verifiers_name[count],BUFFER_SIZE));
+      count2 += strnlen(block_verifiers_list.block_verifiers_IP_address[count],BUFFER_SIZE);
+      memcpy(nodes_IP_address_list+count2,"\\\",",3);
+      count2 += 3;
+    }
+    memcpy(nodes_IP_address_list+count2,"\r\n}",3);
+
+    // create the message
+    memcpy(data,"{\r\n \"message_settings\": \"CONSENSUS_NODE_TO_NODE_RECEIVE_UPDATED_NODE_LIST\",\r\n \"nodes_name_list\": \"",98);
+    count = 98;
+    memcpy(data+count,nodes_name_list,strnlen(nodes_name_list,BUFFER_SIZE));
+    count += strnlen(nodes_name_list,BUFFER_SIZE);
+    memcpy(data+count,"\",\r\n \"nodes_public_address_list\": \"",35);
+    count += 35;
+    memcpy(data+count,nodes_public_address_list,strnlen(nodes_public_address_list,BUFFER_SIZE));
+    count += strnlen(nodes_public_address_list,BUFFER_SIZE);
+    memcpy(data+count,"\",\r\n \"nodes_IP_address_list\": \"",31);
+    count += 31;
+    memcpy(data+count,nodes_IP_address_list,strnlen(nodes_IP_address_list,BUFFER_SIZE));
+    count += strnlen(nodes_IP_address_list,BUFFER_SIZE);
+    memcpy(data+count,"\",\r\n}",5);
+  }
+  else
+  {
+    // create the message
+    memcpy(data,"{\r\n \"message_settings\": \"CONSENSUS_NODE_TO_NODE_RECEIVE_UPDATED_NODE_LIST\",\r\n \"nodes_name_list\": \"UPDATED_NODE_LIST\",\r\n \"nodes_public_address_list\": \"UPDATED_NODE_LIST\",\r\n \"nodes_IP_address_list\": \"UPDATED_NODE_LIST\",\r\n}",220);
+  }
+
+  // sign_data
+  if (sign_data(data,0) == 0)
+  { 
+    SERVER_RECEIVE_DATA_SOCKET_NODE_TO_CONSENSUS_NODE_SEND_UPDATED_NODE_LIST_ERROR("Could not sign data\nFunction: server_receive_data_socket_node_to_consensus_node_send_updated_node_list\nReceive Message: NODE_TO_CONSENSUS_NODE_SEND_UPDATED_NODE_LIST\nSend Message: CONSENSUS_NODE_TO_NODE_RECEIVE_UPDATED_NODE_LIST");
+  }
+
+  // send the data back to the main node on the client socket, since it used the send_and_receive_data_socket
+  if (send_data(CLIENT_SOCKET,data2,1) == 0)
+  {
+    SERVER_RECEIVE_DATA_SOCKET_NODE_TO_CONSENSUS_NODE_SEND_UPDATED_NODE_LIST_ERROR("Could not send the CONSENSUS_NODE_TO_NODE_RECEIVE_CURRENT_CONSENSUS_NODE_IP_ADDRESS message to the block verifier\nFunction: server_receive_data_socket_node_to_consensus_node_send_updated_node_list\nReceive Message: NODE_TO_CONSENSUS_NODE_SEND_UPDATED_NODE_LIST\nSend Message: CONSENSUS_NODE_TO_NODE_RECEIVE_UPDATED_NODE_LIST");
+  }
+ 
+  pointer_reset_all;
+  return 1;
+
+  #undef pointer_reset_all
+  #undef SERVER_RECEIVE_DATA_SOCKET_NODE_TO_CONSENSUS_NODE_SEND_UPDATED_NODE_LIST_ERROR
 }
 
 
@@ -1492,7 +1702,14 @@ int create_server(const int MESSAGE_SETTINGS)
              SERVER_ERROR(1);
            }
          }
-         else if (strstr(buffer,"\"message_settings\": \"NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS\"") != NULL && strncmp(server_message,"NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS",BUFFER_SIZE) == 0)
+         else if (strstr(buffer,"\"message_settings\": \"NODE_TO_CONSENSUS_NODE_SEND_UPDATED_NODE_LIST\"") != NULL)
+         {
+           if (server_receive_data_socket_node_to_consensus_node_send_updated_node_list(CLIENT_SOCKET,buffer) == 0)
+           {
+             SERVER_ERROR(1);
+           }
+         }
+         else if (strstr(buffer,"\"message_settings\": \"NODE_TO_CONSENSUS_NODE_SEND_UPDATED_NODE_LIST\"") != NULL && strncmp(server_message,"NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS",BUFFER_SIZE) == 0)
          {
            if (server_receive_data_socket_node_to_consensus_node_send_current_consensus_node_IP_address(CLIENT_SOCKET,buffer) == 0)
            {

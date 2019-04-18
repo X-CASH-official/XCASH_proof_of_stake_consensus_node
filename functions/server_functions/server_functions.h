@@ -17,5 +17,6 @@ int send_data_socket_consensus_node_to_node();
 int send_data_socket_consensus_node_to_mainnode();
 int server_received_data_xcash_proof_of_stake_test_data(const int CLIENT_SOCKET, char* message);
 int server_receive_data_socket_node_to_consensus_node_send_current_consensus_node_IP_address(const int CLIENT_SOCKET, char* message);
+int server_receive_data_socket_node_to_consensus_node_send_updated_node_list(const int CLIENT_SOCKET, char* message);
 int create_server(const int MESSAGE_SETTINGS);
 #endif
