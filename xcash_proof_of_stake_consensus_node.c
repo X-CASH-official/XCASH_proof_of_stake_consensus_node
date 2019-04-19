@@ -132,10 +132,6 @@ int main(int parameters_count, char* parameters[])
     exit(0);
   } 
 
-  // set the check_if_consensus_node_needs_to_add_a_block_to_the_network_timer_settings and the check_if_consensus_node_is_offline_timer_settings
-  check_if_consensus_node_needs_to_add_a_block_to_the_network_timer_settings = 0;
-  check_if_consensus_node_is_offline_timer_settings = 0;
-
   // set the consensus_node_add_blocks_to_network to 0
   memcpy(consensus_node_add_blocks_to_network,"0",1);
 
@@ -439,29 +435,58 @@ int main(int parameters_count, char* parameters[])
   if (current_consensus_node_settings == 0)
   {
     // start the check_if_consensus_node_is_offline_timer
-    check_if_consensus_node_is_offline_timer_settings = 1;
-    if (pthread_create(&check_if_consensus_node_is_offline_timer_thread_id, NULL, &check_if_consensus_node_is_offline_timer, NULL) != 0)
-    {
-      XCASH_PROOF_OF_STAKE_CONSENSUS_NODE_SERVER_ERROR("Could not start the check_if_consensus_node_is_offline_timer");
-    }    
-    if (pthread_detach(check_if_consensus_node_is_offline_timer_thread_id) != 0)
-    {
-      XCASH_PROOF_OF_STAKE_CONSENSUS_NODE_SERVER_ERROR("Could not set the check_if_consensus_node_is_offline_timer in detach mode\n");
-    }
+    check_if_consensus_node_is_offline_timer_settings.settings = 1;
+
+    // stop the check_if_consensus_node_needs_to_add_a_block_to_the_network_timer
+    check_if_consensus_node_needs_to_add_a_block_to_the_network_timer_settings.settings = 0;
+
+    // stop the update_block_verifiers_timer_settings
+    update_block_verifiers_timer_settings.settings = 0;
   }
   else
-  {    
-    // start the check_if_consensus_node_needs_to_add_a_block_to_the_network_timer
-    check_if_consensus_node_needs_to_add_a_block_to_the_network_timer_settings = 1;
-    if (pthread_create(&check_if_consensus_node_needs_to_add_a_block_to_the_network_timer_thread_id, NULL, &check_if_consensus_node_needs_to_add_a_block_to_the_network_timer, NULL) != 0)
-    {
-      XCASH_PROOF_OF_STAKE_CONSENSUS_NODE_SERVER_ERROR("Could not start the check_if_consensus_node_is_offline_timer");
-    }    
-    if (pthread_detach(check_if_consensus_node_needs_to_add_a_block_to_the_network_timer_thread_id) != 0)
-    {
-      XCASH_PROOF_OF_STAKE_CONSENSUS_NODE_SERVER_ERROR("Could not start the check_if_consensus_node_is_offline_timer");
-    }
+  {  
+    // stop the check_if_consensus_node_is_offline_timer
+    check_if_consensus_node_is_offline_timer_settings.settings = 0;
 
+    // start the check_if_consensus_node_needs_to_add_a_block_to_the_network_timer
+    check_if_consensus_node_needs_to_add_a_block_to_the_network_timer_settings.settings = 1;
+
+    // start the update_block_verifiers_timer_settings
+    update_block_verifiers_timer_settings.settings = 1;
+  }
+
+  // start the check_if_consensus_node_is_offline_timer
+  if (pthread_create(&check_if_consensus_node_is_offline_timer_settings.thread_id, NULL, &check_if_consensus_node_is_offline_timer, NULL) != 0)
+  {
+    XCASH_PROOF_OF_STAKE_CONSENSUS_NODE_SERVER_ERROR("Could not start the check_if_consensus_node_is_offline_timer");
+  }    
+  if (pthread_detach(check_if_consensus_node_is_offline_timer_settings.thread_id) != 0)
+  {
+    XCASH_PROOF_OF_STAKE_CONSENSUS_NODE_SERVER_ERROR("Could not set the check_if_consensus_node_is_offline_timer in detach mode\n");
+  } 
+
+  // start the check_if_consensus_node_needs_to_add_a_block_to_the_network_timer
+  if (pthread_create(&check_if_consensus_node_needs_to_add_a_block_to_the_network_timer_settings.thread_id, NULL, &check_if_consensus_node_needs_to_add_a_block_to_the_network_timer, NULL) != 0)
+  {
+    XCASH_PROOF_OF_STAKE_CONSENSUS_NODE_SERVER_ERROR("Could not start the check_if_consensus_node_is_offline_timer");
+  }    
+  if (pthread_detach(check_if_consensus_node_needs_to_add_a_block_to_the_network_timer_settings.thread_id) != 0)
+  {
+    XCASH_PROOF_OF_STAKE_CONSENSUS_NODE_SERVER_ERROR("Could not start the check_if_consensus_node_is_offline_timer");
+  }
+
+  // start the update_block_verifiers_timer
+  if (pthread_create(&update_block_verifiers_timer_settings.thread_id, NULL, &update_block_verifiers_timer, NULL) != 0)
+  {
+    XCASH_PROOF_OF_STAKE_CONSENSUS_NODE_SERVER_ERROR("Could not start the check_if_consensus_node_is_offline_timer");
+  }    
+  if (pthread_detach(update_block_verifiers_timer_settings.thread_id) != 0)
+  {
+    XCASH_PROOF_OF_STAKE_CONSENSUS_NODE_SERVER_ERROR("Could not start the check_if_consensus_node_is_offline_timer");
+  }
+
+  if (current_consensus_node_settings == 1)
+  {
     start:
 
     // start the new round by sending all of the block verifiers the CONSENSUS_NODE_TO_NODES_MAIN_NODE_PUBLIC_ADDRESS message and the main node the CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND message

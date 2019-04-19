@@ -494,7 +494,7 @@ void* check_if_consensus_node_is_offline_timer()
   {
     sleep(60);
 
-    while (check_if_consensus_node_is_offline_timer_settings == 1)
+    if (check_if_consensus_node_is_offline_timer_settings.settings == 1)
     {
       // check if the current consensus node is online
       if (send_data_socket(CONSENSUS_BACKUP_NODES_IP_ADDRESS,SEND_DATA_PORT,"","Check if the current consensus node is online",0) == 0)
@@ -537,12 +537,33 @@ void* check_if_consensus_node_is_offline_timer()
         }
      
         // stop the check_if_consensus_node_is_offline_timer
-        check_if_consensus_node_is_offline_timer_settings = 0;
+        check_if_consensus_node_is_offline_timer_settings.settings = 0;
 
         // start the check_if_consensus_node_needs_to_add_a_block_to_the_network_timer
-        check_if_consensus_node_needs_to_add_a_block_to_the_network_timer_settings = 1;
+        check_if_consensus_node_needs_to_add_a_block_to_the_network_timer_settings.settings = 1;
+
+        // start the update_block_verifiers_timer_settings
+        update_block_verifiers_timer_settings.settings = 1;
       }      
     }
+    else
+    {
+      // check to make sure the consensus node is still the current consensus node
+      if (get_current_consensus_node() == 0)
+      {
+        // the consensus node is not the current consensus node
+
+        // start the check_if_consensus_node_is_offline_timer
+        check_if_consensus_node_is_offline_timer_settings.settings = 1;
+
+        // stop the check_if_consensus_node_needs_to_add_a_block_to_the_network_timer
+        check_if_consensus_node_needs_to_add_a_block_to_the_network_timer_settings.settings = 0;
+
+        // stop the update_block_verifiers_timer_settings
+        update_block_verifiers_timer_settings.settings = 0;
+
+      }
+    }    
   }
 
   pointer_reset(message);
@@ -588,7 +609,7 @@ void* check_if_consensus_node_needs_to_add_a_block_to_the_network_timer()
   {
     sleep(NETWORK_BLOCK_TIME);
 
-    while (check_if_consensus_node_needs_to_add_a_block_to_the_network_timer_settings == 1)
+    while (check_if_consensus_node_needs_to_add_a_block_to_the_network_timer_settings.settings == 1)
     {
       // create the message
       memcpy(message,MESSAGE,107);
@@ -610,10 +631,7 @@ void* check_if_consensus_node_needs_to_add_a_block_to_the_network_timer()
       }
 
       if (memcmp(consensus_node_add_blocks_to_network,"1",1) == 0)
-      {
-        // stop all of the running timers
-        check_if_consensus_node_is_offline_timer_settings = 0;
-
+      { 
         // let all of the block verifiers know that the consensus node will be adding the blocks to the network
         if (send_consensus_node_needs_to_add_a_block_to_the_network_message() == 0)
         {
@@ -626,11 +644,6 @@ void* check_if_consensus_node_needs_to_add_a_block_to_the_network_timer()
           CHECK_IF_CONSENSUS_NODE_NEEDS_TO_ADD_A_BLOCK_TO_THE_NETWORK_ERROR("The consensus node could not create a block\nFunction: xcash_proof_of_stake_timer\nReceived Message: BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS\nSend Message: CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_RECEIVE_XCASH_PROOF_OF_STAKE_SETTINGS");
         }      
       }
-      else
-      {
-        // start all of the running timers
-        check_if_consensus_node_needs_to_add_a_block_to_the_network_timer_settings = 1;
-      }
     }
   }
 
@@ -639,4 +652,19 @@ void* check_if_consensus_node_needs_to_add_a_block_to_the_network_timer()
 
   #undef MESSAGE
   #undef CHECK_IF_CONSENSUS_NODE_NEEDS_TO_ADD_A_BLOCK_TO_THE_NETWORK
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
+Name: update_block_verifiers_timer
+Description: Updates the block verifiers total vote count
+Return: NULL
+-----------------------------------------------------------------------------------------------------------
+*/
+
+void* update_block_verifiers_timer()
+{ 
+  
 }

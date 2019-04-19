@@ -177,6 +177,11 @@ struct blockchain_data {
     char* transactions[1000000]; // All of the transactions in the block.
 };
 
+struct timer_data {
+    pthread_t thread_id; // The thread id of the timer
+    int settings; // 1 if the timer is running, otherwise 0
+};
+
 struct mainnode_timeout {
     char* block_verifiers_public_address[BLOCK_VERIFIERS_AMOUNT]; // The public address of the block verifiers that voted for a round change because the main node did not send any data
     size_t vote_round_change_timeout; // The amount of block verifiers that voted for a round change because the main node did not send any data
