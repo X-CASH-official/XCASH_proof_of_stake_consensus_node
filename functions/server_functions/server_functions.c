@@ -2078,6 +2078,243 @@ Return: 1 if successfull, otherwise 0.
 
 int create_new_block()
 {
+  // Variables
+  char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* data2 = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* message = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  time_t current_date_and_time;
+  struct tm* current_UTC_date_and_time;  
+  size_t count;
+  size_t count2;
+  size_t counter;
+  size_t data_length;
+
+  // threads
+  pthread_t thread_id;
+
+  // define macros
+  #define DATABASE_COLLECTION "current_round"
+  #define MESSAGE "{\"username\":\"xcash\"}"
+
+  #define pointer_reset_all \
+  free(data); \
+  data = NULL; \
+  free(data2); \
+  data2 = NULL; \
+  free(message); \
+  message = NULL;
+
+  #define CREATE_NEW_BLOCK_ERROR(settings) \
+  color_print(settings,"red"); \
+  pointer_reset_all; \
+  return 0;
+
+  // check if the memory needed was allocated on the heap successfully
+  if (data == NULL || data2 == NULL || message == NULL)
+  {
+    if (data != NULL)
+    {
+      pointer_reset(data);
+    }
+    if (data2 != NULL)
+    {
+      pointer_reset(data2);
+    }
+    if (message != NULL)
+    {
+      pointer_reset(message);
+    }
+    color_print("Could not allocate the memory needed on the heap","red");
+    exit(0);
+  }
+
+  // reset the variables
+  memset(data,0,strnlen(data,BUFFER_SIZE));
+  memset(data2,0,strnlen(data2,BUFFER_SIZE));
+  memset(message,0,strnlen(message,BUFFER_SIZE));
+
+  // convert the network_block_string to blockchain_data
+  if (network_block_string_to_blockchain_data(VRF_data.block_blob) == 0)
+  {
+    CREATE_NEW_BLOCK_ERROR("Could not convert the network_block_string to blockchain_data\nFunction: create_new_block\nReceive Message: BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CREATE_NEW_BLOCK\nSend Message: CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CREATE_NEW_BLOCK");
+  }
+
+  // add the VRF_data struct to the blockchain_data struct
+
+
+  // change the nonce to the CONSENSUS_NODE_NETWORK_BLOCK_NONCE
+  memset(blockchain_data.nonce_data,0,strnlen(blockchain_data.nonce_data,9));
+  memcpy(blockchain_data.nonce_data,CONSENSUS_NODE_NETWORK_BLOCK_NONCE,8);
+
+  // convert the blockchain_data to a network_block_string
+  memset(data,0,strnlen(data,BUFFER_SIZE));
+  if (blockchain_data_to_network_block_string(data) == 0)
+  {
+    CREATE_NEW_BLOCK_ERROR("Could not convert the blockchain_data to a network_block_string\nFunction: create_new_block\nReceive Message: BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CREATE_NEW_BLOCK\nSend Message: CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CREATE_NEW_BLOCK");
+  }
+
+  // create the message
+  data_length = strnlen(data,BUFFER_SIZE);
+  memcpy(message,"{\r\n \"message_settings\": \"CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CREATE_NEW_BLOCK\",\r\n \"block_blob\": \"",116);
+  memcpy(message+116,data,data_length);
+  memcpy(message+116+data_length,"\",\r\n}",5);
+
+  // sign_data
+  if (sign_data(message,0) == 0)
+  { 
+    CREATE_NEW_BLOCK_ERROR("Could not sign_data\nFunction: create_new_block\nReceive Message: BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CREATE_NEW_BLOCK\nSend Message: CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CREATE_NEW_BLOCK");
+  }
+
+  // add the block_validation_node_signature_data_length to the blockchain_data
+  blockchain_data.blockchain_reserve_bytes.block_validation_node_signature_data_length = 196;
+
+  // send the network_block_string to the block validation nodes
+  memset(data,0,strnlen(data,BUFFER_SIZE));
+  for (count = 0; count < BLOCK_VALIDATION_NODES_AMOUNT; count++)
+  {
+    if (send_and_receive_data_socket(data,block_validation_nodes_list.block_validation_nodes_IP_address[count],SEND_DATA_PORT,message,TOTAL_CONNECTION_TIME_SETTINGS,"sending the network_block_string to the block validation nodes",0) == 1)
+    {
+      // convert the block validation signature to hexadecimal
+      memset(data2,0,strnlen(data2,BUFFER_SIZE));
+      for (count2 = 0, counter = 0; count2 < XCASH_SIGN_DATA_LENGTH; count2++, counter += 2)
+      {
+        sprintf(data2+counter,"%02x",data[count2] & 0xFF);
+      }
+
+      // add the block validation signature to the blockchain_data
+      memcpy(blockchain_data.blockchain_reserve_bytes.block_validation_node_signature_data[count],data2,196);
+      memcpy(blockchain_data.blockchain_reserve_bytes.block_validation_node_signature[count],data,XCASH_SIGN_DATA_LENGTH);
+    }
+  }
+
+  // verify the blockchain_data
+  if (verify_network_block_data(1) == 0)
+  {
+    CREATE_NEW_BLOCK_ERROR("Could not verify the blockchain_data\nFunction: create_new_block\nReceive Message: BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CREATE_NEW_BLOCK\nSend Message: CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CREATE_NEW_BLOCK");
+  }
+
+  // convert the blockchain_data to a network_block_string
+  memset(data,0,strnlen(data,BUFFER_SIZE));
+  if (blockchain_data_to_network_block_string(data) == 0)
+  {
+    CREATE_NEW_BLOCK_ERROR("Could not convert the blockchain_data to a network_block_string\nFunction: create_new_block\nReceive Message: BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CREATE_NEW_BLOCK\nSend Message: CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CREATE_NEW_BLOCK");
+  }
+
+  // wait until the NETWORK_BLOCK_TIME to submit the block to the network
+  time(&current_date_and_time);
+  current_UTC_date_and_time = gmtime(&current_date_and_time);
+  while(current_UTC_date_and_time->tm_min % NETWORK_BLOCK_TIME != 0 && current_UTC_date_and_time->tm_sec == 0)
+  {
+    // wait for 100 milliseconds this way blocks are always submitted towards the begining of a minute for a constant block time
+    usleep(100000);
+  }
+
+  // add the network block
+  if (submit_block_template(data,0) == 0)
+  {
+    CREATE_NEW_BLOCK_ERROR("Could not submit the block to the network\nFunction: create_new_block\nReceive Message: BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CREATE_NEW_BLOCK\nSend Message: CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CREATE_NEW_BLOCK");
+  }
+
+  // add the round statistics to the database
+  add_round_statistics();
+
+  // add the block verifier statistics to the database
+  add_block_verifiers_round_statistics();
+
+
+
+  // set the current_round_part and current_round_part_backup_node in the database
+  if (update_document_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,"{\"current_round_part\":\"0\"}",0) == 0 || update_document_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,"{\"current_round_part_backup_node\":\"0\"}",0) == 0)
+  {
+    CREATE_NEW_BLOCK_ERROR("Could not update the current_round_part and current_round_part_backup_node in the database\nFunction: create_new_block\nReceive Message: BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CREATE_NEW_BLOCK\nSend Message: CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CREATE_NEW_BLOCK");
+  }
+
+  // calculate the new main nodes roles from the previous network block
+  if (calculate_main_nodes_role() == 0)
+  {
+    CREATE_NEW_BLOCK_ERROR("Could not calculate main nodes role\nFunction: create_new_block\nReceive Message: BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CREATE_NEW_BLOCK\nSend Message: CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CREATE_NEW_BLOCK");
+    // add another block to the network since the next round could not be started
+    consensus_node_create_new_block();
+  }
+
+  start_current_round_part:
+
+  // calculate the current_round_part and current_round_part_backup_node 
+  if (mainode_consensus() == 0)
+  {
+    CREATE_NEW_BLOCK_ERROR("Could not get the current_round_part and current_round_part_backup_node\nFunction: create_new_block\nReceive Message: BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CREATE_NEW_BLOCK\nSend Message: CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CREATE_NEW_BLOCK");
+    // add another block to the network since the next round could not be started
+    consensus_node_create_new_block();
+  }
+
+  // send the main nodes public address to the block verifiers
+  if (send_data_socket_consensus_node_to_node() == 0)
+  {
+    CREATE_NEW_BLOCK_ERROR("Could not send the main nodes public address to the block verifiers\nFunction: create_new_block\nReceive Message: BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CREATE_NEW_BLOCK\nSend Message: CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CREATE_NEW_BLOCK");
+    // add another block to the network since the next round could not be started
+    consensus_node_create_new_block();
+  }
+
+  // let the main node know they are the main node and they need to start the part of the round
+  if (send_data_socket_consensus_node_to_mainnode() == 0)
+  {
+    CREATE_NEW_BLOCK_ERROR("Could not send the main nodes public address to the block verifiers\nFunction: create_new_block\nReceive Message: BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CREATE_NEW_BLOCK\nSend Message: CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CREATE_NEW_BLOCK");
+    // add another block to the network since the next round could not be started
+    goto start_current_round_part;
+  }
+
+  // start the receive_votes_from_nodes_timeout
+  if (pthread_create(&thread_id, NULL, &receive_votes_from_nodes_timeout_thread, NULL) != 0)
+  {
+    CREATE_NEW_BLOCK_ERROR("Could not start the receive_votes_from_nodes_timeout\nFunction: create_new_block\nReceive Message: BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CREATE_NEW_BLOCK\nSend Message: CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CREATE_NEW_BLOCK");
+    // add another block to the network since the next round could not be started
+    goto start_current_round_part;
+  }
+  // set the thread to detach once completed, since we do not need to use anything it will return
+  if (pthread_detach(thread_id) != 0)
+  {
+    CREATE_NEW_BLOCK_ERROR("Could not start the receive_votes_from_nodes_timeout\nFunction: create_new_block\nReceive Message: BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CREATE_NEW_BLOCK\nSend Message: CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CREATE_NEW_BLOCK");
+    // add another block to the network since the next round could not be started
+    goto start_current_round_part;
+  }
+
+  // set the server message
+  memset(server_message,0,strnlen(server_message,BUFFER_SIZE));
+  memcpy(server_message,"NODES_TO_CONSENSUS_NODE_MAIN_NODE_SOCKET_TIMEOUT_ROUND_CHANGE|NODES_TO_CONSENSUS_NODE_VOTE_RESULTS",98);
+
+  return 1;
+
+  #undef DATABASE_COLLECTION
+  #undef MESSAGE
+  #undef pointer_reset_all
+  #undef CREATE_NEW_BLOCK_ERROR
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
+Name: add_round_statistics
+Description: Adds the round statistics to the database after adding the block to the network
+-----------------------------------------------------------------------------------------------------------
+*/
+
+void add_round_statistics()
+{
+
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
+Name: add_delegate_round_statistics
+Description: Adds the block verifier statistics to the database after adding the block to the network
+-----------------------------------------------------------------------------------------------------------
+*/
+
+void add_block_verifiers_round_statistics()
+{
   
 }
 
