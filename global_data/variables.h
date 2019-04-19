@@ -22,6 +22,7 @@ struct trusted_block_verifiers trusted_block_verifiers; // The list of trusted b
 struct trusted_block_verifiers_VRF_data trusted_block_verifiers_VRF_data; // The list of VRF data for all of the trusted block verifiers.
 struct VRF_data VRF_data; // The list of all of the VRF data to send to the block producer.
 struct blockchain_data blockchain_data; // The data for a new block to be added to the network.
+struct reserve_proofs_list reserve_proofs_list; // Holds all of the reserve proofs in the database when updating the block verifiers list
 struct timer_data check_if_consensus_node_needs_to_add_a_block_to_the_network_timer_settings; // The timer data for the check_if_consensus_node_needs_to_add_a_block_to_the_network_timer
 struct timer_data check_if_consensus_node_is_offline_timer_settings; // The timer data for the check_if_consensus_node_is_offline_timer
 struct timer_data update_block_verifiers_timer_settings; // The timer data for the update_block_verifiers_timer

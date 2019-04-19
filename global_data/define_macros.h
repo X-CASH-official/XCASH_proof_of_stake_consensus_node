@@ -23,6 +23,8 @@ Using define statements instead of constants for increased efficiency
 #define NETWORK_VERSION "0000" // the network version
 #define BLOCK_PRODUCER_NETWORK_BLOCK_NONCE "00000000" // the network block nonce used when the block producer creates the block
 #define CONSENSUS_NODE_NETWORK_BLOCK_NONCE "11111111" // the network block nonce used when the consensus node creates the block
+#define RESERVE_PROOFS_LIST_MAXIMUM_AMOUNT 20000 // the maximum amount of reserve proofs (total_supply / xcash_proof_of_stake_minimum_amount)
+#define XCASH_PROOF_OF_STAKE_MINIMUM_AMOUNT 5000000 // the minimum amount the reserve proof can be created for
 #define BLOCK_VALIDATION_NODES_TOTAL_AMOUNT 100 // The total amount of block validation nodes
 #define BLOCK_VALIDATION_NODES_AMOUNT 100 // The amount of block validation nodes needed to make the network block valid
 #define BLOCK_VERIFIERS_AMOUNT 100 // The amount of block verifiers in a round

@@ -177,6 +177,12 @@ struct blockchain_data {
     char* transactions[1000000]; // All of the transactions in the block.
 };
 
+struct reserve_proofs_list {
+    char* public_address_created_reserve_proof[RESERVE_PROOFS_LIST_MAXIMUM_AMOUNT];
+    char* public_address_voted_for[RESERVE_PROOFS_LIST_MAXIMUM_AMOUNT];
+    char* reserve_proof[RESERVE_PROOFS_LIST_MAXIMUM_AMOUNT];
+};     
+
 struct timer_data {
     pthread_t thread_id; // The thread id of the timer
     int settings; // 1 if the timer is running, otherwise 0

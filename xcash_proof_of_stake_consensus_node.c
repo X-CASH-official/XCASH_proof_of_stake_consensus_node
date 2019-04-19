@@ -311,6 +311,21 @@ int main(int parameters_count, char* parameters[])
     }
   }
 
+  // initialize the reserve_proofs_list struct 
+  for (count = 0; count < RESERVE_PROOFS_LIST_MAXIMUM_AMOUNT; count++)
+  {
+    reserve_proofs_list.public_address_created_reserve_proof[count] = (char*)calloc(XCASH_WALLET_LENGTH+1,sizeof(char));
+    reserve_proofs_list.public_address_voted_for[count] = (char*)calloc(XCASH_WALLET_LENGTH+1,sizeof(char));
+    reserve_proofs_list.reserve_proof[count] = (char*)calloc(10000+1,sizeof(char));
+
+    // check if the memory needed was allocated on the heap successfully
+    if (reserve_proofs_list.public_address_created_reserve_proof[count] == NULL || reserve_proofs_list.public_address_voted_for[count] == NULL || reserve_proofs_list.reserve_proof[count] == NULL)
+    {
+      color_print("Could not allocate the memory needed on the heap","red");
+      exit(0);
+    }
+  }
+
   // initialize the mainnode_timeout struct 
   for (count = 0; count < BLOCK_VERIFIERS_AMOUNT; count++)
   {
