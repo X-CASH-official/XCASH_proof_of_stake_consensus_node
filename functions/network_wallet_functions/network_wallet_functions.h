@@ -8,4 +8,5 @@ Function prototypes
 */
 
 int get_public_address(const int HTTP_SETTINGS);
+int check_reserve_proofs(char* result, const int HTTP_SETTINGS);
 #endif

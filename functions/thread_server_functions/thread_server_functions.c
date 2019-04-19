@@ -17,6 +17,7 @@
 #include "database_functions.h"
 #include "network_functions.h"
 #include "network_security_functions.h"
+#include "network_wallet_functions.h"
 #include "server_functions.h"
 #include "thread_server_functions.h"
 
