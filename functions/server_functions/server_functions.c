@@ -1902,7 +1902,67 @@ Parameters:
 
 void update_block_producer_eligibility(const int SETTINGS)
 {
-  
+  // Variables
+  char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  size_t count;
+  size_t data_length;
+
+  // define macros
+  #define DATABASE_COLLECTION "delegates"
+
+  // check if the memory needed was allocated on the heap successfully
+  if (data == NULL)
+  {
+    color_print("Could not allocate the memory needed on the heap","red");
+    exit(0);
+  }
+
+  if (SETTINGS == 0)
+  {
+    // set all block verifiers that voted for the mainnode_timeout to false
+    for (count = 0; count < mainnode_timeout.vote_round_change_timeout; count++)
+    {
+      // create the message
+      data_length = strnlen(mainnode_timeout.block_verifiers_public_address[count],BUFFER_SIZE);
+      memset(data,0,strnlen(data,BUFFER_SIZE));
+      memcpy(data,"{\"public_address\":\"",19);
+      memcpy(data+19,mainnode_timeout.block_verifiers_public_address[count],data_length);
+      memcpy(data+19+data_length,"\"}",2);
+      update_document_from_collection(DATABASE_NAME,DATABASE_COLLECTION,data,"{\"block_producer_eligibility\":\"false\"}",0);      
+    }
+  }
+  else if (SETTINGS == 1)
+  {
+    // set all block verifiers that voted for the vote_next_round_false to false
+    for (count = 0; count < node_to_node_vote.vote_next_round_false; count++)
+    {
+      // create the message
+      data_length = strnlen(node_to_node_vote.block_verifiers_public_address_vote_next_round_false[count],BUFFER_SIZE);
+      memset(data,0,strnlen(data,BUFFER_SIZE));
+      memcpy(data,"{\"public_address\":\"",19);
+      memcpy(data+19,node_to_node_vote.block_verifiers_public_address_vote_next_round_false[count],data_length);
+      memcpy(data+19+data_length,"\"}",2);
+      update_document_from_collection(DATABASE_NAME,DATABASE_COLLECTION,data,"{\"block_producer_eligibility\":\"false\"}",0);      
+    }
+  }
+  else if (SETTINGS == 2)
+  {
+    // set all block verifiers that voted for the vote_next_round_true to false
+    for (count = 0; count < node_to_node_vote.vote_next_round_true; count++)
+    {
+      // create the message
+      data_length = strnlen(node_to_node_vote.block_verifiers_public_address_vote_next_round_true[count],BUFFER_SIZE);
+      memset(data,0,strnlen(data,BUFFER_SIZE));
+      memcpy(data,"{\"public_address\":\"",19);
+      memcpy(data+19,node_to_node_vote.block_verifiers_public_address_vote_next_round_true[count],data_length);
+      memcpy(data+19+data_length,"\"}",2);
+      update_document_from_collection(DATABASE_NAME,DATABASE_COLLECTION,data,"{\"block_producer_eligibility\":\"false\"}",0);      
+    }
+  }
+
+  return;
+
+  #undef DATABASE_COLLECTION
 }
 
 
