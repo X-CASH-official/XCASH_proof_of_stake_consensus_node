@@ -38,6 +38,7 @@ struct trusted_block_verifiers_VRF_data {
     char* vrf_alpha_string_round_part_3[TRUSTED_BLOCK_VERIFIERS_AMOUNT];
     char* vrf_proof_round_part_3[TRUSTED_BLOCK_VERIFIERS_AMOUNT];
     char* vrf_beta_string_round_part_3[TRUSTED_BLOCK_VERIFIERS_AMOUNT];
+    char* block_blob[TRUSTED_BLOCK_VERIFIERS_AMOUNT];
 };
 
 struct VRF_data {
@@ -53,6 +54,7 @@ struct VRF_data {
     char* vrf_alpha_string_round_part_3;
     char* vrf_proof_round_part_3;
     char* vrf_beta_string_round_part_3;
+    char* block_blob;
 };
 
 struct blockchain_reserve_bytes {
