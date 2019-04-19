@@ -1726,9 +1726,92 @@ Description: sends the CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_ROUND_CHANGE messa
 -----------------------------------------------------------------------------------------------------------
 */
 
-void send_round_change()
+int send_round_change()
 {
-  
+  // Variables
+  char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  size_t count;
+
+  // define macros
+  #define DATABASE_COLLECTION "current_round"
+  #define MESSAGE "{\"username\":\"xcash\"}"
+
+  #define SEND_ROUND_CHANGE_ERROR(settings) \
+  color_print(settings,"red"); \
+  pointer_reset(data); \
+  return 0;
+
+  // check if the memory needed was allocated on the heap successfully
+  if (data == NULL)
+  {
+    color_print("Could not allocate the memory needed on the heap","red");
+    exit(0);
+  }
+
+  // create the message
+  memcpy(data,"{\r\n \"message_settings\": \"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEXT_ROUND\",\r\n}",79);
+
+  // sign_data
+  if (sign_data(data,0) == 0)
+  { 
+    SEND_ROUND_CHANGE_ERROR("Could not sign_data\nFunction: send_round_change\nSend Message: CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_ROUND_CHANGE");
+  }
+
+  // send the CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEW_PART_OF_ROUND message to the nodes and main node
+  for (count = 0; count < BLOCK_VERIFIERS_AMOUNT; count++)
+  {
+    send_data_socket(block_verifiers_list.block_verifiers_IP_address[count],SEND_DATA_PORT,data,"sending CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_ROUND_CHANGE message to the nodes and main node",0);
+  }
+
+  // update the current_round_part and current_round_part_backup_node in the database
+  if (memcmp(current_round_part_backup_node,"0",1) == 0)
+  {
+    memcpy(data,"{\"current_round_part_backup_node\":\"1\"}",26);
+  }
+  else if (memcmp(current_round_part_backup_node,"1",1) == 0)
+  {
+    memcpy(data,"{\"current_round_part_backup_node\":\"2\"}",26);
+  }
+  else if (memcmp(current_round_part_backup_node,"2",1) == 0)
+  {
+    memcpy(data,"{\"current_round_part_backup_node\":\"3\"}",26);
+  }
+  else if (memcmp(current_round_part_backup_node,"3",1) == 0)
+  {
+    memcpy(data,"{\"current_round_part_backup_node\":\"4\"}",26);
+  }
+  else if (memcmp(current_round_part_backup_node,"4",1) == 0)
+  {
+    memcpy(data,"{\"current_round_part_backup_node\":\"5\"}",26);
+  }
+  else if (memcmp(current_round_part_backup_node,"5",1) == 0)
+  {
+    SEND_ROUND_CHANGE_ERROR("The current_round_part_backup_node has no more backup nodes to select\nFunction: send_round_change\nSend Message: CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_ROUND_CHANGE");
+  }
+ 
+  // set the current_round_part and current_round_part_backup_node in the database
+  if (update_document_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,data,0) == 0)
+  {
+    SEND_ROUND_CHANGE_ERROR("Could not update the current_round_part and current_round_part_backup_node in the database\nFunction: send_round_change\nSend Message: CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_ROUND_CHANGE");
+  }
+
+  // send the main nodes public address to the block verifiers
+  if (send_data_socket_consensus_node_to_node() == 0)
+  {
+    SEND_ROUND_CHANGE_ERROR("Could not send the main nodes public address to the block verifiers\nFunction: send_round_change\nSend Message: CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_ROUND_CHANGE");
+  }
+
+  // let the main node know they are the main node and they need to start the part of the round
+  if (send_data_socket_consensus_node_to_mainnode() == 0)
+  {
+    SEND_ROUND_CHANGE_ERROR("Could not send the main nodes public address to the block verifiers\nFunction: send_round_change\nSend Message: CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_ROUND_CHANGE");
+  }
+
+  return 1;
+
+  #undef DATABASE_COLLECTION
+  #undef MESSAGE
+  #undef SEND_ROUND_CHANGE_ERROR
 }
 
 
@@ -1808,6 +1891,24 @@ int start_new_part_of_round()
   if (update_document_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,data,0) == 0 || update_document_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,"{\"current_round_part_backup_node\":\"0\"}",0) == 0)
   {
     START_NEW_PART_OF_ROUND_ERROR("Could not update the current_round_part and current_round_part_backup_node in the database\nFunction: start_new_part_of_round\nSend Message: CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEW_PART_OF_ROUND");
+  }
+
+  // set the current_round_part and current_round_part_backup_node in the database
+  if (update_document_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,data,0) == 0)
+  {
+    START_NEW_PART_OF_ROUND_ERROR("Could not update the current_round_part and current_round_part_backup_node in the database\nFunction: start_new_part_of_round\nSend Message: CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEW_PART_OF_ROUND");
+  }
+
+  // send the main nodes public address to the block verifiers
+  if (send_data_socket_consensus_node_to_node() == 0)
+  {
+    START_NEW_PART_OF_ROUND_ERROR("Could not send the main nodes public address to the block verifiers\nFunction: start_new_part_of_round\nSend Message: CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEW_PART_OF_ROUND");
+  }
+
+  // let the main node know they are the main node and they need to start the part of the round
+  if (send_data_socket_consensus_node_to_mainnode() == 0)
+  {
+    START_NEW_PART_OF_ROUND_ERROR("Could not send the main nodes public address to the block verifiers\nFunction: start_new_part_of_round\nSend Message: CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEW_PART_OF_ROUND");
   }
 
   return 1;

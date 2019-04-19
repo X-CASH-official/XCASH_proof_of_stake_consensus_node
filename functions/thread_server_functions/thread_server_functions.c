@@ -169,8 +169,10 @@ void* receive_votes_from_nodes_timeout_thread()
 
   #define RECEIVE_VOTES_FROM_NODES_TIMEOUT_THREAD_ERROR(settings) \
   color_print(settings,"red"); \
-  return 0;  
+  return 0;
 
+  for (;;)
+  {  
   // wait for the BLOCK_VERIFIERS_TOTAL_VOTE_TIME
   sleep(BLOCK_VERIFIERS_TOTAL_VOTE_TIME);
 
@@ -341,11 +343,8 @@ void* receive_votes_from_nodes_timeout_thread()
   {
     // The main node timeout is valid
 
-    // change the round
-    send_round_change();
-
     // start the part of the round over again
-    if (start_new_part_of_round() == 0)
+    if (send_round_change() == 0)
     {
       // have the consensus node add a block to the network
       consensus_node_create_new_block();
@@ -369,10 +368,7 @@ void* receive_votes_from_nodes_timeout_thread()
   {
     // The vote for false is valid
 
-    // change the round
-    send_round_change();
-
-    // start the part of the round over again
+    // startnew part of round
     if (start_new_part_of_round() == 0)
     {
       // have the consensus node add a block to the network
@@ -399,10 +395,7 @@ void* receive_votes_from_nodes_timeout_thread()
 
     if (memcmp(current_round_part,"4",1) != 0)
     {
-      // change the round
-      send_round_change();
-
-      // start the part of the round over again
+      // start new part of round
       if (start_new_part_of_round() == 0)
       {
         // have the consensus node add a block to the network
@@ -453,6 +446,7 @@ void* receive_votes_from_nodes_timeout_thread()
 
   // set the server message
   memset(server_message,0,strnlen(server_message,BUFFER_SIZE));
+}
 
   pthread_exit((void *)(intptr_t)1);
 
