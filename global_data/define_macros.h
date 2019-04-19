@@ -18,7 +18,8 @@ Using define statements instead of constants for increased efficiency
 #define NODES_UPDATED_TIME_FILE_NAME "nodes_updated_time.txt" // The last time the node has updated the list of nodes from the consensus node
 #define NODES_PUBLIC_ADDRESS_LIST_FILE_NAME "nodes_public_address_list.txt" // The current enabled nodes public address list
 #define NODES_NAME_LIST_FILE_NAME "nodes_name_list.txt" // The current enabled nodes name list
-#define NETWORK_BLOCK_TIME 120 // The network block time for the network in seconds (2 minutes)
+#define NETWORK_BLOCK_TIME 300 // The network block time for the network in seconds (5 minutes)
+#define UPDATE_BLOCK_VERIFIERS_TIME 120 // The time it takes the consensus node to update all of the block verifiers (2 minutes)
 #define NETWORK_VERSION "0000" // the network version
 #define BLOCK_PRODUCER_NETWORK_BLOCK_NONCE "00000000" // the network block nonce used when the block producer creates the block
 #define CONSENSUS_NODE_NETWORK_BLOCK_NONCE "11111111" // the network block nonce used when the consensus node creates the block

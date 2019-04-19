@@ -512,6 +512,14 @@ int consensus_node_create_new_block()
     CONSENSUS_NODE_CREATE_NEW_BLOCK_ERROR("Could not submit the block to the network\nFunction: consensus_node_create_new_block\nReceive Message: BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK\nSend Message: CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK");
   }
 
+  // check if it should wait if the update_block_verifiers_timer is running
+  time(&current_date_and_time);
+  current_UTC_date_and_time = gmtime(&current_date_and_time);
+  if (current_UTC_date_and_time->tm_hour % 2 == 0 && current_UTC_date_and_time->tm_min == 0)
+  {  
+    sleep(UPDATE_BLOCK_VERIFIERS_TIME);
+  }
+
   // calculate the new main nodes roles from the previous network block
   if (calculate_main_nodes_role() == 0)
   {
@@ -2245,6 +2253,14 @@ int create_new_block()
 
   // add the block verifier statistics to the database
   add_block_verifiers_round_statistics();
+
+  // check if it should wait if the update_block_verifiers_timer is running
+  time(&current_date_and_time);
+  current_UTC_date_and_time = gmtime(&current_date_and_time);
+  if (current_UTC_date_and_time->tm_hour % 2 == 0 && current_UTC_date_and_time->tm_min == 0)
+  {  
+    sleep(UPDATE_BLOCK_VERIFIERS_TIME);
+  }
 
 
 
