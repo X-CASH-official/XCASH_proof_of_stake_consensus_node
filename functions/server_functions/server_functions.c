@@ -2340,9 +2340,398 @@ Description: Adds the round statistics to the database after adding the block to
 -----------------------------------------------------------------------------------------------------------
 */
 
-void add_round_statistics()
+int add_round_statistics()
 {
+  // Constants
+  const bson_t* current_document;
+  
+  // Variables
+  char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* data2 = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* data3 = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* settings = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  size_t count;
+  size_t count2;
+  size_t counter;
+  double total;
+  double total2;
+  double total3;
+  mongoc_collection_t* collection;
+  mongoc_cursor_t* document_settings;
+  bson_error_t error;
+  bson_t* document = NULL;  
+  char* message;
+  char* message_copy1;
+  char* message_copy2;
 
+  // define macros
+  #define MESSAGE "{\"username\":\"xcash\"}"
+  #define pointer_reset_all \
+  free(data); \
+  data = NULL; \
+  free(data2); \
+  data2 = NULL; \
+  free(data3); \
+  data3 = NULL; \
+  free(settings); \
+  settings = NULL; 
+
+  #define ADD_ROUND_STATISTICS_ERROR(settings) \
+  color_print(settings,"red"); \
+  pointer_reset(data); \
+  return 0;
+
+  // check if the memory needed was allocated on the heap successfully
+  if (data == NULL || data2 == NULL || data3 == NULL || settings == NULL)
+  {   
+    if (data != NULL)
+    {
+      pointer_reset(data);
+    }
+    if (data2 != NULL)
+    {
+      pointer_reset(data2);
+    }
+    if (data3 != NULL)
+    {
+      pointer_reset(data3);
+    }
+    if (settings != NULL)
+    {
+      pointer_reset(settings);
+    }
+    color_print("Could not allocate the memory needed on the heap","red");
+    exit(0);
+  }  
+
+  // calculate the most_total_rounds_delegate_name and most_total_rounds
+  count = 0;
+  // set the collection
+  collection = mongoc_client_get_collection(database_client, DATABASE_NAME, "delegates");
+  document = bson_new(); 
+  document_settings = mongoc_collection_find_with_opts(collection, document, NULL, NULL);
+  while (mongoc_cursor_next(document_settings, &current_document))
+  {
+    // reset the variables
+    memset(data,0,strnlen(data,10485760));
+    memset(data2,0,strnlen(data2,BUFFER_SIZE));
+    memset(data3,0,strnlen(data3,BUFFER_SIZE));
+    memset(settings,0,strnlen(settings,BUFFER_SIZE));
+    count2 = 0;
+
+    message = bson_as_canonical_extended_json(current_document, NULL);
+    memcpy(data,message,strnlen(message,BUFFER_SIZE));
+    bson_free(message);
+
+    // get the block_verifier_total_rounds
+    memcpy(data2,", \"",3);
+    memcpy(data2+3,"block_verifier_total_rounds",27);
+    memcpy(data2+30,"\" : \"",5);
+
+    message_copy1 = strstr(data,data2) + strnlen(data2,BUFFER_SIZE);
+    message_copy2 = strstr(message_copy1,"\"");
+    memcpy(data3,message_copy1,message_copy2 - message_copy1);
+    sscanf(data3, "%zu", &count2);
+
+    if (count2 > count)
+    {
+      count = count2;
+      // get the delegate_name
+      memcpy(data2,", \"",3);
+      memcpy(data2+3,"delegate_name",13);
+      memcpy(data2+16,"\" : \"",5);
+
+      message_copy1 = strstr(data,data2) + strnlen(data2,BUFFER_SIZE);
+      message_copy2 = strstr(message_copy1,"\"");
+      memcpy(data3,message_copy1,message_copy2 - message_copy1);
+      memset(settings,0,strnlen(settings,BUFFER_SIZE));
+      memcpy(settings,data3,strnlen(data3,BUFFER_SIZE));
+    }
+  }
+
+  // create the message
+  memset(data,0,strnlen(data,BUFFER_SIZE));
+  memcpy(data,"{\"most_total_rounds_delegate_name\":\"",36);
+  memcpy(data+36,settings,strnlen(settings,BUFFER_SIZE));
+  memcpy(data+36+strnlen(settings,BUFFER_SIZE),"\"}",2);
+
+  memset(data2,0,strnlen(data2,BUFFER_SIZE));
+  memcpy(data2,"{\"most_total_rounds\":\"",25);
+  sprintf(data2+25,"%zu",count);
+  memcpy(data2+strnlen(data2,BUFFER_SIZE),"\"}",2);
+
+  // update the database
+  if (update_document_from_collection(DATABASE_NAME,"delegates",MESSAGE,data,0) == 0 || update_document_from_collection(DATABASE_NAME,"delegates",MESSAGE,data2,0) == 0)
+  {
+    ADD_ROUND_STATISTICS_ERROR("Could not update a delegates most_total_rounds_delegate_name or most_total_rounds in the database\nFunction: add_round_statistics");
+  }
+
+  // calculate the best_block_verifier_online_percentage_delegate_name and best_block_verifier_online_percentage
+
+  total = 0;
+  // set the collection
+  collection = mongoc_client_get_collection(database_client, DATABASE_NAME, "delegates");
+  document = bson_new(); 
+  document_settings = mongoc_collection_find_with_opts(collection, document, NULL, NULL);
+  while (mongoc_cursor_next(document_settings, &current_document))
+  {
+    // reset the variables
+    memset(data,0,strnlen(data,10485760));
+    memset(data2,0,strnlen(data2,BUFFER_SIZE));
+    memset(data3,0,strnlen(data3,BUFFER_SIZE));
+    memset(settings,0,strnlen(settings,BUFFER_SIZE));
+    count2 = 0;
+
+    message = bson_as_canonical_extended_json(current_document, NULL);
+    memcpy(data,message,strnlen(message,BUFFER_SIZE));
+    bson_free(message);
+
+    // get the block_verifier_total_rounds
+    memcpy(data2,", \"",3);
+    memcpy(data2+3,"block_verifier_total_rounds",27);
+    memcpy(data2+30,"\" : \"",5);
+
+    message_copy1 = strstr(data,data2) + strnlen(data2,BUFFER_SIZE);
+    message_copy2 = strstr(message_copy1,"\"");
+    memcpy(data3,message_copy1,message_copy2 - message_copy1);
+    sscanf(data3, "%lf", &total2);
+
+    // get the block_verifier_online_total_rounds
+    memset(data2,0,strnlen(data2,BUFFER_SIZE));
+    memset(data3,0,strnlen(data3,BUFFER_SIZE));
+    memcpy(data2,", \"",3);
+    memcpy(data2+3,"block_verifier_online_total_rounds",34);
+    memcpy(data2+34,"\" : \"",5);
+
+    message_copy1 = strstr(data,data2) + strnlen(data2,BUFFER_SIZE);
+    message_copy2 = strstr(message_copy1,"\"");
+    memcpy(data3,message_copy1,message_copy2 - message_copy1);
+    sscanf(data3, "%lf", &total3);
+
+    if (total3 / total2 > total)
+    {
+      total = total3 / total2;
+      // get the delegate_name
+      memcpy(data2,", \"",3);
+      memcpy(data2+3,"delegate_name",13);
+      memcpy(data2+16,"\" : \"",5);
+
+      message_copy1 = strstr(data,data2) + strnlen(data2,BUFFER_SIZE);
+      message_copy2 = strstr(message_copy1,"\"");
+      memcpy(data3,message_copy1,message_copy2 - message_copy1);
+      memset(settings,0,strnlen(settings,BUFFER_SIZE));
+      memcpy(settings,data3,strnlen(data3,BUFFER_SIZE));
+    }
+  }
+
+  // create the message
+  memset(data,0,strnlen(data,BUFFER_SIZE));
+  memcpy(data,"{\"most_block_producer_total_rounds_delegate_name\":\"",51);
+  memcpy(data+51,settings,strnlen(settings,BUFFER_SIZE));
+  memcpy(data+51+strnlen(settings,BUFFER_SIZE),"\"}",2);
+
+  memset(data2,0,strnlen(data2,BUFFER_SIZE));
+  memcpy(data2,"{\"best_block_verifier_online_percentage\":\"",45);
+  sprintf(data2+45,"%lf",total);
+  memcpy(data2+strnlen(data2,BUFFER_SIZE),"\"}",2);
+
+  // update the database
+  if (update_document_from_collection(DATABASE_NAME,"delegates",MESSAGE,data,0) == 0 || update_document_from_collection(DATABASE_NAME,"delegates",MESSAGE,data2,0) == 0)
+  {
+    ADD_ROUND_STATISTICS_ERROR("Could not update a delegates most_block_producer_total_rounds_delegate_name or best_block_verifier_online_percentage in the database\nFunction: add_round_statistics");
+  }
+
+  // calculate the most_block_producer_total_rounds_delegate_name and most_block_producer_total_rounds
+  count = 0;
+  // set the collection
+  collection = mongoc_client_get_collection(database_client, DATABASE_NAME, "delegates");
+  document = bson_new(); 
+  document_settings = mongoc_collection_find_with_opts(collection, document, NULL, NULL);
+  while (mongoc_cursor_next(document_settings, &current_document))
+  {
+    // reset the variables
+    memset(data,0,strnlen(data,10485760));
+    memset(data2,0,strnlen(data2,BUFFER_SIZE));
+    memset(data3,0,strnlen(data3,BUFFER_SIZE));
+    memset(settings,0,strnlen(settings,BUFFER_SIZE));
+    count2 = 0;
+
+    message = bson_as_canonical_extended_json(current_document, NULL);
+    memcpy(data,message,strnlen(message,BUFFER_SIZE));
+    bson_free(message);
+
+    // get the block_verifier_total_rounds
+    memcpy(data2,", \"",3);
+    memcpy(data2+3,"block_producer_total_rounds",27);
+    memcpy(data2+30,"\" : \"",5);
+
+    message_copy1 = strstr(data,data2) + strnlen(data2,BUFFER_SIZE);
+    message_copy2 = strstr(message_copy1,"\"");
+    memcpy(data3,message_copy1,message_copy2 - message_copy1);
+    sscanf(data3, "%zu", &count2);
+
+    if (count2 > count)
+    {
+      count = count2;
+      // get the delegate_name
+      memcpy(data2,", \"",3);
+      memcpy(data2+3,"delegate_name",13);
+      memcpy(data2+16,"\" : \"",5);
+
+      message_copy1 = strstr(data,data2) + strnlen(data2,BUFFER_SIZE);
+      message_copy2 = strstr(message_copy1,"\"");
+      memcpy(data3,message_copy1,message_copy2 - message_copy1);
+      memset(settings,0,strnlen(settings,BUFFER_SIZE));
+      memcpy(settings,data3,strnlen(data3,BUFFER_SIZE));
+    }
+  }
+
+  // create the message
+  memset(data,0,strnlen(data,BUFFER_SIZE));
+  memcpy(data,"{\"most_block_producer_total_rounds_delegate_name\":\"",51);
+  memcpy(data+51,settings,strnlen(settings,BUFFER_SIZE));
+  memcpy(data+51+strnlen(settings,BUFFER_SIZE),"\"}",2);
+
+  memset(data2,0,strnlen(data2,BUFFER_SIZE));
+  memcpy(data2,"{\"most_block_producer_total_rounds\":\"",40);
+  sprintf(data2+40,"%zu",count);
+  memcpy(data2+strnlen(data2,BUFFER_SIZE),"\"}",2);
+
+  // update the database
+  if (update_document_from_collection(DATABASE_NAME,"delegates",MESSAGE,data,0) == 0 || update_document_from_collection(DATABASE_NAME,"delegates",MESSAGE,data2,0) == 0)
+  {
+    ADD_ROUND_STATISTICS_ERROR("Could not update a delegates most_block_producer_total_rounds_delegate_name or most_block_producer_total_rounds in the database\nFunction: add_round_statistics");
+  }
+
+  // calculate the most_VRF_node_public_and_private_key_total_rounds_delegate_name and most_VRF_node_public_and_private_key_total_rounds
+  count = 0;
+  // set the collection
+  collection = mongoc_client_get_collection(database_client, DATABASE_NAME, "delegates");
+  document = bson_new(); 
+  document_settings = mongoc_collection_find_with_opts(collection, document, NULL, NULL);
+  while (mongoc_cursor_next(document_settings, &current_document))
+  {
+    // reset the variables
+    memset(data,0,strnlen(data,10485760));
+    memset(data2,0,strnlen(data2,BUFFER_SIZE));
+    memset(data3,0,strnlen(data3,BUFFER_SIZE));
+    memset(settings,0,strnlen(settings,BUFFER_SIZE));
+    count2 = 0;
+
+    message = bson_as_canonical_extended_json(current_document, NULL);
+    memcpy(data,message,strnlen(message,BUFFER_SIZE));
+    bson_free(message);
+
+    // get the block_verifier_total_rounds
+    memcpy(data2,", \"",3);
+    memcpy(data2+3,"VRF_node_public_and_private_key_total_rounds",44);
+    memcpy(data2+47,"\" : \"",5);
+
+    message_copy1 = strstr(data,data2) + strnlen(data2,BUFFER_SIZE);
+    message_copy2 = strstr(message_copy1,"\"");
+    memcpy(data3,message_copy1,message_copy2 - message_copy1);
+    sscanf(data3, "%zu", &count2);
+
+    if (count2 > count)
+    {
+      count = count2;
+      // get the delegate_name
+      memcpy(data2,", \"",3);
+      memcpy(data2+3,"delegate_name",13);
+      memcpy(data2+16,"\" : \"",5);
+
+      message_copy1 = strstr(data,data2) + strnlen(data2,BUFFER_SIZE);
+      message_copy2 = strstr(message_copy1,"\"");
+      memcpy(data3,message_copy1,message_copy2 - message_copy1);
+      memset(settings,0,strnlen(settings,BUFFER_SIZE));
+      memcpy(settings,data3,strnlen(data3,BUFFER_SIZE));
+    }
+  }
+
+  // create the message
+  memset(data,0,strnlen(data,BUFFER_SIZE));
+  memcpy(data,"{\"most_VRF_node_public_and_private_key_total_rounds_delegate_name\":\"",68);
+  memcpy(data+68,settings,strnlen(settings,BUFFER_SIZE));
+  memcpy(data+68+strnlen(settings,BUFFER_SIZE),"\"}",2);
+
+  memset(data2,0,strnlen(data2,BUFFER_SIZE));
+  memcpy(data2,"{\"most_VRF_node_public_and_private_key_total_rounds\":\"",54);
+  sprintf(data2+54,"%zu",count);
+  memcpy(data2+strnlen(data2,BUFFER_SIZE),"\"}",2);
+
+  // update the database
+  if (update_document_from_collection(DATABASE_NAME,"delegates",MESSAGE,data,0) == 0 || update_document_from_collection(DATABASE_NAME,"delegates",MESSAGE,data2,0) == 0)
+  {
+    ADD_ROUND_STATISTICS_ERROR("Could not update a delegates most_VRF_node_public_and_private_key_total_rounds_delegate_name or most_VRF_node_random_data_total_rounds in the database\nFunction: add_round_statistics");
+  }
+
+  // calculate the most_VRF_node_random_data_total_rounds_delegate_name and most_VRF_node_public_and_private_key_total_rounds
+  count = 0;
+  // set the collection
+  collection = mongoc_client_get_collection(database_client, DATABASE_NAME, "delegates");
+  document = bson_new(); 
+  document_settings = mongoc_collection_find_with_opts(collection, document, NULL, NULL);
+  while (mongoc_cursor_next(document_settings, &current_document))
+  {
+    // reset the variables
+    memset(data,0,strnlen(data,10485760));
+    memset(data2,0,strnlen(data2,BUFFER_SIZE));
+    memset(data3,0,strnlen(data3,BUFFER_SIZE));
+    memset(settings,0,strnlen(settings,BUFFER_SIZE));
+    count2 = 0;
+
+    message = bson_as_canonical_extended_json(current_document, NULL);
+    memcpy(data,message,strnlen(message,BUFFER_SIZE));
+    bson_free(message);
+
+    // get the block_verifier_total_rounds
+    memcpy(data2,", \"",3);
+    memcpy(data2+3,"VRF_node_random_data_total_rounds",33);
+    memcpy(data2+36,"\" : \"",5);
+
+    message_copy1 = strstr(data,data2) + strnlen(data2,BUFFER_SIZE);
+    message_copy2 = strstr(message_copy1,"\"");
+    memcpy(data3,message_copy1,message_copy2 - message_copy1);
+    sscanf(data3, "%zu", &count2);
+
+    if (count2 > count)
+    {
+      count = count2;
+      // get the delegate_name
+      memcpy(data2,", \"",3);
+      memcpy(data2+3,"delegate_name",13);
+      memcpy(data2+16,"\" : \"",5);
+
+      message_copy1 = strstr(data,data2) + strnlen(data2,BUFFER_SIZE);
+      message_copy2 = strstr(message_copy1,"\"");
+      memcpy(data3,message_copy1,message_copy2 - message_copy1);
+      memset(settings,0,strnlen(settings,BUFFER_SIZE));
+      memcpy(settings,data3,strnlen(data3,BUFFER_SIZE));
+    }
+  }
+
+  // create the message
+  memset(data,0,strnlen(data,BUFFER_SIZE));
+  memcpy(data,"{\"most_VRF_node_random_data_total_rounds_delegate_name\":\"",57);
+  memcpy(data+57,settings,strnlen(settings,BUFFER_SIZE));
+  memcpy(data+57+strnlen(settings,BUFFER_SIZE),"\"}",2);
+
+  memset(data2,0,strnlen(data2,BUFFER_SIZE));
+  memcpy(data2,"{\"most_VRF_node_random_data_total_rounds\":\"",46);
+  sprintf(data2+46,"%zu",count);
+  memcpy(data2+strnlen(data2,BUFFER_SIZE),"\"}",2);
+
+  // update the database
+  if (update_document_from_collection(DATABASE_NAME,"delegates",MESSAGE,data,0) == 0 || update_document_from_collection(DATABASE_NAME,"delegates",MESSAGE,data2,0) == 0)
+  {
+    ADD_ROUND_STATISTICS_ERROR("Could not update a delegates most_VRF_node_random_data_total_rounds_delegate_name or most_VRF_node_random_data_total_rounds in the database\nFunction: add_round_statistics");
+  }
+
+  return 1;
+
+  #undef MESSAGE
+  #undef pointer_reset_all
+  #undef ADD_ROUND_STATISTICS_ERROR
 }
 
 

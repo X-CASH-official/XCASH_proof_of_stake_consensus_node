@@ -26,7 +26,7 @@ int start_new_part_of_round();
 int start_next_round(const int SETTINGS);
 void update_block_producer_eligibility(const int SETTINGS);
 int create_new_block();
-void add_round_statistics();
+int add_round_statistics();
 void add_block_verifiers_round_statistics();
 int send_recalculating_votes_to_nodes_and_main_nodes();
 int send_vote_list_to_nodes();
