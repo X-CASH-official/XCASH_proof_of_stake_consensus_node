@@ -1,5 +1,5 @@
-#ifndef NUMBER_FUNCTIONS_TEST_H_   /* Include guard */
-#define NUMBER_FUNCTIONS_TEST_H_
+#ifndef BLOCKCHAIN_FUNCTIONS_TEST_H_   /* Include guard */
+#define BLOCKCHAIN_FUNCTIONS_TEST_H_
 
 /*
 -----------------------------------------------------------------------------------------------------------

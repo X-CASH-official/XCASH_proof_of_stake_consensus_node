@@ -19,9 +19,9 @@ Functions
 
 /*
 -----------------------------------------------------------------------------------------------------------
-Name: varint_decode_test
-Description: Test the varint_decode function
-Return: The number of passed varint_decode test
+Name: blockchain_test
+Description: Test the blockchain_functions
+Return: The number of passed blockchain test
 -----------------------------------------------------------------------------------------------------------
 */
 
