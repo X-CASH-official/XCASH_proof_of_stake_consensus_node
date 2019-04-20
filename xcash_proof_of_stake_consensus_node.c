@@ -317,6 +317,9 @@ int main(int parameters_count, char* parameters[])
     reserve_proofs_list.public_address_created_reserve_proof[count] = (char*)calloc(XCASH_WALLET_LENGTH+1,sizeof(char));
     reserve_proofs_list.public_address_voted_for[count] = (char*)calloc(XCASH_WALLET_LENGTH+1,sizeof(char));
     reserve_proofs_list.reserve_proof[count] = (char*)calloc(10000+1,sizeof(char));
+    reserve_proofs_list.settings[count] = 0;
+    reserve_proofs_list.amount[count] = 0;
+    reserve_proofs_list.number[count] = 0;
 
     // check if the memory needed was allocated on the heap successfully
     if (reserve_proofs_list.public_address_created_reserve_proof[count] == NULL || reserve_proofs_list.public_address_voted_for[count] == NULL || reserve_proofs_list.reserve_proof[count] == NULL)
@@ -325,6 +328,7 @@ int main(int parameters_count, char* parameters[])
       exit(0);
     }
   }
+  reserve_proofs_list.count = 0;
 
   // initialize the mainnode_timeout struct 
   for (count = 0; count < BLOCK_VERIFIERS_AMOUNT; count++)

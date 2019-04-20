@@ -105,28 +105,37 @@ int check_reserve_proofs(char* result, const int HTTP_SETTINGS)
   // create the message
   memcpy(data,"{\"jsonrpc\":\"2.0\",\"id\":\"0\",\"method\":\"check_reserve_proofs\",\"params\":{\"address\":[\"",80);
   counter = 80;
-  for (count = 0; count < RESERVE_PROOFS_LIST_MAXIMUM_AMOUNT; count++)
+  for (count = 0; count < reserve_proofs_list.count; count++)
   {
-    memcpy(data+counter,reserve_proofs_list.public_address_created_reserve_proof[count],XCASH_WALLET_LENGTH);
-    counter += XCASH_WALLET_LENGTH;
-    memcpy(data+counter,"\",\"",3);
-    counter += 3;
+    if (reserve_proofs_list.settings[count] == 0)
+    {
+      memcpy(data+counter,reserve_proofs_list.public_address_created_reserve_proof[count],XCASH_WALLET_LENGTH);
+      counter += XCASH_WALLET_LENGTH;
+      memcpy(data+counter,"\",\"",3);
+      counter += 3;
+    }    
   }
   memcpy(data+counter-1,"],\"message\":[\"",14);
-  for (count = 0; count < RESERVE_PROOFS_LIST_MAXIMUM_AMOUNT; count++)
+  for (count = 0; count < reserve_proofs_list.count; count++)
   {
-    memcpy(data+counter,reserve_proofs_list.public_address_voted_for[count],XCASH_WALLET_LENGTH);
-    counter += XCASH_WALLET_LENGTH;
-    memcpy(data+counter,"\",\"",3);
-    counter += 3;
+    if (reserve_proofs_list.settings[count] == 0)
+    {
+      memcpy(data+counter,reserve_proofs_list.public_address_voted_for[count],XCASH_WALLET_LENGTH);
+      counter += XCASH_WALLET_LENGTH;
+      memcpy(data+counter,"\",\"",3);
+      counter += 3;
+    }
   }
   memcpy(data+counter-1,"],\"signature\":[\"",14);
-  for (count = 0; count < RESERVE_PROOFS_LIST_MAXIMUM_AMOUNT; count++)
+  for (count = 0; count < reserve_proofs_list.count; count++)
   {
-    memcpy(data+counter,reserve_proofs_list.reserve_proof[count],strnlen(reserve_proofs_list.reserve_proof[count],10000));
-    counter += strnlen(reserve_proofs_list.reserve_proof[count],10000);
-    memcpy(data+counter,"\",\"",3);
-    counter += 3;
+    if (reserve_proofs_list.settings[count] == 0)
+    {
+      memcpy(data+counter,reserve_proofs_list.reserve_proof[count],strnlen(reserve_proofs_list.reserve_proof[count],10000));
+      counter += strnlen(reserve_proofs_list.reserve_proof[count],10000);
+      memcpy(data+counter,"\",\"",3);
+      counter += 3;
+    }
   }
   memcpy(data+counter-1,"]}}",3);
 

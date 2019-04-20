@@ -2656,6 +2656,97 @@ int send_recalculating_votes_to_nodes_and_main_nodes()
 
 /*
 -----------------------------------------------------------------------------------------------------------
+Name: send_vote_list_to_nodes
+Description: sends the CONSENSUS_NODE_TO_NODES_LIST_OF_ENABLED_NODES message to the nodes and main node
+Return: 1 if the consensus node is the current consensus node, otherwise 0.
+-----------------------------------------------------------------------------------------------------------
+*/
+
+int send_vote_list_to_nodes()
+{
+  // Variables
+  char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  size_t count;
+  size_t counter;
+
+  // define macros
+  #define SEND_VOTE_LIST_TO_NODES_ERROR(settings) \
+  color_print(settings,"red"); \
+  pointer_reset(data); \
+  return 0;
+
+
+  // check if the memory needed was allocated on the heap successfully
+  if (data == NULL)
+  {
+    color_print("Could not allocate the memory needed on the heap","red");
+    exit(0);
+  }
+
+  // create the message
+  memcpy(data,"{\r\n \"message_settings\": \"CONSENSUS_NODE_TO_NODES_LIST_OF_ENABLED_NODES\",\r\n \"nodes_name_list\": \"{\r\n \\\"",100);
+  counter = 100;
+  for (count = 0; count < BLOCK_VERIFIERS_AMOUNT; count++)
+  {
+    memcpy(data+counter,"node",4);
+    counter += 4;
+    sprintf(data+counter,"%zu",count);
+    counter = strnlen(data,BUFFER_SIZE);
+    memcpy(data+counter,"\\\": \\\"",4);
+    counter += 4;
+    memcpy(data+counter,block_verifiers_list.block_verifiers_name[count],strnlen(block_verifiers_list.block_verifiers_name[count],BUFFER_SIZE));
+    counter += strnlen(block_verifiers_list.block_verifiers_name[count],BUFFER_SIZE);
+    memcpy(data+counter,",\r\n \\\"",5);
+  }
+  memcpy(data+counter-2,"}\",\r\n \"nodes_public_address_list\": \"{\r\n \\\"",42);
+  for (count = 0; count < BLOCK_VERIFIERS_AMOUNT; count++)
+  {
+    memcpy(data+counter,"node",4);
+    counter += 4;
+    sprintf(data+counter,"%zu",count);
+    counter = strnlen(data,BUFFER_SIZE);
+    memcpy(data+counter,"\\\": \\\"",4);
+    counter += 4;
+    memcpy(data+counter,block_verifiers_list.block_verifiers_name[count],strnlen(block_verifiers_list.block_verifiers_name[count],BUFFER_SIZE));
+    counter += strnlen(block_verifiers_list.block_verifiers_name[count],BUFFER_SIZE);
+    memcpy(data+counter,",\r\n \\\"",5);
+  }
+  memcpy(data+counter-2,"}\",\r\n \"nodes_IP_address_list\": \"{\r\n \\\"",38);
+  for (count = 0; count < BLOCK_VERIFIERS_AMOUNT; count++)
+  {
+    memcpy(data+counter,"node",4);
+    counter += 4;
+    sprintf(data+counter,"%zu",count);
+    counter = strnlen(data,BUFFER_SIZE);
+    memcpy(data+counter,"\\\": \\\"",4);
+    counter += 4;
+    memcpy(data+counter,block_verifiers_list.block_verifiers_name[count],strnlen(block_verifiers_list.block_verifiers_name[count],BUFFER_SIZE));
+    counter += strnlen(block_verifiers_list.block_verifiers_name[count],BUFFER_SIZE);
+    memcpy(data+counter,",\r\n \\\"",5);
+  }
+  memcpy(data+counter-2,"}\",\r\n}",6);  
+
+  // sign_data
+  if (sign_data(data,0) == 0)
+  { 
+    SEND_VOTE_LIST_TO_NODES_ERROR("Could not sign_data\nFunction: send_vote_list_to_nodes\nSend Message: CONSENSUS_NODE_TO_NODES_LIST_OF_ENABLED_NODES");
+  }
+
+  // send the CONSENSUS_NODE_TO_NODES_LIST_OF_ENABLED_NODES message to the nodes and main node
+  for (count = 0; count < BLOCK_VERIFIERS_AMOUNT; count++)
+  {
+    send_data_socket(block_verifiers_list.block_verifiers_IP_address[count],SEND_DATA_PORT,data,"sending CONSENSUS_NODE_TO_NODES_LIST_OF_ENABLED_NODES message to the nodes and main node",0);
+  }
+
+  return 1;
+
+  #undef SEND_VOTE_LIST_TO_NODES_ERROR
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
 Name: create_server
 Description: Creates the server
 Parameters:

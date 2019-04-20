@@ -667,5 +667,5 @@ Return: NULL
 
 void* update_block_verifiers_timer()
 { 
-  
+
 }

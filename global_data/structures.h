@@ -181,6 +181,10 @@ struct reserve_proofs_list {
     char* public_address_created_reserve_proof[RESERVE_PROOFS_LIST_MAXIMUM_AMOUNT];
     char* public_address_voted_for[RESERVE_PROOFS_LIST_MAXIMUM_AMOUNT];
     char* reserve_proof[RESERVE_PROOFS_LIST_MAXIMUM_AMOUNT];
+    int settings[RESERVE_PROOFS_LIST_MAXIMUM_AMOUNT]; // 0 if invalid, 1 if invalid because of a double vote, 2 if valid
+    long long int amount[RESERVE_PROOFS_LIST_MAXIMUM_AMOUNT];
+    int number[RESERVE_PROOFS_LIST_MAXIMUM_AMOUNT];
+    size_t count;
 };     
 
 struct timer_data {
