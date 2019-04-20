@@ -485,7 +485,7 @@ int consensus_node_create_new_block()
   }
 
   // verify the blockchain_data
-  if (verify_network_block_data(1) == 0)
+  if (verify_network_block_data(1,1) == 0)
   {
     CONSENSUS_NODE_CREATE_NEW_BLOCK_ERROR("Could not verify the blockchain_data\nFunction: consensus_node_create_new_block\nReceive Message: BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK\nSend Message: CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK");
   }
@@ -2221,7 +2221,7 @@ int create_new_block()
   }
 
   // verify the blockchain_data
-  if (verify_network_block_data(1) == 0)
+  if (verify_network_block_data(1,1) == 0)
   {
     CREATE_NEW_BLOCK_ERROR("Could not verify the blockchain_data\nFunction: create_new_block\nReceive Message: BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CREATE_NEW_BLOCK\nSend Message: CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CREATE_NEW_BLOCK");
   }

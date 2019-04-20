@@ -7,5 +7,5 @@ Function prototypes
 -----------------------------------------------------------------------------------------------------------
 */
 
-int varint_decode_test();
+int blockchain_test();
 #endif
