@@ -2350,8 +2350,30 @@ int add_round_statistics()
   char* data2 = (char*)calloc(BUFFER_SIZE,sizeof(char));
   char* data3 = (char*)calloc(BUFFER_SIZE,sizeof(char));
   char* settings = (char*)calloc(BUFFER_SIZE,sizeof(char));
-  size_t count;
-  size_t count2;
+  char* delegates_name = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* block_verifier_total_rounds_delegates_name = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* best_block_verifier_online_percentage_delegate_name = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* most_block_producer_total_rounds_delegate_name = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* most_VRF_node_public_and_private_key_total_rounds_delegate_name = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* most_VRF_node_random_data_total_rounds_delegate_name = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* message1 = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* message2 = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* message3 = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* message4 = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* message5 = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* message6 = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* message7 = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* message8 = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* message9 = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  char* message10 = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  size_t block_verifier_total_rounds_count = 0;
+  size_t block_verifier_total_rounds_count2 = 0;
+  size_t most_block_producer_total_rounds_count = 0;
+  size_t most_block_producer_total_rounds_count2 = 0;
+  size_t most_VRF_node_public_and_private_key_total_rounds_count = 0;
+  size_t most_VRF_node_public_and_private_key_total_rounds_count2 = 0;
+  size_t most_VRF_node_random_data_total_rounds_count = 0;
+  size_t most_VRF_node_random_data_total_rounds_count2 = 0;
   size_t counter;
   double total;
   double total2;
@@ -2374,7 +2396,39 @@ int add_round_statistics()
   free(data3); \
   data3 = NULL; \
   free(settings); \
-  settings = NULL; 
+  settings = NULL; \
+  free(delegates_name); \
+  delegates_name = NULL; \
+  free(block_verifier_total_rounds_delegates_name); \
+  block_verifier_total_rounds_delegates_name = NULL; \
+  free(best_block_verifier_online_percentage_delegate_name); \
+  best_block_verifier_online_percentage_delegate_name = NULL; \
+  free(most_block_producer_total_rounds_delegate_name); \
+  most_block_producer_total_rounds_delegate_name = NULL; \
+  free(most_VRF_node_public_and_private_key_total_rounds_delegate_name); \
+  most_VRF_node_public_and_private_key_total_rounds_delegate_name = NULL; \
+  free(most_VRF_node_random_data_total_rounds_delegate_name); \
+  most_VRF_node_random_data_total_rounds_delegate_name = NULL; \
+  free(message1); \
+  message1 = NULL; \
+  free(message2); \
+  message2 = NULL; \
+  free(message3); \
+  message3 = NULL; \
+  free(message4); \
+  message4 = NULL; \
+  free(message5); \
+  message5 = NULL; \
+  free(message6); \
+  message6 = NULL; \
+  free(message7); \
+  message7 = NULL; \
+  free(message8); \
+  message8 = NULL; \
+  free(message9); \
+  message9 = NULL; \
+  free(message10); \
+  message10 = NULL;
 
   #define ADD_ROUND_STATISTICS_ERROR(settings) \
   color_print(settings,"red"); \
@@ -2382,7 +2436,7 @@ int add_round_statistics()
   return 0;
 
   // check if the memory needed was allocated on the heap successfully
-  if (data == NULL || data2 == NULL || data3 == NULL || settings == NULL)
+  if (data == NULL || data2 == NULL || data3 == NULL || settings == NULL || delegates_name == NULL || block_verifier_total_rounds_delegates_name == NULL || best_block_verifier_online_percentage_delegate_name == NULL || most_block_producer_total_rounds_delegate_name == NULL || most_VRF_node_public_and_private_key_total_rounds_delegate_name == NULL || most_VRF_node_random_data_total_rounds_delegate_name == NULL || message1 == NULL || message2 == NULL || message3 == NULL || message4 == NULL || message5 == NULL || message6 == NULL || message7 == NULL || message8 == NULL || message9 == NULL || message10 == NULL)
   {   
     if (data != NULL)
     {
@@ -2400,12 +2454,74 @@ int add_round_statistics()
     {
       pointer_reset(settings);
     }
+    if (delegates_name != NULL)
+    {
+      pointer_reset(delegates_name);
+    }
+    if (block_verifier_total_rounds_delegates_name != NULL)
+    {
+      pointer_reset(block_verifier_total_rounds_delegates_name);
+    }
+    if (best_block_verifier_online_percentage_delegate_name != NULL)
+    {
+      pointer_reset(best_block_verifier_online_percentage_delegate_name);
+    }
+    if (most_block_producer_total_rounds_delegate_name != NULL)
+    {
+      pointer_reset(most_block_producer_total_rounds_delegate_name);
+    }
+    if (most_VRF_node_public_and_private_key_total_rounds_delegate_name != NULL)
+    {
+      pointer_reset(most_VRF_node_public_and_private_key_total_rounds_delegate_name);
+    }
+    if (most_VRF_node_random_data_total_rounds_delegate_name != NULL)
+    {
+      pointer_reset(most_VRF_node_random_data_total_rounds_delegate_name);
+    }
+    if (message1 != NULL)
+    {
+      pointer_reset(message1);
+    }
+    if (message2 != NULL)
+    {
+      pointer_reset(message2);
+    }
+    if (message3 != NULL)
+    {
+      pointer_reset(message3);
+    }
+    if (message4 != NULL)
+    {
+      pointer_reset(message4);
+    }
+    if (message5 != NULL)
+    {
+      pointer_reset(message5);
+    }
+    if (message6 != NULL)
+    {
+      pointer_reset(message6);
+    }
+    if (message7 != NULL)
+    {
+      pointer_reset(message7);
+    }
+    if (message8 != NULL)
+    {
+      pointer_reset(message8);
+    }
+    if (message9 != NULL)
+    {
+      pointer_reset(message9);
+    }
+    if (message10 != NULL)
+    {
+      pointer_reset(message10);
+    }
     color_print("Could not allocate the memory needed on the heap","red");
     exit(0);
   }  
-
-  // calculate the most_total_rounds_delegate_name and most_total_rounds
-  count = 0;
+  
   // set the collection
   collection = mongoc_client_get_collection(database_client, DATABASE_NAME, "delegates");
   document = bson_new(); 
@@ -2417,74 +2533,20 @@ int add_round_statistics()
     memset(data2,0,strnlen(data2,BUFFER_SIZE));
     memset(data3,0,strnlen(data3,BUFFER_SIZE));
     memset(settings,0,strnlen(settings,BUFFER_SIZE));
-    count2 = 0;
 
     message = bson_as_canonical_extended_json(current_document, NULL);
     memcpy(data,message,strnlen(message,BUFFER_SIZE));
     bson_free(message);
 
-    // get the block_verifier_total_rounds
+    // get the delegate_name
     memcpy(data2,", \"",3);
-    memcpy(data2+3,"block_verifier_total_rounds",27);
-    memcpy(data2+30,"\" : \"",5);
+    memcpy(data2+3,"delegate_name",13);
+    memcpy(data2+16,"\" : \"",5);
 
     message_copy1 = strstr(data,data2) + strnlen(data2,BUFFER_SIZE);
     message_copy2 = strstr(message_copy1,"\"");
-    memcpy(data3,message_copy1,message_copy2 - message_copy1);
-    sscanf(data3, "%zu", &count2);
-
-    if (count2 > count)
-    {
-      count = count2;
-      // get the delegate_name
-      memcpy(data2,", \"",3);
-      memcpy(data2+3,"delegate_name",13);
-      memcpy(data2+16,"\" : \"",5);
-
-      message_copy1 = strstr(data,data2) + strnlen(data2,BUFFER_SIZE);
-      message_copy2 = strstr(message_copy1,"\"");
-      memcpy(data3,message_copy1,message_copy2 - message_copy1);
-      memset(settings,0,strnlen(settings,BUFFER_SIZE));
-      memcpy(settings,data3,strnlen(data3,BUFFER_SIZE));
-    }
-  }
-
-  // create the message
-  memset(data,0,strnlen(data,BUFFER_SIZE));
-  memcpy(data,"{\"most_total_rounds_delegate_name\":\"",36);
-  memcpy(data+36,settings,strnlen(settings,BUFFER_SIZE));
-  memcpy(data+36+strnlen(settings,BUFFER_SIZE),"\"}",2);
-
-  memset(data2,0,strnlen(data2,BUFFER_SIZE));
-  memcpy(data2,"{\"most_total_rounds\":\"",25);
-  sprintf(data2+25,"%zu",count);
-  memcpy(data2+strnlen(data2,BUFFER_SIZE),"\"}",2);
-
-  // update the database
-  if (update_document_from_collection(DATABASE_NAME,"delegates",MESSAGE,data,0) == 0 || update_document_from_collection(DATABASE_NAME,"delegates",MESSAGE,data2,0) == 0)
-  {
-    ADD_ROUND_STATISTICS_ERROR("Could not update a delegates most_total_rounds_delegate_name or most_total_rounds in the database\nFunction: add_round_statistics");
-  }
-
-  // calculate the best_block_verifier_online_percentage_delegate_name and best_block_verifier_online_percentage
-
-  total = 0;
-  // set the collection
-  collection = mongoc_client_get_collection(database_client, DATABASE_NAME, "delegates");
-  document = bson_new(); 
-  document_settings = mongoc_collection_find_with_opts(collection, document, NULL, NULL);
-  while (mongoc_cursor_next(document_settings, &current_document))
-  {
-    // reset the variables
-    memset(data,0,strnlen(data,10485760));
+    memcpy(delegates_name,message_copy1,message_copy2 - message_copy1);
     memset(data2,0,strnlen(data2,BUFFER_SIZE));
-    memset(data3,0,strnlen(data3,BUFFER_SIZE));
-    memset(settings,0,strnlen(settings,BUFFER_SIZE));
-    count2 = 0;
-
-    message = bson_as_canonical_extended_json(current_document, NULL);
-    memcpy(data,message,strnlen(message,BUFFER_SIZE));
-    bson_free(message);
 
     // get the block_verifier_total_rounds
     memcpy(data2,", \"",3);
@@ -2494,11 +2556,19 @@ int add_round_statistics()
     message_copy1 = strstr(data,data2) + strnlen(data2,BUFFER_SIZE);
     message_copy2 = strstr(message_copy1,"\"");
     memcpy(data3,message_copy1,message_copy2 - message_copy1);
+    sscanf(data3, "%zu", &block_verifier_total_rounds_count2);
     sscanf(data3, "%lf", &total2);
+    memset(data2,0,strnlen(data2,BUFFER_SIZE));
+    memset(data3,0,strnlen(data3,BUFFER_SIZE));
+
+    if (block_verifier_total_rounds_count2 > block_verifier_total_rounds_count)
+    {
+      block_verifier_total_rounds_count = block_verifier_total_rounds_count2;
+      memset(block_verifier_total_rounds_delegates_name,0,strnlen(block_verifier_total_rounds_delegates_name,BUFFER_SIZE));
+      memcpy(block_verifier_total_rounds_delegates_name,delegates_name,strnlen(delegates_name,BUFFER_SIZE));
+    }
 
     // get the block_verifier_online_total_rounds
-    memset(data2,0,strnlen(data2,BUFFER_SIZE));
-    memset(data3,0,strnlen(data3,BUFFER_SIZE));
     memcpy(data2,", \"",3);
     memcpy(data2+3,"block_verifier_online_total_rounds",34);
     memcpy(data2+34,"\" : \"",5);
@@ -2507,224 +2577,116 @@ int add_round_statistics()
     message_copy2 = strstr(message_copy1,"\"");
     memcpy(data3,message_copy1,message_copy2 - message_copy1);
     sscanf(data3, "%lf", &total3);
+    memset(data2,0,strnlen(data2,BUFFER_SIZE));
+    memset(data3,0,strnlen(data3,BUFFER_SIZE));
 
     if (total3 / total2 > total)
     {
       total = total3 / total2;
-      // get the delegate_name
-      memcpy(data2,", \"",3);
-      memcpy(data2+3,"delegate_name",13);
-      memcpy(data2+16,"\" : \"",5);
-
-      message_copy1 = strstr(data,data2) + strnlen(data2,BUFFER_SIZE);
-      message_copy2 = strstr(message_copy1,"\"");
-      memcpy(data3,message_copy1,message_copy2 - message_copy1);
-      memset(settings,0,strnlen(settings,BUFFER_SIZE));
-      memcpy(settings,data3,strnlen(data3,BUFFER_SIZE));
+      memset(best_block_verifier_online_percentage_delegate_name,0,strnlen(best_block_verifier_online_percentage_delegate_name,BUFFER_SIZE));
+      memcpy(best_block_verifier_online_percentage_delegate_name,delegates_name,strnlen(delegates_name,BUFFER_SIZE));
     }
-  }
 
-  // create the message
-  memset(data,0,strnlen(data,BUFFER_SIZE));
-  memcpy(data,"{\"most_block_producer_total_rounds_delegate_name\":\"",51);
-  memcpy(data+51,settings,strnlen(settings,BUFFER_SIZE));
-  memcpy(data+51+strnlen(settings,BUFFER_SIZE),"\"}",2);
-
-  memset(data2,0,strnlen(data2,BUFFER_SIZE));
-  memcpy(data2,"{\"best_block_verifier_online_percentage\":\"",45);
-  sprintf(data2+45,"%lf",total);
-  memcpy(data2+strnlen(data2,BUFFER_SIZE),"\"}",2);
-
-  // update the database
-  if (update_document_from_collection(DATABASE_NAME,"delegates",MESSAGE,data,0) == 0 || update_document_from_collection(DATABASE_NAME,"delegates",MESSAGE,data2,0) == 0)
-  {
-    ADD_ROUND_STATISTICS_ERROR("Could not update a delegates most_block_producer_total_rounds_delegate_name or best_block_verifier_online_percentage in the database\nFunction: add_round_statistics");
-  }
-
-  // calculate the most_block_producer_total_rounds_delegate_name and most_block_producer_total_rounds
-  count = 0;
-  // set the collection
-  collection = mongoc_client_get_collection(database_client, DATABASE_NAME, "delegates");
-  document = bson_new(); 
-  document_settings = mongoc_collection_find_with_opts(collection, document, NULL, NULL);
-  while (mongoc_cursor_next(document_settings, &current_document))
-  {
-    // reset the variables
-    memset(data,0,strnlen(data,10485760));
-    memset(data2,0,strnlen(data2,BUFFER_SIZE));
-    memset(data3,0,strnlen(data3,BUFFER_SIZE));
-    memset(settings,0,strnlen(settings,BUFFER_SIZE));
-    count2 = 0;
-
-    message = bson_as_canonical_extended_json(current_document, NULL);
-    memcpy(data,message,strnlen(message,BUFFER_SIZE));
-    bson_free(message);
-
-    // get the block_verifier_total_rounds
+    // get the block_producer_total_rounds
     memcpy(data2,", \"",3);
     memcpy(data2+3,"block_producer_total_rounds",27);
     memcpy(data2+30,"\" : \"",5);
-
     message_copy1 = strstr(data,data2) + strnlen(data2,BUFFER_SIZE);
     message_copy2 = strstr(message_copy1,"\"");
     memcpy(data3,message_copy1,message_copy2 - message_copy1);
-    sscanf(data3, "%zu", &count2);
-
-    if (count2 > count)
-    {
-      count = count2;
-      // get the delegate_name
-      memcpy(data2,", \"",3);
-      memcpy(data2+3,"delegate_name",13);
-      memcpy(data2+16,"\" : \"",5);
-
-      message_copy1 = strstr(data,data2) + strnlen(data2,BUFFER_SIZE);
-      message_copy2 = strstr(message_copy1,"\"");
-      memcpy(data3,message_copy1,message_copy2 - message_copy1);
-      memset(settings,0,strnlen(settings,BUFFER_SIZE));
-      memcpy(settings,data3,strnlen(data3,BUFFER_SIZE));
-    }
-  }
-
-  // create the message
-  memset(data,0,strnlen(data,BUFFER_SIZE));
-  memcpy(data,"{\"most_block_producer_total_rounds_delegate_name\":\"",51);
-  memcpy(data+51,settings,strnlen(settings,BUFFER_SIZE));
-  memcpy(data+51+strnlen(settings,BUFFER_SIZE),"\"}",2);
-
-  memset(data2,0,strnlen(data2,BUFFER_SIZE));
-  memcpy(data2,"{\"most_block_producer_total_rounds\":\"",40);
-  sprintf(data2+40,"%zu",count);
-  memcpy(data2+strnlen(data2,BUFFER_SIZE),"\"}",2);
-
-  // update the database
-  if (update_document_from_collection(DATABASE_NAME,"delegates",MESSAGE,data,0) == 0 || update_document_from_collection(DATABASE_NAME,"delegates",MESSAGE,data2,0) == 0)
-  {
-    ADD_ROUND_STATISTICS_ERROR("Could not update a delegates most_block_producer_total_rounds_delegate_name or most_block_producer_total_rounds in the database\nFunction: add_round_statistics");
-  }
-
-  // calculate the most_VRF_node_public_and_private_key_total_rounds_delegate_name and most_VRF_node_public_and_private_key_total_rounds
-  count = 0;
-  // set the collection
-  collection = mongoc_client_get_collection(database_client, DATABASE_NAME, "delegates");
-  document = bson_new(); 
-  document_settings = mongoc_collection_find_with_opts(collection, document, NULL, NULL);
-  while (mongoc_cursor_next(document_settings, &current_document))
-  {
-    // reset the variables
-    memset(data,0,strnlen(data,10485760));
+    sscanf(data3, "%zu", &most_block_producer_total_rounds_count2);
     memset(data2,0,strnlen(data2,BUFFER_SIZE));
     memset(data3,0,strnlen(data3,BUFFER_SIZE));
-    memset(settings,0,strnlen(settings,BUFFER_SIZE));
-    count2 = 0;
 
-    message = bson_as_canonical_extended_json(current_document, NULL);
-    memcpy(data,message,strnlen(message,BUFFER_SIZE));
-    bson_free(message);
+    if (most_block_producer_total_rounds_count2 > most_block_producer_total_rounds_count)
+    {
+      most_block_producer_total_rounds_count = most_block_producer_total_rounds_count2;
+      memset(most_block_producer_total_rounds_delegate_name,0,strnlen(most_block_producer_total_rounds_delegate_name,BUFFER_SIZE));
+      memcpy(most_block_producer_total_rounds_delegate_name,delegates_name,strnlen(delegates_name,BUFFER_SIZE));
+    }
 
-    // get the block_verifier_total_rounds
+    // get the VRF_node_public_and_private_key_total_rounds
     memcpy(data2,", \"",3);
     memcpy(data2+3,"VRF_node_public_and_private_key_total_rounds",44);
     memcpy(data2+47,"\" : \"",5);
-
     message_copy1 = strstr(data,data2) + strnlen(data2,BUFFER_SIZE);
     message_copy2 = strstr(message_copy1,"\"");
     memcpy(data3,message_copy1,message_copy2 - message_copy1);
-    sscanf(data3, "%zu", &count2);
-
-    if (count2 > count)
-    {
-      count = count2;
-      // get the delegate_name
-      memcpy(data2,", \"",3);
-      memcpy(data2+3,"delegate_name",13);
-      memcpy(data2+16,"\" : \"",5);
-
-      message_copy1 = strstr(data,data2) + strnlen(data2,BUFFER_SIZE);
-      message_copy2 = strstr(message_copy1,"\"");
-      memcpy(data3,message_copy1,message_copy2 - message_copy1);
-      memset(settings,0,strnlen(settings,BUFFER_SIZE));
-      memcpy(settings,data3,strnlen(data3,BUFFER_SIZE));
-    }
-  }
-
-  // create the message
-  memset(data,0,strnlen(data,BUFFER_SIZE));
-  memcpy(data,"{\"most_VRF_node_public_and_private_key_total_rounds_delegate_name\":\"",68);
-  memcpy(data+68,settings,strnlen(settings,BUFFER_SIZE));
-  memcpy(data+68+strnlen(settings,BUFFER_SIZE),"\"}",2);
-
-  memset(data2,0,strnlen(data2,BUFFER_SIZE));
-  memcpy(data2,"{\"most_VRF_node_public_and_private_key_total_rounds\":\"",54);
-  sprintf(data2+54,"%zu",count);
-  memcpy(data2+strnlen(data2,BUFFER_SIZE),"\"}",2);
-
-  // update the database
-  if (update_document_from_collection(DATABASE_NAME,"delegates",MESSAGE,data,0) == 0 || update_document_from_collection(DATABASE_NAME,"delegates",MESSAGE,data2,0) == 0)
-  {
-    ADD_ROUND_STATISTICS_ERROR("Could not update a delegates most_VRF_node_public_and_private_key_total_rounds_delegate_name or most_VRF_node_random_data_total_rounds in the database\nFunction: add_round_statistics");
-  }
-
-  // calculate the most_VRF_node_random_data_total_rounds_delegate_name and most_VRF_node_public_and_private_key_total_rounds
-  count = 0;
-  // set the collection
-  collection = mongoc_client_get_collection(database_client, DATABASE_NAME, "delegates");
-  document = bson_new(); 
-  document_settings = mongoc_collection_find_with_opts(collection, document, NULL, NULL);
-  while (mongoc_cursor_next(document_settings, &current_document))
-  {
-    // reset the variables
-    memset(data,0,strnlen(data,10485760));
+    sscanf(data3, "%zu", &most_VRF_node_public_and_private_key_total_rounds_count2);
     memset(data2,0,strnlen(data2,BUFFER_SIZE));
     memset(data3,0,strnlen(data3,BUFFER_SIZE));
-    memset(settings,0,strnlen(settings,BUFFER_SIZE));
-    count2 = 0;
 
-    message = bson_as_canonical_extended_json(current_document, NULL);
-    memcpy(data,message,strnlen(message,BUFFER_SIZE));
-    bson_free(message);
+    if (most_VRF_node_public_and_private_key_total_rounds_count2 > most_VRF_node_public_and_private_key_total_rounds_count)
+    {
+      most_VRF_node_public_and_private_key_total_rounds_count = most_VRF_node_public_and_private_key_total_rounds_count2;
+      memset(most_VRF_node_public_and_private_key_total_rounds_delegate_name,0,strnlen(most_VRF_node_public_and_private_key_total_rounds_delegate_name,BUFFER_SIZE));
+      memcpy(most_VRF_node_public_and_private_key_total_rounds_delegate_name,delegates_name,strnlen(delegates_name,BUFFER_SIZE));
+    }
 
-    // get the block_verifier_total_rounds
+    // get the VRF_node_random_data_total_rounds
     memcpy(data2,", \"",3);
     memcpy(data2+3,"VRF_node_random_data_total_rounds",33);
     memcpy(data2+36,"\" : \"",5);
-
     message_copy1 = strstr(data,data2) + strnlen(data2,BUFFER_SIZE);
     message_copy2 = strstr(message_copy1,"\"");
     memcpy(data3,message_copy1,message_copy2 - message_copy1);
-    sscanf(data3, "%zu", &count2);
+    sscanf(data3, "%zu", &most_VRF_node_random_data_total_rounds_count2);
+    memset(data2,0,strnlen(data2,BUFFER_SIZE));
+    memset(data3,0,strnlen(data3,BUFFER_SIZE));
 
-    if (count2 > count)
+    if (most_VRF_node_random_data_total_rounds_count2 > most_VRF_node_random_data_total_rounds_count)
     {
-      count = count2;
-      // get the delegate_name
-      memcpy(data2,", \"",3);
-      memcpy(data2+3,"delegate_name",13);
-      memcpy(data2+16,"\" : \"",5);
-
-      message_copy1 = strstr(data,data2) + strnlen(data2,BUFFER_SIZE);
-      message_copy2 = strstr(message_copy1,"\"");
-      memcpy(data3,message_copy1,message_copy2 - message_copy1);
-      memset(settings,0,strnlen(settings,BUFFER_SIZE));
-      memcpy(settings,data3,strnlen(data3,BUFFER_SIZE));
+      most_VRF_node_random_data_total_rounds_count = most_VRF_node_random_data_total_rounds_count2;
+      memset(most_VRF_node_random_data_total_rounds_delegate_name,0,strnlen(most_VRF_node_random_data_total_rounds_delegate_name,BUFFER_SIZE));
+      memcpy(most_VRF_node_random_data_total_rounds_delegate_name,delegates_name,strnlen(delegates_name,BUFFER_SIZE));
     }
   }
 
   // create the message
-  memset(data,0,strnlen(data,BUFFER_SIZE));
-  memcpy(data,"{\"most_VRF_node_random_data_total_rounds_delegate_name\":\"",57);
-  memcpy(data+57,settings,strnlen(settings,BUFFER_SIZE));
-  memcpy(data+57+strnlen(settings,BUFFER_SIZE),"\"}",2);
+  memcpy(message1,"{\"most_total_rounds_delegate_name\":\"",36);
+  memcpy(message1+36,block_verifier_total_rounds_delegates_name,strnlen(block_verifier_total_rounds_delegates_name,BUFFER_SIZE));
+  memcpy(message1+36+strnlen(block_verifier_total_rounds_delegates_name,BUFFER_SIZE),"\"}",2);
 
-  memset(data2,0,strnlen(data2,BUFFER_SIZE));
-  memcpy(data2,"{\"most_VRF_node_random_data_total_rounds\":\"",46);
-  sprintf(data2+46,"%zu",count);
-  memcpy(data2+strnlen(data2,BUFFER_SIZE),"\"}",2);
+  memcpy(message2,"{\"most_total_rounds\":\"",25);
+  sprintf(message2+25,"%zu",block_verifier_total_rounds_count);
+  memcpy(message2+strnlen(message2,BUFFER_SIZE),"\"}",2);
+
+  memcpy(message3,"{\"best_block_verifier_online_percentage_delegate_name\":\"",56);
+  memcpy(message3+56,best_block_verifier_online_percentage_delegate_name,strnlen(settings,BUFFER_SIZE));
+  memcpy(message3+56+strnlen(best_block_verifier_online_percentage_delegate_name,BUFFER_SIZE),"\"}",2);
+
+  memcpy(message4,"{\"best_block_verifier_online_percentage\":\"",45);
+  sprintf(message4+45,"%lf",total);
+  memcpy(message4+strnlen(message4,BUFFER_SIZE),"\"}",2);
+
+  memcpy(message5,"{\"most_block_producer_total_rounds_delegate_name\":\"",51);
+  memcpy(message5+51,most_block_producer_total_rounds_delegate_name,strnlen(most_block_producer_total_rounds_delegate_name,BUFFER_SIZE));
+  memcpy(message5+51+strnlen(most_block_producer_total_rounds_delegate_name,BUFFER_SIZE),"\"}",2);
+
+  memcpy(message6,"{\"most_block_producer_total_rounds\":\"",40);
+  sprintf(message6+40,"%zu",most_block_producer_total_rounds_count);
+  memcpy(message6+strnlen(message6,BUFFER_SIZE),"\"}",2);
+
+  memcpy(message5,"{\"most_VRF_node_public_and_private_key_total_rounds_delegate_name\":\"",68);
+  memcpy(message5+68,most_VRF_node_public_and_private_key_total_rounds_delegate_name,strnlen(most_VRF_node_public_and_private_key_total_rounds_delegate_name,BUFFER_SIZE));
+  memcpy(message5+68+strnlen(most_VRF_node_public_and_private_key_total_rounds_delegate_name,BUFFER_SIZE),"\"}",2);
+
+  memcpy(message6,"{\"most_VRF_node_public_and_private_key_total_rounds\":\"",54);
+  sprintf(message6+54,"%zu",most_VRF_node_public_and_private_key_total_rounds_count);
+  memcpy(message6+strnlen(message6,BUFFER_SIZE),"\"}",2);
+
+  memcpy(message5,"{\"most_VRF_node_random_data_total_rounds_delegate_name\":\"",57);
+  memcpy(message5+57,most_VRF_node_random_data_total_rounds_delegate_name,strnlen(most_VRF_node_random_data_total_rounds_delegate_name,BUFFER_SIZE));
+  memcpy(message5+57+strnlen(most_VRF_node_random_data_total_rounds_delegate_name,BUFFER_SIZE),"\"}",2);
+
+  memcpy(message6,"{\"most_VRF_node_random_data_total_rounds\":\"",43);
+  sprintf(message6+43,"%zu",most_VRF_node_random_data_total_rounds_count);
+  memcpy(message6+strnlen(message6,BUFFER_SIZE),"\"}",2);
 
   // update the database
-  if (update_document_from_collection(DATABASE_NAME,"delegates",MESSAGE,data,0) == 0 || update_document_from_collection(DATABASE_NAME,"delegates",MESSAGE,data2,0) == 0)
+  if (update_document_from_collection(DATABASE_NAME,"statistics",MESSAGE,message1,0) == 0 || update_document_from_collection(DATABASE_NAME,"statistics",MESSAGE,message2,0) == 0 || update_document_from_collection(DATABASE_NAME,"statistics",MESSAGE,message3,0) == 0 || update_document_from_collection(DATABASE_NAME,"statistics",MESSAGE,message4,0) == 0 || update_document_from_collection(DATABASE_NAME,"statistics",MESSAGE,message5,0) == 0 || update_document_from_collection(DATABASE_NAME,"statistics",MESSAGE,message6,0) == 0 || update_document_from_collection(DATABASE_NAME,"statistics",MESSAGE,message7,0) == 0 || update_document_from_collection(DATABASE_NAME,"statistics",MESSAGE,message8,0) == 0 || update_document_from_collection(DATABASE_NAME,"statistics",MESSAGE,message9,0) == 0 || update_document_from_collection(DATABASE_NAME,"statistics",MESSAGE,message10,0) == 0)
   {
-    ADD_ROUND_STATISTICS_ERROR("Could not update a delegates most_VRF_node_random_data_total_rounds_delegate_name or most_VRF_node_random_data_total_rounds in the database\nFunction: add_round_statistics");
+    ADD_ROUND_STATISTICS_ERROR("Could not update the round statistics in the database\nFunction: add_round_statistics");
   }
 
   return 1;

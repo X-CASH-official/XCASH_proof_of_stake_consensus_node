@@ -827,13 +827,11 @@ void* update_block_verifiers_timer()
         }
 
         // remove any duplicate votes or invalid votes
-        count = 0;
         // set the collection
         collection = mongoc_client_get_collection(database_client, DATABASE_NAME, "votes_list");
         document_settings = mongoc_collection_find_with_opts(collection, document, NULL, NULL);
         while (mongoc_cursor_next(document_settings, &current_document))
         {
-          count++;
           // reset the variables
           memset(data,0,strnlen(data,10485760));
           memset(data2,0,strnlen(data2,BUFFER_SIZE));
@@ -858,14 +856,13 @@ void* update_block_verifiers_timer()
           memcpy(settings+41,data3,strnlen(data3,BUFFER_SIZE));
           memcpy(settings+41+strnlen(data3,BUFFER_SIZE),"\"}",2);
 
-          if (count_documents_in_collection(DATABASE_NAME, "votes_list", settings, 0) > 1 || strnlen(data3,BUFFER_SIZE) != XCASH_WALLET_LENGTH || memcmp(data3,CONSENSUS_NODE_PUBLIC_ADDRESS,3) != 0)
+          if (count_documents_in_collection(DATABASE_NAME, "votes_list", settings, 0) > 1 || strnlen(data3,BUFFER_SIZE) != XCASH_WALLET_LENGTH || memcmp(data3,XCASH_WALLET_PREFIX,3) != 0)
           {
             // delete the current document
             if (delete_document_from_collection(DATABASE_NAME, "votes_list", settings, 0) == 0)
             {
               color_print("Could not delete a double vote in the database\nFunction: update_block_verifiers_timer","red");
             }
-            count--;
             continue;
           }
 
@@ -886,35 +883,17 @@ void* update_block_verifiers_timer()
           memcpy(settings+29,data3,strnlen(data3,BUFFER_SIZE));
           memcpy(settings+29+strnlen(data3,BUFFER_SIZE),"\"}",2);
 
-          if (strnlen(data3,BUFFER_SIZE) != XCASH_WALLET_LENGTH || memcmp(data3,CONSENSUS_NODE_PUBLIC_ADDRESS,3) != 0)
+          if (strnlen(data3,BUFFER_SIZE) != XCASH_WALLET_LENGTH || memcmp(data3,XCASH_WALLET_PREFIX,3) != 0)
           {
             // delete the current document
             if (delete_document_from_collection(DATABASE_NAME, "votes_list", settings, 0) == 0)
             {
               color_print("Could not delete a double vote in the database\nFunction: update_block_verifiers_timer","red");
             }
-            count--;
             continue;
           }
-        }        
 
-        // load all of the reserve proof data into a struct so we can use the check_reserve_proofs
-        count = 0;
-        // set the collection
-        collection = mongoc_client_get_collection(database_client, DATABASE_NAME, "votes_list");
-        document_settings = mongoc_collection_find_with_opts(collection, document, NULL, NULL);
-        while (mongoc_cursor_next(document_settings, &current_document))
-        {
-          // reset the variables
-          memset(data,0,strnlen(data,10485760));
-          memset(data2,0,strnlen(data2,BUFFER_SIZE));
-          memset(data3,0,strnlen(data3,BUFFER_SIZE));
-          memset(settings,0,strnlen(settings,BUFFER_SIZE));
-
-          message = bson_as_canonical_extended_json(current_document, NULL);
-          memcpy(data,message,strnlen(message,BUFFER_SIZE));
-          bson_free(message);
-
+          // load all of the valid reserve proofs into the reserve_proofs_list struct so we can use the check_reserve_proofs
           // get the public_address_created_reserve_proof
           memcpy(data2,", \"",3);
           memcpy(data2+3,"public_address_created_reserve_proof",36);
@@ -954,26 +933,18 @@ void* update_block_verifiers_timer()
           memset(data2,0,strnlen(data2,BUFFER_SIZE));
           memset(data3,0,strnlen(data3,BUFFER_SIZE));
 
+          reserve_proofs_list.settings[count] = 0;
+          reserve_proofs_list.amount[count] = 0;
+          reserve_proofs_list.number[count] = 0;
+
           reserve_proofs_list.count++;
-        }
+        }  
 
         // reset the variables
         memset(data,0,strnlen(data,10485760));
         memset(data2,0,strnlen(data2,BUFFER_SIZE));
         memset(data3,0,strnlen(data3,BUFFER_SIZE));
         memset(settings,0,strnlen(settings,BUFFER_SIZE));
-
-        // check to make sure their was no more double votes added to the database between the two database loops
-        for (count = 0; count < reserve_proofs_list.count; count++)
-        {
-          for (count2 = 0; count2 < reserve_proofs_list.count; count2++)
-          {
-            if (memcmp(reserve_proofs_list.public_address_created_reserve_proof[count],reserve_proofs_list.public_address_created_reserve_proof[count2],XCASH_WALLET_LENGTH) == 0)
-            {
-              reserve_proofs_list.settings[count2] = 1;
-            }
-          }
-        }
 
         // check the reserve proofs
         if (check_reserve_proofs(data,0) == 0)
@@ -1005,7 +976,7 @@ void* update_block_verifiers_timer()
               }
               memset(data2,0,strnlen(data2,BUFFER_SIZE));
               memcpy(data2,message_copy1,count2);
-              reserve_proofs_list.settings[count] = 2;
+              reserve_proofs_list.settings[count] = 1;
               sscanf(data2, "%lld", &reserve_proofs_list.amount[count]);
               if (reserve_proofs_list.amount[count] < XCASH_PROOF_OF_STAKE_MINIMUM_AMOUNT)
               {
@@ -1013,16 +984,6 @@ void* update_block_verifiers_timer()
                 reserve_proofs_list.amount[count] = 0;
               }
             }
-            else
-            {
-              reserve_proofs_list.settings[count] = 0;
-              reserve_proofs_list.amount[count] = 0;
-            }
-          }
-          else
-          {
-            reserve_proofs_list.settings[count] = 0;
-            reserve_proofs_list.amount[count] = 0;
           }
         }
 
@@ -1062,7 +1023,7 @@ void* update_block_verifiers_timer()
           {
             if (memcmp(reserve_proofs_list.public_address_created_reserve_proof[count2],data3,XCASH_WALLET_LENGTH) == 0)
             {
-              if (reserve_proofs_list.settings[count2] != 2)
+              if (reserve_proofs_list.settings[count2] == 0)
               {
                 // delete the current document
                 if (delete_document_from_collection(DATABASE_NAME, "votes_list", settings, 0) == 0)
@@ -1095,7 +1056,7 @@ void* update_block_verifiers_timer()
               memcpy(data2+strnlen(data2,BUFFER_SIZE),"\"}",2);
 
               // update the database
-              if (update_document_from_collection(DATABASE_NAME,"votes_list",data,data2,0) == 0 || update_document_from_collection(DATABASE_NAME,"votes_list",data,"{\"public_address_created_reserve_proof\":\"enabled\"}",0) == 0)
+              if (update_document_from_collection(DATABASE_NAME,"votes_list",data,data2,0) == 0 || update_document_from_collection(DATABASE_NAME,"votes_list",data,"{\"vote_status\":\"enabled\"}",0) == 0)
               {
                 color_print("Could not update a delgates reserve proof amount in the database\nFunction: update_block_verifiers_timer","red");
               }
@@ -1121,7 +1082,10 @@ void* update_block_verifiers_timer()
             {
               if (memcmp(reserve_proofs_list.public_address_voted_for[count],reserve_proofs_list.public_address_voted_for[count2],XCASH_WALLET_LENGTH) == 0)
               {
-                amount += reserve_proofs_list.amount[count2];
+                if (reserve_proofs_list.settings[count2] == 1)
+                {
+                  amount += reserve_proofs_list.amount[count2];
+                }
               }
             }
 
@@ -1139,33 +1103,6 @@ void* update_block_verifiers_timer()
               color_print("Could not update a delegates current_vote_count or total_vote_count in the database\nFunction: update_block_verifiers_timer","red");
             }
           }
-
-          // reset the variables
-          memset(data,0,strnlen(data,10485760));
-          memset(data2,0,strnlen(data2,BUFFER_SIZE));
-          memset(data3,0,strnlen(data3,BUFFER_SIZE));
-          memset(settings,0,strnlen(settings,BUFFER_SIZE));
-
-          // update the reserve proofs total and vote_status in the database      
-          for (count = 0; count < reserve_proofs_list.count; count++)
-          {
-            // create the message
-            memcpy(settings,"{\"public_address_created_reserve_proof\":\"",41);
-            memcpy(settings+41,reserve_proofs_list.public_address_created_reserve_proof[count],XCASH_WALLET_LENGTH);
-            memcpy(settings+139,"\"}",2);
-            
-            memcpy(data,"{\"total\":\"",9);
-            sprintf(data+9,"%lld",reserve_proofs_list.amount[count]);
-            memcpy(data+strnlen(data,BUFFER_SIZE),"\"}",2);
-
-            memcpy(data2,"{\"vote_status\":\"enabled\"}",25);
-
-            // update the database
-            if (update_document_from_collection(DATABASE_NAME,"votes_list",settings,data,0) == 0 || update_document_from_collection(DATABASE_NAME,"votes_list",settings,data2,0) == 0)
-            {
-              color_print("Could not update a reserve proofs total or vote_status in the database\nFunction: update_block_verifiers_timer","red");
-            }
-          }  
 
           // reset the variables
           memset(data,0,strnlen(data,10485760));
