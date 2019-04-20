@@ -28,5 +28,6 @@ void update_block_producer_eligibility(const int SETTINGS);
 int create_new_block();
 void add_round_statistics();
 void add_block_verifiers_round_statistics();
+int send_recalculating_votes_to_nodes_and_main_nodes();
 int create_server(const int MESSAGE_SETTINGS);
 #endif

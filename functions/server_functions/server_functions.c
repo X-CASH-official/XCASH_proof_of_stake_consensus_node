@@ -2606,6 +2606,56 @@ void add_block_verifiers_round_statistics()
 
 /*
 -----------------------------------------------------------------------------------------------------------
+Name: send_recalculating_votes_to_nodes_and_main_nodes
+Description: sends the CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_RECALCULATING_VOTES message to the nodes and main node
+Return: 1 if the consensus node is the current consensus node, otherwise 0.
+-----------------------------------------------------------------------------------------------------------
+*/
+
+int send_recalculating_votes_to_nodes_and_main_nodes()
+{
+  // Variables
+  char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  size_t count;
+
+  // define macros
+  #define SEND_RECALCULATING_VOTES_TO_NODES_AND_MAIN_NODES_ERROR(settings) \
+  color_print(settings,"red"); \
+  pointer_reset(data); \
+  return 0;
+
+
+  // check if the memory needed was allocated on the heap successfully
+  if (data == NULL)
+  {
+    color_print("Could not allocate the memory needed on the heap","red");
+    exit(0);
+  }
+
+  // create the message
+  memcpy(data,"{\r\n \"message_settings\": \"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_RECALCULATING_VOTES\",\r\n}",88);
+
+  // sign_data
+  if (sign_data(data,0) == 0)
+  { 
+    SEND_RECALCULATING_VOTES_TO_NODES_AND_MAIN_NODES_ERROR("Could not sign_data\nFunction: send_recalculating_votes_to_nodes_and_main_nodes\nSend Message: CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_RECALCULATING_VOTES");
+  }
+
+  // send the CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_RECALCULATING_VOTES message to the nodes and main node
+  for (count = 0; count < BLOCK_VERIFIERS_AMOUNT; count++)
+  {
+    send_data_socket(block_verifiers_list.block_verifiers_IP_address[count],SEND_DATA_PORT,data,"sending CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_RECALCULATING_VOTES message to the nodes and main node",0);
+  }
+
+  return 1;
+
+  #undef SEND_RECALCULATING_VOTES_TO_NODES_AND_MAIN_NODES_ERROR
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
 Name: create_server
 Description: Creates the server
 Parameters:
