@@ -363,6 +363,22 @@ int main(int parameters_count, char* parameters[])
   // Add each block validation nodes data to the block_validation_nodes_list struct
 
   // Add each block validation nodes data to the block_validation_nodes_list struct
+
+// check if the program needs to run the test
+  if (parameters_count == 2)
+  {
+    if (strncmp(parameters[1],"--test",BUFFER_SIZE) == 0)
+    {
+      test();
+    }
+    else
+    {
+      color_print("Invalid parameters\n","red");
+      printf(INVALID_PARAMETERS_ERROR_MESSAGE);
+    }
+    pointer_reset_all;
+    exit(0);
+  }
   
 
   // initialize the database connection
