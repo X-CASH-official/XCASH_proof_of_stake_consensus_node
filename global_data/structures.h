@@ -65,7 +65,7 @@ struct blockchain_reserve_bytes {
     char* block_producer_public_address; // The block_producer_public_address_data text
     size_t block_producer_public_address_data_length; // The amount of characters of the block_producer_public_address_data
     char* block_producer_node_backup_count_data; // The block_producer_node_backup_count
-    size_t block_producer_node_backup_count; // The block_producer_node_backup_count_data text
+    char* block_producer_node_backup_count; // The block_producer_node_backup_count_data text
     size_t block_producer_node_backup_count_data_length; // The amount of characters of the block_producer_node_backup_count_data
     char* block_producer_backup_nodes_names_data; // The block_producer_backup_nodes_names
     char* block_producer_backup_nodes_names; // The block_producer_backup_nodes_names_data text
@@ -77,7 +77,7 @@ struct blockchain_reserve_bytes {
     char* vrf_node_public_and_secret_key_public_address; // The vrf_node_public_and_secret_key_public_address_data text
     size_t vrf_node_public_and_secret_key_public_address_data_length; // The amount of characters of the vrf_node_public_and_secret_key_public_address_data
     char* vrf_node_public_and_secret_key_node_backup_count_data; // The vrf_node_public_and_secret_key_node_backup_count
-    size_t vrf_node_public_and_secret_key_node_backup_count; // The vrf_node_public_and_secret_key_node_backup_count_data text
+    char* vrf_node_public_and_secret_key_node_backup_count; // The vrf_node_public_and_secret_key_node_backup_count_data text
     size_t vrf_node_public_and_secret_key_node_backup_count_data_length; // The amount of characters of the vrf_node_public_and_secret_key_node_backup_count_data
     char* vrf_node_public_and_secret_key_backup_nodes_names_data; // The vrf_node_public_and_secret_key_backup_nodes_names
     char* vrf_node_public_and_secret_key_backup_nodes_names; // The vrf_node_public_and_secret_key_backup_nodes_names_data text
@@ -89,7 +89,7 @@ struct blockchain_reserve_bytes {
     char* vrf_node_random_data_public_address; // The vrf_node_random_data_public_address_data text
     size_t vrf_node_random_data_public_address_data_length; // The amount of characters of the vrf_node_random_data_public_address_data
     char* vrf_node_random_data_node_backup_count_data; // The vrf_node_random_data_node_backup_count
-    size_t vrf_node_random_data_node_backup_count; // The vrf_node_random_data_node_backup_count_data text
+    char* vrf_node_random_data_node_backup_count; // The vrf_node_random_data_node_backup_count_data text
     size_t vrf_node_random_data_node_backup_count_data_length; // The amount of characters of the vrf_node_random_data_node_backup_count_data
     char* vrf_node_random_data_backup_nodes_names_data; // The vrf_node_random_data_backup_nodes_names
     char* vrf_node_random_data_backup_nodes_names; // The vrf_node_random_data_backup_nodes_names_data text
