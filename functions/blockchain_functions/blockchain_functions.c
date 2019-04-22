@@ -19,6 +19,138 @@ Functions
 
 /*
 -----------------------------------------------------------------------------------------------------------
+Name: varint_encode
+Description: Encodes varints for the get_block_template blocktemplate_blob
+Parameters:
+  number - The number to decode
+  result - the string to store the result
+Return: 1 if successfull, otherwise 0
+-----------------------------------------------------------------------------------------------------------
+*/
+
+int varint_encode(long long int number, char* result)
+{
+  // Variables
+  char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  size_t length;
+  size_t count = 0;
+  size_t count2 = 0;
+  size_t count3 = 0;
+  int binary_numbers[8];
+  int binary_numbers_copy;
+  long long int number_copy = number;  
+
+  // check if the memory needed was allocated on the heap successfully
+  if (data == NULL)
+  {
+    color_print("Could not allocate the memory needed on the heap","red");
+    exit(0);
+  }  
+  
+
+  // check if it should not be encoded
+  if (number <= 0xFF)
+  {
+    sprintf(result,"%02x",data[count2]);
+    return 1;
+  }
+
+  // convert the number to a binary string
+  while (number_copy != 0)
+  {
+    if (number_copy % 2 == 1)
+    {
+      memcpy(data+count,"1",1);
+    }
+    else
+    {
+      memcpy(data+count,"0",1);
+    }  
+    number_copy /= 2;
+    count++;
+  }
+
+  // pad the string to a mulitple of 7 bits
+  count = strnlen(data,BUFFER_SIZE);;
+  while (count % 7 != 0)
+  {
+    memcpy(result+strnlen(result,BUFFER_SIZE),"0",1);
+      count++;
+  }
+
+  // reverse the string
+  length = strnlen(data,BUFFER_SIZE);
+  for (count = 0; count <= length; count++)
+  {
+    memcpy(result+strnlen(result,BUFFER_SIZE),&data[length - count],1);
+  }
+  memset(data,0,strnlen(data,BUFFER_SIZE));
+  memcpy(data,result,strnlen(result,BUFFER_SIZE));
+  memset(result,0,strnlen(result,BUFFER_SIZE));
+
+  /*
+  convert each 7 bits to one byte
+  set the first bit to 1 for all groups of 7 except for the first group of 7
+  */
+
+ length = strnlen(data,BUFFER_SIZE) + (strnlen(data,BUFFER_SIZE) / 7);
+ count = 0;
+ count2 = 0;
+
+ while (count < length)
+ {
+   if (count % 8 == 0 && count != 0)
+   {
+     // reverse the binary bits
+     binary_numbers[count2] = (binary_numbers[count2] * 0x0202020202ULL & 0x010884422010ULL) % 1023;
+     count2++;
+   } 
+   if (count % 8 == 0)
+   {
+     if (count == 0)
+     {
+         // clear the binary bit to 0
+       binary_numbers[count2] &= ~(1 << (count % 8));      
+     }
+     else
+     {
+        // set the binary bit to 1
+       binary_numbers[count2] |= 1 << (count % 8);
+     }
+   }
+   else
+   {
+     if (memcmp(data + (count - (count2+1)),"1",1) == 0)
+     {
+       // set the binary bit to 1
+       binary_numbers[count2] |= 1 << (count % 8);
+     }
+     else
+     {
+       // clear the binary bit to 0
+       binary_numbers[count2] &= ~(1 << (count % 8));
+     }     
+   }
+   count++;
+ }
+
+  // reverse the last binary_number
+  length = strnlen(data,BUFFER_SIZE) / 8;
+  binary_numbers[length] = (binary_numbers[length] * 0x0202020202ULL & 0x010884422010ULL) % 1023;
+
+  // create the varint encoded string
+  for (count = 0, count2 = 0; count <= length; count++, count2 += 2)
+  {
+    sprintf(result+count2,"%02x",binary_numbers[count] & 0xFF);
+  }
+
+ return 1;    
+}
+
+
+
+/*
+-----------------------------------------------------------------------------------------------------------
 Name: varint_decode
 Description: Decodes varints for the get_block_template blocktemplate_blob
 Parameters:
