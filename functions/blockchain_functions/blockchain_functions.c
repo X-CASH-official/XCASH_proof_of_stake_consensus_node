@@ -30,7 +30,6 @@ Return: 1 if successfull, otherwise 0
 
 int varint_encode(long long int number, char* result)
 {
-    #define BUFFER_SIZE 6400
   // Variables
   char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
   size_t length;
@@ -43,7 +42,7 @@ int varint_encode(long long int number, char* result)
   // check if the memory needed was allocated on the heap successfully
   if (data == NULL)
   {
-    
+    color_print("Could not allocate the memory needed on the heap","red");    
     exit(0);
   }  
   
@@ -51,7 +50,7 @@ int varint_encode(long long int number, char* result)
   // check if it should not be encoded
   if (number <= 0xFF)
   {
-    sprintf(result,"%02x",data[count2]);
+    sprintf(result,"%02llx",number);
     return 1;
   }
 
@@ -76,6 +75,7 @@ int varint_encode(long long int number, char* result)
   }
 
   // reverse the string
+  memset(result,0,strnlen(result,BUFFER_SIZE));
   length = strnlen(data,BUFFER_SIZE);
   for (count = 0; count <= length; count++)
   {
