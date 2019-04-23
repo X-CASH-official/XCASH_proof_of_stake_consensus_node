@@ -124,7 +124,6 @@ int blockchain_test()
   }
 
   // run the varint_encode test
-  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if ((varint_encode(VARINT_DECODED_VALUE_1,data_test) == 1 && strncmp(data_test,VARINT_ENCODED_VALUE_TEXT_1,BUFFER_SIZE) == 0) ||
       (varint_encode(VARINT_DECODED_VALUE_2,data_test) == 1 && strncmp(data_test,VARINT_ENCODED_VALUE_TEXT_2,BUFFER_SIZE) == 0) ||
       (varint_encode(VARINT_DECODED_VALUE_3,data_test) == 1 && strncmp(data_test,VARINT_ENCODED_VALUE_TEXT_3,BUFFER_SIZE) == 0) ||
@@ -144,6 +143,8 @@ int blockchain_test()
   {
     color_print("PASSED! Test for varint encode","green");
     count_test++;
+    varint_encode(562949953421311,data_test);printf("%s\n",data_test);
+    varint_encode(1020304050,data_test);printf("%s\n",data_test);
   }
   else
   {

@@ -41,10 +41,11 @@ int varint_encode(long long int number, char* result)
 
   // check if the memory needed was allocated on the heap successfully
   if (data == NULL)
-  {
-    color_print("Could not allocate the memory needed on the heap","red");    
+  {    
     exit(0);
-  }  
+  } 
+
+  memset(result,0,strnlen(result,BUFFER_SIZE));
   
 
   // check if it should not be encoded
@@ -75,7 +76,6 @@ int varint_encode(long long int number, char* result)
   }
 
   // reverse the string
-  memset(result,0,strnlen(result,BUFFER_SIZE));
   length = strnlen(data,BUFFER_SIZE);
   for (count = 0; count <= length; count++)
   {

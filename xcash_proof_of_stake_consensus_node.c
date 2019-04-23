@@ -364,8 +364,7 @@ int main(int parameters_count, char* parameters[])
 
   // Add each block validation nodes data to the block_validation_nodes_list struct
 
-test();
-exit(0);
+test();exit(0);
 
   // initialize the database connection
   mongoc_init();
