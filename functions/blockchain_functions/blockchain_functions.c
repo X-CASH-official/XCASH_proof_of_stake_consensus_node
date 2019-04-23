@@ -30,20 +30,20 @@ Return: 1 if successfull, otherwise 0
 
 int varint_encode(long long int number, char* result)
 {
+    #define BUFFER_SIZE 6400
   // Variables
   char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
   size_t length;
   size_t count = 0;
   size_t count2 = 0;
-  size_t count3 = 0;
   int binary_numbers[8];
-  int binary_numbers_copy;
+  int binary_number_copy;
   long long int number_copy = number;  
 
   // check if the memory needed was allocated on the heap successfully
   if (data == NULL)
   {
-    color_print("Could not allocate the memory needed on the heap","red");
+    
     exit(0);
   }  
   
@@ -56,7 +56,7 @@ int varint_encode(long long int number, char* result)
   }
 
   // convert the number to a binary string
-  while (number_copy != 0)
+  for (count = 0; number_copy != 0; count++)
   {
     if (number_copy % 2 == 1)
     {
@@ -65,17 +65,14 @@ int varint_encode(long long int number, char* result)
     else
     {
       memcpy(data+count,"0",1);
-    }  
-    number_copy /= 2;
-    count++;
+    }
+    number_copy /= 2; 
   }
 
-  // pad the string to a mulitple of 7 bits
-  count = strnlen(data,BUFFER_SIZE);;
-  while (count % 7 != 0)
+  // pad the string to a mulitple of 7 bits  
+  for (count = strnlen(data,BUFFER_SIZE); count % 7 != 0; count++)
   {
     memcpy(result+strnlen(result,BUFFER_SIZE),"0",1);
-      count++;
   }
 
   // reverse the string
@@ -92,29 +89,37 @@ int varint_encode(long long int number, char* result)
   convert each 7 bits to one byte
   set the first bit to 1 for all groups of 7 except for the first group of 7
   */
+  length = strnlen(data,BUFFER_SIZE) + (strnlen(data,BUFFER_SIZE) / 7);
+  count = 0;
+  count2 = 0;
 
- length = strnlen(data,BUFFER_SIZE) + (strnlen(data,BUFFER_SIZE) / 7);
- count = 0;
- count2 = 0;
-
- while (count < length)
+ for (count = 0, count2 = 0; count < length; count++)
  {
    if (count % 8 == 0 && count != 0)
    {
      // reverse the binary bits
-     binary_numbers[count2] = (binary_numbers[count2] * 0x0202020202ULL & 0x010884422010ULL) % 1023;
+     binary_number_copy = 0;       
+     if (((binary_numbers[count2] >> 7) & 1U) == 1) {binary_number_copy |= 1UL << 0;} else {binary_number_copy &= ~(1UL << 0);}
+     if (((binary_numbers[count2] >> 6) & 1U) == 1) {binary_number_copy |= 1UL << 1;} else {binary_number_copy &= ~(1UL << 1);}
+     if (((binary_numbers[count2] >> 5) & 1U) == 1) {binary_number_copy |= 1UL << 2;} else {binary_number_copy &= ~(1UL << 2);}
+     if (((binary_numbers[count2] >> 4) & 1U) == 1) {binary_number_copy |= 1UL << 3;} else {binary_number_copy &= ~(1UL << 3);}
+     if (((binary_numbers[count2] >> 3) & 1U) == 1) {binary_number_copy |= 1UL << 4;} else {binary_number_copy &= ~(1UL << 4);}
+     if (((binary_numbers[count2] >> 2) & 1U) == 1) {binary_number_copy |= 1UL << 5;} else {binary_number_copy &= ~(1UL << 5);}
+     if (((binary_numbers[count2] >> 1) & 1U) == 1) {binary_number_copy |= 1UL << 6;} else {binary_number_copy &= ~(1UL << 6);}
+     if (((binary_numbers[count2] >> 0) & 1U) == 1) {binary_number_copy |= 1UL << 7;} else {binary_number_copy &= ~(1UL << 7);}
+     binary_numbers[count2] = binary_number_copy;
      count2++;
    } 
    if (count % 8 == 0)
    {
      if (count == 0)
      {
-         // clear the binary bit to 0
+       // clear the binary bit to 0
        binary_numbers[count2] &= ~(1 << (count % 8));      
      }
      else
      {
-        // set the binary bit to 1
+       // set the binary bit to 1
        binary_numbers[count2] |= 1 << (count % 8);
      }
    }
@@ -131,17 +136,25 @@ int varint_encode(long long int number, char* result)
        binary_numbers[count2] &= ~(1 << (count % 8));
      }     
    }
-   count++;
  }
 
   // reverse the last binary_number
   length = strnlen(data,BUFFER_SIZE) / 8;
-  binary_numbers[length] = (binary_numbers[length] * 0x0202020202ULL & 0x010884422010ULL) % 1023;
+  binary_number_copy = 0;
+  if (((binary_numbers[length] >> 7) & 1U) == 1) {binary_number_copy |= 1UL << 0;} else {binary_number_copy &= ~(1UL << 0);}
+  if (((binary_numbers[length] >> 6) & 1U) == 1) {binary_number_copy |= 1UL << 1;} else {binary_number_copy &= ~(1UL << 1);}
+  if (((binary_numbers[length] >> 5) & 1U) == 1) {binary_number_copy |= 1UL << 2;} else {binary_number_copy &= ~(1UL << 2);}
+  if (((binary_numbers[length] >> 4) & 1U) == 1) {binary_number_copy |= 1UL << 3;} else {binary_number_copy &= ~(1UL << 3);}
+  if (((binary_numbers[length] >> 3) & 1U) == 1) {binary_number_copy |= 1UL << 4;} else {binary_number_copy &= ~(1UL << 4);}
+  if (((binary_numbers[length] >> 2) & 1U) == 1) {binary_number_copy |= 1UL << 5;} else {binary_number_copy &= ~(1UL << 5);}
+  if (((binary_numbers[length] >> 1) & 1U) == 1) {binary_number_copy |= 1UL << 6;} else {binary_number_copy &= ~(1UL << 6);}
+  if (((binary_numbers[length] >> 0) & 1U) == 1) {binary_number_copy |= 1UL << 7;} else {binary_number_copy &= ~(1UL << 7);}
+  binary_numbers[length] = binary_number_copy;
 
   // create the varint encoded string
   for (count = 0, count2 = 0; count <= length; count++, count2 += 2)
   {
-    sprintf(result+count2,"%02x",binary_numbers[count] & 0xFF);
+    sprintf(result+count2,"%02x",binary_numbers[length-count] & 0xFF);
   }
 
  return 1;    
