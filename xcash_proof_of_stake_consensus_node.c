@@ -265,18 +265,18 @@ int main(int parameters_count, char* parameters[])
   blockchain_data.blockchain_reserve_bytes.vrf_node_random_data_node_backup_count_data = (char*)calloc(2,sizeof(char));
   blockchain_data.blockchain_reserve_bytes.vrf_node_random_data_backup_nodes_names_data = (char*)calloc(249,sizeof(char));
   blockchain_data.blockchain_reserve_bytes.vrf_node_random_data_backup_nodes_names = (char*)calloc(125,sizeof(char));
-  blockchain_data.blockchain_reserve_bytes.vrf_public_key_round_part_1 = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  blockchain_data.blockchain_reserve_bytes.vrf_public_key_round_part_1 = (char*)calloc(VRF_PUBLIC_KEY_LENGTH,sizeof(char));
   blockchain_data.blockchain_reserve_bytes.vrf_alpha_string_round_part_1 = (char*)calloc(BUFFER_SIZE,sizeof(char));
-  blockchain_data.blockchain_reserve_bytes.vrf_proof_round_part_1 = (char*)calloc(BUFFER_SIZE,sizeof(char));
-  blockchain_data.blockchain_reserve_bytes.vrf_beta_string_round_part_1 = (char*)calloc(BUFFER_SIZE,sizeof(char));
-  blockchain_data.blockchain_reserve_bytes.vrf_public_key_round_part_2 = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  blockchain_data.blockchain_reserve_bytes.vrf_proof_round_part_1 = (char*)calloc(VRF_PROOF_LENGTH,sizeof(char));
+  blockchain_data.blockchain_reserve_bytes.vrf_beta_string_round_part_1 = (char*)calloc(VRF_BETA_LENGTH,sizeof(char));
+  blockchain_data.blockchain_reserve_bytes.vrf_public_key_round_part_2 = (char*)calloc(VRF_PUBLIC_KEY_LENGTH,sizeof(char));
   blockchain_data.blockchain_reserve_bytes.vrf_alpha_string_round_part_2 = (char*)calloc(BUFFER_SIZE,sizeof(char));
-  blockchain_data.blockchain_reserve_bytes.vrf_proof_round_part_2 = (char*)calloc(BUFFER_SIZE,sizeof(char));
-  blockchain_data.blockchain_reserve_bytes.vrf_beta_string_round_part_2 = (char*)calloc(BUFFER_SIZE,sizeof(char));
-  blockchain_data.blockchain_reserve_bytes.vrf_public_key_round_part_3 = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  blockchain_data.blockchain_reserve_bytes.vrf_proof_round_part_2 = (char*)calloc(VRF_PROOF_LENGTH,sizeof(char));
+  blockchain_data.blockchain_reserve_bytes.vrf_beta_string_round_part_2 = (char*)calloc(VRF_BETA_LENGTH,sizeof(char));
+  blockchain_data.blockchain_reserve_bytes.vrf_public_key_round_part_3 = (char*)calloc(VRF_PUBLIC_KEY_LENGTH,sizeof(char));
   blockchain_data.blockchain_reserve_bytes.vrf_alpha_string_round_part_3 = (char*)calloc(BUFFER_SIZE,sizeof(char));
-  blockchain_data.blockchain_reserve_bytes.vrf_proof_round_part_3 = (char*)calloc(BUFFER_SIZE,sizeof(char));
-  blockchain_data.blockchain_reserve_bytes.vrf_beta_string_round_part_3 = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  blockchain_data.blockchain_reserve_bytes.vrf_proof_round_part_3 = (char*)calloc(VRF_PROOF_LENGTH,sizeof(char));
+  blockchain_data.blockchain_reserve_bytes.vrf_beta_string_round_part_3 = (char*)calloc(VRF_BETA_LENGTH,sizeof(char));
   blockchain_data.blockchain_reserve_bytes.previous_block_hash_data = (char*)calloc(BUFFER_SIZE,sizeof(char));
 
   // check if the memory needed was allocated on the heap successfully
@@ -363,8 +363,6 @@ int main(int parameters_count, char* parameters[])
   // Add each block validation nodes data to the block_validation_nodes_list struct
 
   // Add each block validation nodes data to the block_validation_nodes_list struct
-
-test();exit(0);
 
   // initialize the database connection
   mongoc_init();
