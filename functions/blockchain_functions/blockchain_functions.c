@@ -894,8 +894,9 @@ int network_block_string_to_blockchain_data(const char* data)
   message_copy1 = strstr(data+count,BLOCKCHAIN_DATA_SEGMENT_STRING);
   message_copy2 = (char*)data+count;
   blockchain_data.blockchain_reserve_bytes.block_validation_node_signature_data_length = (strlen(data) - strlen(message_copy1)) - count;
-  for (count3 = 0; count3 < BLOCK_VALIDATION_NODES_AMOUNT; count3++)
-  {    
+  size_t count5 = string_count(data,"5369675631");
+  for (count3 = 0; count3 < count5; count3++)
+  { 
     memcpy(blockchain_data.blockchain_reserve_bytes.block_validation_node_signature_data[count3],&data[count],blockchain_data.blockchain_reserve_bytes.block_validation_node_signature_data_length);
     // convert the hexadecimal string to a string
     for (number = 0, count2 = 0; number < blockchain_data.blockchain_reserve_bytes.block_validation_node_signature_data_length; count2++, number += 2)
@@ -1332,6 +1333,10 @@ int blockchain_data_to_network_block_string(char* result)
   blockchain_data.blockchain_reserve_bytes.block_validation_node_signature_data_length = BLOCKCHAIN_DATA_BLOCKCHAIN_RESERVE_BYTES_BLOCK_VALIDATION_NODE_SIGNATURE_DATA_SIZE;
   for (count = 0; count < BLOCK_VALIDATION_NODES_AMOUNT; count++)
   {
+    if (strlen(blockchain_data.blockchain_reserve_bytes.block_validation_node_signature[count]) == 0)
+    {
+      break;
+    }
     // convert the string to hexadecimal
     for (count2 = 0, counter = 0; count2 < XCASH_SIGN_DATA_LENGTH; count2++, counter += 2)
     {

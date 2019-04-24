@@ -10,14 +10,14 @@ Global Structures
 */
 
 struct block_verifiers_list {
-    char* block_verifiers_name[BLOCK_VERIFIERS_AMOUNT];
-    char* block_verifiers_public_address[BLOCK_VERIFIERS_AMOUNT];
-    char* block_verifiers_IP_address[BLOCK_VERIFIERS_AMOUNT];
+    char* block_verifiers_name[BLOCK_VERIFIERS_AMOUNT]; // The block verifiers name
+    char* block_verifiers_public_address[BLOCK_VERIFIERS_AMOUNT]; // The block verifiers public address
+    char* block_verifiers_IP_address[BLOCK_VERIFIERS_AMOUNT]; // The block verifiers IP address
 };
 
 struct block_validation_nodes_list {
-    char* block_validation_nodes_public_address[BLOCK_VALIDATION_NODES_AMOUNT];
-    char* block_validation_nodes_IP_address[BLOCK_VALIDATION_NODES_AMOUNT];
+    char* block_validation_nodes_public_address[BLOCK_VALIDATION_NODES_AMOUNT]; // The block validation nodes public address
+    char* block_validation_nodes_IP_address[BLOCK_VALIDATION_NODES_AMOUNT]; // The block validation nodes IP address
 };
 
 struct trusted_block_verifiers {
@@ -25,36 +25,36 @@ struct trusted_block_verifiers {
 };
 
 struct trusted_block_verifiers_VRF_data {
-    char* public_address[TRUSTED_BLOCK_VERIFIERS_AMOUNT];
-    char* vrf_public_key_round_part_1[TRUSTED_BLOCK_VERIFIERS_AMOUNT];
-    char* vrf_alpha_string_round_part_1[TRUSTED_BLOCK_VERIFIERS_AMOUNT];
-    char* vrf_proof_round_part_1[TRUSTED_BLOCK_VERIFIERS_AMOUNT];
-    char* vrf_beta_string_round_part_1[TRUSTED_BLOCK_VERIFIERS_AMOUNT];
-    char* vrf_public_key_round_part_2[TRUSTED_BLOCK_VERIFIERS_AMOUNT];
-    char* vrf_alpha_string_round_part_2[TRUSTED_BLOCK_VERIFIERS_AMOUNT];
-    char* vrf_proof_round_part_2[TRUSTED_BLOCK_VERIFIERS_AMOUNT];
-    char* vrf_beta_string_round_part_2[TRUSTED_BLOCK_VERIFIERS_AMOUNT];
-    char* vrf_public_key_round_part_3[TRUSTED_BLOCK_VERIFIERS_AMOUNT];
-    char* vrf_alpha_string_round_part_3[TRUSTED_BLOCK_VERIFIERS_AMOUNT];
-    char* vrf_proof_round_part_3[TRUSTED_BLOCK_VERIFIERS_AMOUNT];
-    char* vrf_beta_string_round_part_3[TRUSTED_BLOCK_VERIFIERS_AMOUNT];
-    char* block_blob[TRUSTED_BLOCK_VERIFIERS_AMOUNT];
+    char* public_address[TRUSTED_BLOCK_VERIFIERS_AMOUNT]; // The public_address of the trusted block verifier
+    char* vrf_public_key_round_part_1[TRUSTED_BLOCK_VERIFIERS_AMOUNT]; // The vrf_public_key_round_part_1 that the trusted block verifier received
+    char* vrf_alpha_string_round_part_1[TRUSTED_BLOCK_VERIFIERS_AMOUNT]; // The vrf_alpha_string_round_part_1 that the trusted block verifier received
+    char* vrf_proof_round_part_1[TRUSTED_BLOCK_VERIFIERS_AMOUNT]; // The vrf_proof_round_part_1 that the trusted block verifier received
+    char* vrf_beta_string_round_part_1[TRUSTED_BLOCK_VERIFIERS_AMOUNT]; // The vrf_beta_string_round_part_1 that the trusted block verifier received
+    char* vrf_public_key_round_part_2[TRUSTED_BLOCK_VERIFIERS_AMOUNT]; // The vrf_public_key_round_part_2 that the trusted block verifier received
+    char* vrf_alpha_string_round_part_2[TRUSTED_BLOCK_VERIFIERS_AMOUNT]; // The vrf_alpha_string_round_part_2 that the trusted block verifier received
+    char* vrf_proof_round_part_2[TRUSTED_BLOCK_VERIFIERS_AMOUNT]; // The vrf_proof_round_part_2 that the trusted block verifier received
+    char* vrf_beta_string_round_part_2[TRUSTED_BLOCK_VERIFIERS_AMOUNT]; // The vrf_beta_string_round_part_2 that the trusted block verifier received
+    char* vrf_public_key_round_part_3[TRUSTED_BLOCK_VERIFIERS_AMOUNT]; // The vrf_public_key_round_part_3 that the trusted block verifier received
+    char* vrf_alpha_string_round_part_3[TRUSTED_BLOCK_VERIFIERS_AMOUNT]; // The vrf_alpha_string_round_part_3 that the trusted block verifier received
+    char* vrf_proof_round_part_3[TRUSTED_BLOCK_VERIFIERS_AMOUNT]; // The vrf_proof_round_part_3 that the trusted block verifier received
+    char* vrf_beta_string_round_part_3[TRUSTED_BLOCK_VERIFIERS_AMOUNT]; // The vrf_beta_string_round_part_3 that the trusted block verifier received
+    char* block_blob[TRUSTED_BLOCK_VERIFIERS_AMOUNT]; // The block_blob that the trusted block verifier received
 };
 
 struct VRF_data {
-    char* vrf_public_key_round_part_1;
-    char* vrf_alpha_string_round_part_1;
-    char* vrf_proof_round_part_1;
-    char* vrf_beta_string_round_part_1;
-    char* vrf_public_key_round_part_2;
-    char* vrf_alpha_string_round_part_2;
-    char* vrf_proof_round_part_2;
-    char* vrf_beta_string_round_part_2;
-    char* vrf_public_key_round_part_3;
-    char* vrf_alpha_string_round_part_3;
-    char* vrf_proof_round_part_3;
-    char* vrf_beta_string_round_part_3;
-    char* block_blob;
+    char* vrf_public_key_round_part_1; // The vrf_public_key_round_part_1 to send to the block producer so they can create the block
+    char* vrf_alpha_string_round_part_1; // The vrf_alpha_string_round_part_1 to send to the block producer so they can create the block
+    char* vrf_proof_round_part_1; // The vrf_proof_round_part_1 to send to the block producer so they can create the block
+    char* vrf_beta_string_round_part_1; // The vrf_beta_string_round_part_1 to send to the block producer so they can create the block
+    char* vrf_public_key_round_part_2; // The vrf_public_key_round_part_2 to send to the block producer so they can create the block
+    char* vrf_alpha_string_round_part_2; // The vrf_alpha_string_round_part_2 to send to the block producer so they can create the block
+    char* vrf_proof_round_part_2; // The vrf_proof_round_part_2 to send to the block producer so they can create the block
+    char* vrf_beta_string_round_part_2; // The vrf_beta_string_round_part_2 to send to the block producer so they can create the block
+    char* vrf_public_key_round_part_3; // The vrf_public_key_round_part_3 to send to the block producer so they can create the block
+    char* vrf_alpha_string_round_part_3; // The vrf_alpha_string_round_part_3 to send to the block producer so they can create the block
+    char* vrf_proof_round_part_3; // The vrf_proof_round_part_3 to send to the block producer so they can create the block
+    char* vrf_beta_string_round_part_3; // The vrf_beta_string_round_part_3 to send to the block producer so they can create the block
+    char* block_blob; // The block_blob that the block producer creates to send to the consensus node
 };
 
 struct blockchain_reserve_bytes {
@@ -183,13 +183,13 @@ struct blockchain_data {
 };
 
 struct reserve_proofs_list {
-    char* public_address_created_reserve_proof[RESERVE_PROOFS_LIST_MAXIMUM_AMOUNT];
-    char* public_address_voted_for[RESERVE_PROOFS_LIST_MAXIMUM_AMOUNT];
-    char* reserve_proof[RESERVE_PROOFS_LIST_MAXIMUM_AMOUNT];
+    char* public_address_created_reserve_proof[RESERVE_PROOFS_LIST_MAXIMUM_AMOUNT]; // The public address that created the reserve proof
+    char* public_address_voted_for[RESERVE_PROOFS_LIST_MAXIMUM_AMOUNT]; // The public address that was voted for in the reserve proof
+    char* reserve_proof[RESERVE_PROOFS_LIST_MAXIMUM_AMOUNT]; // The reserve proof
     int settings[RESERVE_PROOFS_LIST_MAXIMUM_AMOUNT]; // 0 if invalid, 1 if valid
-    long long int amount[RESERVE_PROOFS_LIST_MAXIMUM_AMOUNT];
-    int number[RESERVE_PROOFS_LIST_MAXIMUM_AMOUNT];
-    size_t count;
+    long long int amount[RESERVE_PROOFS_LIST_MAXIMUM_AMOUNT]; // The amount the reserve proof was created for
+    int number[RESERVE_PROOFS_LIST_MAXIMUM_AMOUNT]; // the number of reserve proofs in the reserve_proofs_list struct
+    size_t count; // the amount of reserve proofs in the reserve_proofs_list struct
 };     
 
 struct timer_data {
@@ -212,16 +212,16 @@ struct node_to_node_vote {
 
 // database struct
 struct database_document_fields {
-    size_t count;
-    char* item[100];
-    char* value[100];
+    size_t count; // The amount of items in the database_document_fields struct
+    char* item[100]; // The item
+    char* value[100]; // The value
 };
 
 struct database_multiple_documents_fields {
-    size_t document_count;
-    size_t database_fields_count;
-    char* item[DATABASE_ARRAY_COUNT][DATABASE_ARRAY_COUNT];
-    char* value[DATABASE_ARRAY_COUNT][DATABASE_ARRAY_COUNT];
+    size_t document_count; // The amount of documents in the database_multiple_documents_fields
+    size_t database_fields_count; // The amount of items in each document
+    char* item[DATABASE_ARRAY_COUNT][DATABASE_ARRAY_COUNT]; // The item
+    char* value[DATABASE_ARRAY_COUNT][DATABASE_ARRAY_COUNT]; // The value
 };
 
 
