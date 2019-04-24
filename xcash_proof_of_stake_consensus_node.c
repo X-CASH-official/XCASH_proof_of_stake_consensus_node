@@ -269,14 +269,18 @@ int main(int parameters_count, char* parameters[])
   blockchain_data.blockchain_reserve_bytes.vrf_alpha_string_round_part_1 = (char*)calloc(BUFFER_SIZE,sizeof(char));
   blockchain_data.blockchain_reserve_bytes.vrf_proof_round_part_1 = (char*)calloc(VRF_PROOF_LENGTH,sizeof(char));
   blockchain_data.blockchain_reserve_bytes.vrf_beta_string_round_part_1 = (char*)calloc(VRF_BETA_LENGTH,sizeof(char));
+  blockchain_data.blockchain_reserve_bytes.vrf_data_round_part_1 = (char*)calloc(11,sizeof(char));
   blockchain_data.blockchain_reserve_bytes.vrf_public_key_round_part_2 = (char*)calloc(VRF_PUBLIC_KEY_LENGTH,sizeof(char));
   blockchain_data.blockchain_reserve_bytes.vrf_alpha_string_round_part_2 = (char*)calloc(BUFFER_SIZE,sizeof(char));
   blockchain_data.blockchain_reserve_bytes.vrf_proof_round_part_2 = (char*)calloc(VRF_PROOF_LENGTH,sizeof(char));
   blockchain_data.blockchain_reserve_bytes.vrf_beta_string_round_part_2 = (char*)calloc(VRF_BETA_LENGTH,sizeof(char));
+  blockchain_data.blockchain_reserve_bytes.vrf_data_round_part_2 = (char*)calloc(11,sizeof(char));
   blockchain_data.blockchain_reserve_bytes.vrf_public_key_round_part_3 = (char*)calloc(VRF_PUBLIC_KEY_LENGTH,sizeof(char));
   blockchain_data.blockchain_reserve_bytes.vrf_alpha_string_round_part_3 = (char*)calloc(BUFFER_SIZE,sizeof(char));
   blockchain_data.blockchain_reserve_bytes.vrf_proof_round_part_3 = (char*)calloc(VRF_PROOF_LENGTH,sizeof(char));
   blockchain_data.blockchain_reserve_bytes.vrf_beta_string_round_part_3 = (char*)calloc(VRF_BETA_LENGTH,sizeof(char));
+  blockchain_data.blockchain_reserve_bytes.vrf_data_round_part_3 = (char*)calloc(11,sizeof(char));
+  blockchain_data.blockchain_reserve_bytes.vrf_data = (char*)calloc(11,sizeof(char));
   blockchain_data.blockchain_reserve_bytes.previous_block_hash_data = (char*)calloc(BUFFER_SIZE,sizeof(char));
 
   // check if the memory needed was allocated on the heap successfully

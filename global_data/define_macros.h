@@ -51,6 +51,7 @@ Using define statements instead of constants for increased efficiency
 #define VRF_SECRET_KEY_LENGTH 128
 #define VRF_PROOF_LENGTH 160
 #define VRF_BETA_LENGTH 128
+#define VRF_DATA_LENGTH 8 // true when the VRF data is verified
 
 #define NODES_UPDATED_TIME_FILE_NAME "nodes_updated_time.txt" // The last time the node has updated the list of nodes from the consensus node
 #define NODES_PUBLIC_ADDRESS_LIST_FILE_NAME "nodes_public_address_list.txt" // The current enabled nodes public address list
