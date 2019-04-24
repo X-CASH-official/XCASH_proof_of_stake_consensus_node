@@ -591,25 +591,28 @@ Return: 1 if successfull, otherwise 0.
 
 int calculate_main_nodes_role()
 {
+  // Struct
+  struct delegate_numbers {
+    int block_producer; // The selection for the block_producer node
+    int vrf_node_public_and_secret_key; // The selection for the vrf_node_public_and_secret_key node
+    int vrf_node_random_data; // The selection for the vrf_node_random_data node
+    int settings; // 1 if calculating the block_producer role, 2 if calculating the vrf_node_public_and_secret_key role, 3 if calculating the vrf_node_random_data role
+  };
+
   // Variables
   char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
   size_t count;
+  int number;
+  struct delegate_numbers delegate_numbers;  
 
   // define macros
-  #define DATABASE_COLLECTION "nodes"
+  #define DATABASE_COLLECTION "current_round"
   #define MESSAGE "{\"username\":\"xcash\"}"
-
-  #define pointer_reset_all \
-  free(data); \
-  data = NULL; \
-  free(settings); \
-  settings = NULL; 
 
   #define CALCULATE_MAIN_NODES_ROLE_ERROR(settings) \
   color_print(settings,"red"); \
   pointer_reset(data); \
   return 0;
-
 
   // check if the memory needed was allocated on the heap successfully
   if (data == NULL)
@@ -617,6 +620,12 @@ int calculate_main_nodes_role()
     color_print("Could not allocate the memory needed on the heap","red");
     exit(0);
   }
+
+  // initialize the delegate_numbers struct 
+  delegate_numbers.block_producer = 0;
+  delegate_numbers.vrf_node_public_and_secret_key = 0;
+  delegate_numbers.vrf_node_random_data = 0;
+  delegate_numbers.settings = 1;
 
   // get the previous block template
   if (get_previous_block_template(data,0) == 0)
@@ -630,11 +639,72 @@ int calculate_main_nodes_role()
     CALCULATE_MAIN_NODES_ROLE_ERROR("Could not convert the network_block_string to blockchain_data\nFunction: calculate_main_nodes_role");
   }
 
-  // read the VRF beta string for round part 3 and calculate the main nodes role
+  // calculate the main nodes role from the vrf_beta_string_round_part_3
+  for (count = 0; count < VRF_BETA_LENGTH; count += 2)
+  {
+    memset(data,0,strnlen(data,BUFFER_SIZE));
+    memcpy(data,blockchain_data.blockchain_reserve_bytes.vrf_beta_string_round_part_3+count,2);
+    // convert the byte to a number
+    number = (int)strtol(data, NULL, 16);
+    // only use numbers between 1 and 200 since this is gives an even amount of selections for all delegate numbers
+    if (number >= 1 && number <= 200)
+    {
+      number = number % BLOCK_VERIFIERS_AMOUNT;
+      // check if the selection is already used
+      if (number != delegate_numbers.block_producer && number != delegate_numbers.vrf_node_public_and_secret_key && number != delegate_numbers.vrf_node_random_data)
+      {
+        if (delegate_numbers.settings == 1)
+        {
+          // subtract 1 from the number since the array is 0 to 99, not 1 to 100
+          delegate_numbers.block_producer = number - 1;
+          delegate_numbers.settings++;
+        }
+        else if (delegate_numbers.settings == 2)
+        {
+          // subtract 1 from the number since the array is 0 to 99, not 1 to 100
+          delegate_numbers.vrf_node_public_and_secret_key = number - 1;
+          delegate_numbers.settings++;
+        }
+        else if (delegate_numbers.settings == 3)
+        {
+          // subtract 1 from the number since the array is 0 to 99, not 1 to 100
+          delegate_numbers.vrf_node_random_data = number - 1;
+          // exit when all three roles are calculated
+          break;
+        }
+      }
+    }
+  }
 
+  // update the block_producer 
+  memset(data,0,strnlen(data,BUFFER_SIZE));
+  memcpy(data,"{\"block_producer_public_address\":\"",34);
+  memcpy(data+34,block_verifiers_list.block_verifiers_public_address[delegate_numbers.block_producer],XCASH_WALLET_LENGTH);
+  memcpy(data+132,"\"}",2);
+  if (update_document_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,data,0) == 0)
+  {
+    CALCULATE_MAIN_NODES_ROLE_ERROR("Could not update the block_producer_public_address in the database\nFunction: calculate_main_nodes_role");
+  }
 
-  // update the main nodes role in the database
-  
+  // update the vrf_node_public_and_secret_key 
+  memset(data,0,strnlen(data,BUFFER_SIZE));
+  memcpy(data,"{\"vrf_node_public_and_private_key_public_address\":\"",51);
+  memcpy(data+51,block_verifiers_list.block_verifiers_public_address[delegate_numbers.vrf_node_public_and_secret_key],XCASH_WALLET_LENGTH);
+  memcpy(data+149,"\"}",2);
+  if (update_document_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,data,0) == 0)
+  {
+    CALCULATE_MAIN_NODES_ROLE_ERROR("Could not update the vrf_node_public_and_private_key_public_address in the database\nFunction: calculate_main_nodes_role");
+  }
+
+  // update the vrf_node_random_data 
+  memset(data,0,strnlen(data,BUFFER_SIZE));
+  memcpy(data,"{\"vrf_node_random_data_public_address\":\"",40);
+  memcpy(data+40,block_verifiers_list.block_verifiers_public_address[delegate_numbers.vrf_node_random_data],XCASH_WALLET_LENGTH);
+  memcpy(data+138,"\"}",2);
+  if (update_document_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,data,0) == 0)
+  {
+    CALCULATE_MAIN_NODES_ROLE_ERROR("Could not update the vrf_node_random_data_public_address in the database\nFunction: calculate_main_nodes_role");
+  }
 
   // set the current_round_part and current_round_part_backup_node
   memset(current_round_part,0,strnlen(current_round_part,BUFFER_SIZE));
@@ -643,7 +713,7 @@ int calculate_main_nodes_role()
   memcpy(current_round_part_backup_node,"0",1);
 
   // set the current_round_part and current_round_part_backup_node in the database
-  if (update_document_from_collection(DATABASE_NAME,"current_round",MESSAGE,"{\"current_round_part\":\"1\"}",0) == 0 || update_document_from_collection(DATABASE_NAME,"current_round",MESSAGE,"{\"current_round_part_backup_node\":\"0\"}",0) == 0)
+  if (update_document_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,"{\"current_round_part\":\"1\"}",0) == 0 || update_document_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,"{\"current_round_part_backup_node\":\"0\"}",0) == 0)
   {
     CALCULATE_MAIN_NODES_ROLE_ERROR("Could not update the current_round_part and current_round_part_backup_node in the database\nFunction: calculate_main_nodes_role");
   }
@@ -652,7 +722,6 @@ int calculate_main_nodes_role()
 
   #undef DATABASE_COLLECTION
   #undef MESSAGE
-  #undef pointer_reset_all
   #undef CALCULATE_MAIN_NODES_ROLE_ERROR
 }
 
