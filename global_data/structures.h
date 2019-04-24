@@ -39,6 +39,7 @@ struct trusted_block_verifiers_VRF_data {
     char* vrf_proof_round_part_3[TRUSTED_BLOCK_VERIFIERS_AMOUNT]; // The vrf_proof_round_part_3 that the trusted block verifier received
     char* vrf_beta_string_round_part_3[TRUSTED_BLOCK_VERIFIERS_AMOUNT]; // The vrf_beta_string_round_part_3 that the trusted block verifier received
     char* block_blob[TRUSTED_BLOCK_VERIFIERS_AMOUNT]; // The block_blob that the trusted block verifier received
+    size_t count; // How many items are in the trusted_block_verifiers_VRF_data struct
 };
 
 struct VRF_data {

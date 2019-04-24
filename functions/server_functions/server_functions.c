@@ -1652,6 +1652,7 @@ int server_receive_data_socket_node_to_node_vote(char* message)
   // Variables
   char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
   char* data2 = (char*)calloc(BUFFER_SIZE,sizeof(char));
+  size_t count;
 
   // define macros
   #define pointer_reset_all \
@@ -1724,6 +1725,42 @@ int server_receive_data_socket_node_to_node_vote(char* message)
   }
 
   // if the block verifiers public address is a trusted block verifier, add the VRF data to the trusted_block_verifiers_VRF_data
+  for (count = 0; count < TRUSTED_BLOCK_VERIFIERS_AMOUNT; count++)
+  {
+    if (memcmp(trusted_block_verifiers.trusted_block_verifiers_public_address[count],data,XCASH_WALLET_LENGTH) == 0)
+    {
+      // parse the message
+      if (memcmp(current_round_part,"1",1) == 0)
+      {
+        if (parse_json_data(message,"vrf_public_key",trusted_block_verifiers_VRF_data.vrf_public_key_round_part_1[trusted_block_verifiers_VRF_data.count]) == 0 || parse_json_data(message,"vrf_alpha_string",trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_1[trusted_block_verifiers_VRF_data.count]) == 0 || parse_json_data(message,"vrf_proof",trusted_block_verifiers_VRF_data.vrf_proof_round_part_1[trusted_block_verifiers_VRF_data.count]) == 0 || parse_json_data(message,"vrf_beta_string",trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_1[trusted_block_verifiers_VRF_data.count]) == 0)
+        {
+          SERVER_RECEIVE_DATA_SOCKET_NOTE_TO_NODE_VOTE_ERROR("Could not parse data\nFunction: server_receive_data_socket_node_to_node_vote\nReceive Message: NODES_TO_CONSENSUS_NODE_VOTE_RESULTS");
+        }
+      }
+      else if (memcmp(current_round_part,"2",1) == 0)
+      {
+        if (parse_json_data(message,"vrf_public_key",trusted_block_verifiers_VRF_data.vrf_public_key_round_part_2[trusted_block_verifiers_VRF_data.count]) == 0 || parse_json_data(message,"vrf_alpha_string",trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_2[trusted_block_verifiers_VRF_data.count]) == 0 || parse_json_data(message,"vrf_proof",trusted_block_verifiers_VRF_data.vrf_proof_round_part_2[trusted_block_verifiers_VRF_data.count]) == 0 || parse_json_data(message,"vrf_beta_string",trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_2[trusted_block_verifiers_VRF_data.count]) == 0)
+        {
+          SERVER_RECEIVE_DATA_SOCKET_NOTE_TO_NODE_VOTE_ERROR("Could not parse data\nFunction: server_receive_data_socket_node_to_node_vote\nReceive Message: NODES_TO_CONSENSUS_NODE_VOTE_RESULTS");
+        }
+      }
+      else if (memcmp(current_round_part,"3",1) == 0)
+      {
+        if (parse_json_data(message,"vrf_public_key",trusted_block_verifiers_VRF_data.vrf_public_key_round_part_3[trusted_block_verifiers_VRF_data.count]) == 0 || parse_json_data(message,"vrf_alpha_string",trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_3[trusted_block_verifiers_VRF_data.count]) == 0 || parse_json_data(message,"vrf_proof",trusted_block_verifiers_VRF_data.vrf_proof_round_part_3[trusted_block_verifiers_VRF_data.count]) == 0 || parse_json_data(message,"vrf_beta_string",trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_3[trusted_block_verifiers_VRF_data.count]) == 0)
+        {
+          SERVER_RECEIVE_DATA_SOCKET_NOTE_TO_NODE_VOTE_ERROR("Could not parse data\nFunction: server_receive_data_socket_node_to_node_vote\nReceive Message: NODES_TO_CONSENSUS_NODE_VOTE_RESULTS");
+        }
+      }
+      else if (memcmp(current_round_part,"4",1) == 0)
+      {
+        if (parse_json_data(message,"block_blob",trusted_block_verifiers_VRF_data.block_blob[trusted_block_verifiers_VRF_data.count]) == 0)
+        {
+          SERVER_RECEIVE_DATA_SOCKET_NOTE_TO_NODE_VOTE_ERROR("Could not parse data\nFunction: server_receive_data_socket_node_to_node_vote\nReceive Message: NODES_TO_CONSENSUS_NODE_VOTE_RESULTS");
+        }
+      }
+      trusted_block_verifiers_VRF_data.count++;
+    }
+  }
   
 
   return 1;
