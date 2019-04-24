@@ -109,6 +109,7 @@ int get_block_verifiers_list()
   char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
   char* settings = (char*)calloc(BUFFER_SIZE,sizeof(char));
   size_t count = 0;
+  size_t count2 = 0;
   size_t field_name_length;
 
   // define macros
@@ -169,127 +170,39 @@ int get_block_verifiers_list()
       memcpy(data,message,strnlen(message,BUFFER_SIZE));
       bson_free(message); 
 
-      if (strstr(data,"\"delegate_number\" : \"1\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"2\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"3\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"4\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"5\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"6\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"7\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"8\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"9\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"10\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"11\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"12\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"13\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"14\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"15\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"16\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"17\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"18\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"19\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"20\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"21\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"22\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"23\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"24\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"25\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"26\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"27\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"28\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"29\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"30\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"31\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"32\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"33\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"34\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"35\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"36\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"37\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"38\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"39\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"40\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"41\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"42\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"43\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"44\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"45\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"46\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"47\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"48\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"49\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"50\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"51\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"52\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"53\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"54\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"55\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"56\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"57\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"58\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"59\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"60\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"61\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"62\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"63\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"64\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"65\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"66\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"67\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"68\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"69\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"70\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"71\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"72\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"73\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"74\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"75\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"76\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"77\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"78\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"79\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"80\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"81\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"82\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"83\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"84\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"85\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"86\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"87\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"88\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"89\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"90\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"91\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"92\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"93\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"94\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"95\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"96\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"97\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"98\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"99\"") != NULL ||
-          strstr(data,"\"delegate_number\" : \"100\"") != NULL)
-      {        
-        // parse the delegate_name
+      for (count2 = 0; count < BLOCK_VERIFIERS_AMOUNT; count2++)
+      {
+        // create the message
         memset(settings,0,strnlen(settings,BUFFER_SIZE));
-        memcpy(settings,", \"delegate_name\" : \"",21);
-        message_copy1 = strstr(data,settings) + 21;
-        message_copy2 = strstr(message_copy1,"\"");
-        memcpy(block_verifiers_list.block_verifiers_name[count],message_copy1,message_copy2 - message_copy1);
-        // parse the public_address
-        memset(settings,0,strnlen(settings,BUFFER_SIZE));
-        memcpy(settings,", \"public_address\" : \"",22);
-        message_copy1 = strstr(data,settings) + 22;
-        message_copy2 = strstr(message_copy1,"\"");
-        memcpy(block_verifiers_list.block_verifiers_public_address[count],message_copy1,message_copy2 - message_copy1);
-        // parse the IP_address
-        memset(settings,0,strnlen(settings,BUFFER_SIZE));
-        memcpy(settings,", \"IP_address\" : \"",18);
-        message_copy1 = strstr(data,settings) + 18;
-        message_copy2 = strstr(message_copy1,"\"");
-        memcpy(block_verifiers_list.block_verifiers_IP_address[count],message_copy1,message_copy2 - message_copy1);
-        count++;
+        memcpy(settings,"\"delegate_number\" : \"",22);
+        sprintf(settings+22,"%zu",count2+1);
+        memcpy(settings+strnlen(settings,BUFFER_SIZE),"\"",1);
+
+        if (strstr(data,settings) != NULL)
+        {
+          // parse the delegate_name
+          memset(settings,0,strnlen(settings,BUFFER_SIZE));
+          memcpy(settings,", \"delegate_name\" : \"",21);
+          message_copy1 = strstr(data,settings) + 21;
+          message_copy2 = strstr(message_copy1,"\"");
+          memcpy(block_verifiers_list.block_verifiers_name[count2],message_copy1,message_copy2 - message_copy1);
+          // parse the public_address
+          memset(settings,0,strnlen(settings,BUFFER_SIZE));
+          memcpy(settings,", \"public_address\" : \"",22);
+          message_copy1 = strstr(data,settings) + 22;
+          message_copy2 = strstr(message_copy1,"\"");
+          memcpy(block_verifiers_list.block_verifiers_public_address[count2],message_copy1,message_copy2 - message_copy1);
+          // parse the IP_address
+          memset(settings,0,strnlen(settings,BUFFER_SIZE));
+          memcpy(settings,", \"IP_address\" : \"",18);
+          message_copy1 = strstr(data,settings) + 18;
+          message_copy2 = strstr(message_copy1,"\"");
+          memcpy(block_verifiers_list.block_verifiers_IP_address[count2],message_copy1,message_copy2 - message_copy1);
+          count++;
+          break;
+        }
       }
+
       // check if that is the total amount of documents to read
       if (count == BLOCK_VERIFIERS_AMOUNT)
       {
