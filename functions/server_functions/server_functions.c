@@ -1760,8 +1760,7 @@ int server_receive_data_socket_node_to_node_vote(char* message)
       }
       trusted_block_verifiers_VRF_data.count++;
     }
-  }
-  
+  }  
 
   return 1;
 
@@ -2192,11 +2191,34 @@ int create_new_block()
   }
 
   // add the VRF_data struct to the blockchain_data struct
+  blockchain_data.blockchain_reserve_bytes.vrf_public_key_length_round_part_1 = VRF_PUBLIC_KEY_LENGTH;
+  memcpy(blockchain_data.blockchain_reserve_bytes.vrf_public_key_round_part_1,VRF_data.vrf_public_key_round_part_1,blockchain_data.blockchain_reserve_bytes.vrf_public_key_length_round_part_1);
+  blockchain_data.blockchain_reserve_bytes.vrf_alpha_string_length_round_part_1 = strnlen(VRF_data.vrf_alpha_string_round_part_1,BUFFER_SIZE);
+  memcpy(blockchain_data.blockchain_reserve_bytes.vrf_alpha_string_round_part_1,VRF_data.vrf_alpha_string_round_part_1,blockchain_data.blockchain_reserve_bytes.vrf_alpha_string_length_round_part_1);
+  blockchain_data.blockchain_reserve_bytes.vrf_proof_length_round_part_1 = VRF_PROOF_LENGTH;
+  memcpy(blockchain_data.blockchain_reserve_bytes.vrf_proof_round_part_1,VRF_data.vrf_proof_round_part_1,blockchain_data.blockchain_reserve_bytes.vrf_proof_length_round_part_1);
+  blockchain_data.blockchain_reserve_bytes.vrf_beta_string_length_round_part_1 = VRF_BETA_LENGTH;
+  memcpy(blockchain_data.blockchain_reserve_bytes.vrf_beta_string_round_part_1,VRF_data.vrf_beta_string_round_part_1,blockchain_data.blockchain_reserve_bytes.vrf_beta_string_length_round_part_1);
+  blockchain_data.blockchain_reserve_bytes.vrf_public_key_length_round_part_2 = VRF_PUBLIC_KEY_LENGTH;
+  memcpy(blockchain_data.blockchain_reserve_bytes.vrf_public_key_round_part_2,VRF_data.vrf_public_key_round_part_2,blockchain_data.blockchain_reserve_bytes.vrf_public_key_length_round_part_2);
+  blockchain_data.blockchain_reserve_bytes.vrf_alpha_string_length_round_part_2 = strnlen(VRF_data.vrf_alpha_string_round_part_2,BUFFER_SIZE);
+  memcpy(blockchain_data.blockchain_reserve_bytes.vrf_alpha_string_round_part_2,VRF_data.vrf_alpha_string_round_part_2,blockchain_data.blockchain_reserve_bytes.vrf_alpha_string_length_round_part_2);
+  blockchain_data.blockchain_reserve_bytes.vrf_proof_length_round_part_2 = VRF_PROOF_LENGTH;
+  memcpy(blockchain_data.blockchain_reserve_bytes.vrf_proof_round_part_2,VRF_data.vrf_proof_round_part_2,blockchain_data.blockchain_reserve_bytes.vrf_proof_length_round_part_2);
+  blockchain_data.blockchain_reserve_bytes.vrf_beta_string_length_round_part_2 = VRF_BETA_LENGTH;
+  memcpy(blockchain_data.blockchain_reserve_bytes.vrf_beta_string_round_part_2,VRF_data.vrf_beta_string_round_part_2,blockchain_data.blockchain_reserve_bytes.vrf_beta_string_length_round_part_2);
+  blockchain_data.blockchain_reserve_bytes.vrf_public_key_length_round_part_3 = VRF_PUBLIC_KEY_LENGTH;
+  memcpy(blockchain_data.blockchain_reserve_bytes.vrf_public_key_round_part_3,VRF_data.vrf_public_key_round_part_3,blockchain_data.blockchain_reserve_bytes.vrf_public_key_length_round_part_3);
+  blockchain_data.blockchain_reserve_bytes.vrf_alpha_string_length_round_part_3 = strnlen(VRF_data.vrf_alpha_string_round_part_3,BUFFER_SIZE);
+  memcpy(blockchain_data.blockchain_reserve_bytes.vrf_alpha_string_round_part_3,VRF_data.vrf_alpha_string_round_part_3,blockchain_data.blockchain_reserve_bytes.vrf_alpha_string_length_round_part_3);
+  blockchain_data.blockchain_reserve_bytes.vrf_proof_length_round_part_3 = VRF_PROOF_LENGTH;
+  memcpy(blockchain_data.blockchain_reserve_bytes.vrf_proof_round_part_3,VRF_data.vrf_proof_round_part_3,blockchain_data.blockchain_reserve_bytes.vrf_proof_length_round_part_3);
+  blockchain_data.blockchain_reserve_bytes.vrf_beta_string_length_round_part_3 = VRF_BETA_LENGTH;
+  memcpy(blockchain_data.blockchain_reserve_bytes.vrf_beta_string_round_part_3,VRF_data.vrf_beta_string_round_part_3,blockchain_data.blockchain_reserve_bytes.vrf_beta_string_length_round_part_3);
 
-
-  // change the nonce to the CONSENSUS_NODE_NETWORK_BLOCK_NONCE
+  // change the nonce to the BLOCK_PRODUCER_NETWORK_BLOCK_NONCE
   memset(blockchain_data.nonce_data,0,strnlen(blockchain_data.nonce_data,9));
-  memcpy(blockchain_data.nonce_data,CONSENSUS_NODE_NETWORK_BLOCK_NONCE,8);
+  memcpy(blockchain_data.nonce_data,BLOCK_PRODUCER_NETWORK_BLOCK_NONCE,8);
 
   // convert the blockchain_data to a network_block_string
   memset(data,0,strnlen(data,BUFFER_SIZE));
