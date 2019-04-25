@@ -65,6 +65,7 @@ Using define statements instead of constants for increased efficiency
 #define RESERVE_PROOFS_LIST_MAXIMUM_AMOUNT 20000 // the maximum amount of reserve proofs (total_supply / xcash_proof_of_stake_minimum_amount)
 #define XCASH_PROOF_OF_STAKE_MINIMUM_AMOUNT 5000000000000 // the minimum amount the reserve proof can be created for
 #define BLOCK_VALIDATION_NODES_TOTAL_AMOUNT 100 // The total amount of block validation nodes
+#define DATA_HASH_LENGTH 128 // The length of the SHA2-512 hash
 #define BLOCK_VALIDATION_NODES_AMOUNT 100 // The amount of block validation nodes needed to make the network block valid
 #define BLOCK_VERIFIERS_AMOUNT 100 // The amount of block verifiers in a round
 #define BLOCK_VERIFIERS_VALID_AMOUNT 67 // The amount of block verifiers that need to vote true for the part of the round to be valid.

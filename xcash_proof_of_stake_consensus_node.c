@@ -181,19 +181,20 @@ int main(int parameters_count, char* parameters[])
   for (count = 0; count < BLOCK_VERIFIERS_AMOUNT; count++)
   {
     trusted_block_verifiers_VRF_data.public_address[count] = (char*)calloc(XCASH_WALLET_LENGTH+1,sizeof(char));
-    trusted_block_verifiers_VRF_data.vrf_public_key_round_part_1[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
+    trusted_block_verifiers_VRF_data.vrf_public_key_round_part_1[count] = (char*)calloc(VRF_PUBLIC_KEY_LENGTH+1,sizeof(char));
     trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_1[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
-    trusted_block_verifiers_VRF_data.vrf_proof_round_part_1[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
-    trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_1[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
-    trusted_block_verifiers_VRF_data.vrf_public_key_round_part_2[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
+    trusted_block_verifiers_VRF_data.vrf_proof_round_part_1[count] = (char*)calloc(VRF_PROOF_LENGTH+1,sizeof(char));
+    trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_1[count] = (char*)calloc(VRF_BETA_LENGTH+1,sizeof(char));
+    trusted_block_verifiers_VRF_data.vrf_public_key_round_part_2[count] = (char*)calloc(VRF_PUBLIC_KEY_LENGTH+1,sizeof(char));
     trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_2[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
-    trusted_block_verifiers_VRF_data.vrf_proof_round_part_2[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
-    trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_2[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
-    trusted_block_verifiers_VRF_data.vrf_public_key_round_part_3[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
+    trusted_block_verifiers_VRF_data.vrf_proof_round_part_2[count] = (char*)calloc(VRF_PROOF_LENGTH+1,sizeof(char));
+    trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_2[count] = (char*)calloc(VRF_BETA_LENGTH+1,sizeof(char));
+    trusted_block_verifiers_VRF_data.vrf_public_key_round_part_3[count] = (char*)calloc(VRF_PUBLIC_KEY_LENGTH+1,sizeof(char));
     trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_3[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
-    trusted_block_verifiers_VRF_data.vrf_proof_round_part_3[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
-    trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_3[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
+    trusted_block_verifiers_VRF_data.vrf_proof_round_part_3[count] = (char*)calloc(VRF_PROOF_LENGTH+1,sizeof(char));
+    trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_3[count] = (char*)calloc(VRF_BETA_LENGTH+1,sizeof(char));
     trusted_block_verifiers_VRF_data.block_blob[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
+    trusted_block_verifiers_VRF_data.data_hash[count] = (char*)calloc(DATA_HASH_LENGTH,sizeof(char));
 
     // check if the memory needed was allocated on the heap successfully
     if (trusted_block_verifiers_VRF_data.public_address[count] == NULL || trusted_block_verifiers_VRF_data.vrf_public_key_round_part_1[count] == NULL  || trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_1[count] == NULL  || trusted_block_verifiers_VRF_data.vrf_proof_round_part_1[count] == NULL  || trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_1[count] == NULL || trusted_block_verifiers_VRF_data.vrf_public_key_round_part_2[count] == NULL  || trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_2[count] == NULL  || trusted_block_verifiers_VRF_data.vrf_proof_round_part_2[count] == NULL  || trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_2[count] == NULL || trusted_block_verifiers_VRF_data.vrf_public_key_round_part_3[count] == NULL  || trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_3[count] == NULL  || trusted_block_verifiers_VRF_data.vrf_proof_round_part_3[count] == NULL  || trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_3[count] == NULL || trusted_block_verifiers_VRF_data.block_blob[count] == NULL)

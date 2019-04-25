@@ -20,6 +20,9 @@
 #include "network_wallet_functions.h"
 #include "server_functions.h"
 #include "thread_server_functions.h"
+#include "vrf.h"
+#include "crypto_vrf.h"
+#include "VRF_functions.h"
 
 /*
 -----------------------------------------------------------------------------------------------------------
@@ -87,65 +90,6 @@ void* total_connection_time_thread(void* parameters)
 }
 
 
-/*
------------------------------------------------------------------------------------------------------------
-Name: mainnode_timeout_thread
-Description: Closes the forked process after a certain connection timeout. This is so the node knows if it should send a message to the consensus node that the main node never sent any data, and if a round change should occur
-Parameters:
-  parameters - A pointer to the mainnode_timeout_thread_parameters struct
-  struct mainnode_timeout_thread_parameters
-    process_id - The process id of the forked process
-    data_received - 1 if the node has received data from the main node, otherwise 0
-    main_nodes_public_address - The public address of the main node for that part of the round
-    current_round_part - The current round part (1-4).
-    current_round_part_backup_node - The current main node in the current round part (0-5)
-Return: NULL
------------------------------------------------------------------------------------------------------------
-*/
-
-void* mainnode_timeout_thread(void* parameters)
-{
-  // Variables
-  char* string = (char*)calloc(BUFFER_SIZE,sizeof(char));
-  struct mainnode_timeout_thread_parameters* data = parameters;
-  size_t main_node_length = strnlen(data->main_node,BUFFER_SIZE);
-
-  // check if the memory needed was allocated on the heap successfully
-  if (string == NULL)
-  {
-    color_print("Could not allocate the memory needed on the heap","red");
-    exit(0);
-  }
-
-  sleep(TOTAL_CONNECTION_TIME_SETTINGS_MAIN_NODE_TIMEOUT);  
-  printf("Total connection time for the main node has been reached"); 
-  if (data->data_received == 1)
-  {
-    memcpy(string,"Received data from main node, ",30);
-    memcpy(string+30,data->main_node,main_node_length);
-    memcpy(string+30+main_node_length," backup node number ",20);
-    memcpy(string+50+main_node_length,data->current_round_part_backup_node,1);
-    memcpy(string+51+main_node_length," in current round part ",23);
-    memcpy(string+74+main_node_length,data->current_round_part,1);
-    color_print(string,"green");
-  }
-  else
-  {
-    memcpy(string,"main node, ",11);
-    memcpy(string+11,data->main_node,main_node_length);
-    memcpy(string+11+main_node_length," backup node number ",20);
-    memcpy(string+31+main_node_length,data->current_round_part_backup_node,1);
-    memcpy(string+32+main_node_length," in current round part ",23);
-    memcpy(string+55+main_node_length,data->current_round_part,1);
-    memcpy(string+56+main_node_length," did not send any data before the timeout",41);
-    color_print(string,"red");    
-  }
-  pointer_reset(string);
-  kill((intptr_t)data->process_id, SIGTERM);
-  pthread_exit((void *)(intptr_t)1);
-}
-
-
 
 /*
 -----------------------------------------------------------------------------------------------------------
@@ -158,6 +102,7 @@ Return: NULL
 void* receive_votes_from_nodes_timeout_thread()
 {  
   // Variables
+  char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
   size_t count;
   size_t count2;
   size_t counter;
@@ -171,6 +116,13 @@ void* receive_votes_from_nodes_timeout_thread()
   #define RECEIVE_VOTES_FROM_NODES_TIMEOUT_THREAD_ERROR(settings) \
   color_print(settings,"red"); \
   return 0;
+
+  // check if the memory needed was allocated on the heap successfully
+  if (data == NULL)
+  {
+    color_print("Could not allocate the memory needed on the heap","red");
+    exit(0);
+  }
 
   for (;;)
   {  
@@ -186,7 +138,204 @@ void* receive_votes_from_nodes_timeout_thread()
   }
 
   // check if the trusted nodes for at least TRUSTED_BLOCK_VERIFIERS_AMOUNT have the same result and get the VRF from the trusted nodes
+  memset(data,0,strnlen(data,BUFFER_SIZE));
+  memcpy(data,trusted_block_verifiers_VRF_data.data_hash[0],strnlen(trusted_block_verifiers_VRF_data.data_hash[0],DATA_HASH_LENGTH));
+  for (count = 1, count2 = 0, settings = 0; count < trusted_block_verifiers_VRF_data.count; count++)
+  {
+    if (memcmp(trusted_block_verifiers_VRF_data.data_hash[count],data,DATA_HASH_LENGTH) == 0)
+    {
+      settings = count;
+      count2++;
+    }
+    else
+    {
+      memset(data,0,strnlen(data,BUFFER_SIZE));
+      memcpy(data,trusted_block_verifiers_VRF_data.data_hash[count],strnlen(trusted_block_verifiers_VRF_data.data_hash[0],DATA_HASH_LENGTH));
+    }
+  }
 
+  if (count2 >= TRUSTED_BLOCK_VERIFIERS_AMOUNT)
+  {    
+    // Add the VRF data for this part of the round to the VRF_data and the database
+    if (memcmp(current_round_part,"1",1) == 0)
+    {
+      // verify the VRF data
+      settings2 = crypto_vrf_verify(trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_1[settings],trusted_block_verifiers_VRF_data.vrf_public_key_round_part_1[settings],trusted_block_verifiers_VRF_data.vrf_proof_round_part_1[settings],trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_1[settings],strnlen(trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_1[settings],BUFFER_SIZE));
+      if (settings2 == 1)
+      {
+        // The vote for false is valid
+        settings = 3;
+        goto end;
+      }
+      memset(VRF_data.vrf_public_key_round_part_1,0,strnlen(VRF_data.vrf_public_key_round_part_1,VRF_PUBLIC_KEY_LENGTH));
+      memset(VRF_data.vrf_alpha_string_round_part_1,0,strnlen(VRF_data.vrf_alpha_string_round_part_1,BUFFER_SIZE));
+      memset(VRF_data.vrf_proof_round_part_1,0,strnlen(VRF_data.vrf_proof_round_part_1,VRF_PROOF_LENGTH));
+      memset(VRF_data.vrf_beta_string_round_part_1,0,strnlen(VRF_data.vrf_beta_string_round_part_1,VRF_BETA_LENGTH));
+      memcpy(VRF_data.vrf_public_key_round_part_1,trusted_block_verifiers_VRF_data.vrf_public_key_round_part_1[settings],strnlen(trusted_block_verifiers_VRF_data.vrf_public_key_round_part_1[settings],VRF_PUBLIC_KEY_LENGTH));
+      memcpy(VRF_data.vrf_alpha_string_round_part_1,trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_1[settings],strnlen(trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_1[settings],BUFFER_SIZE));
+      memcpy(VRF_data.vrf_proof_round_part_1,trusted_block_verifiers_VRF_data.vrf_proof_round_part_1[settings],strnlen(trusted_block_verifiers_VRF_data.vrf_proof_round_part_1[settings],VRF_PROOF_LENGTH));
+      memcpy(VRF_data.vrf_beta_string_round_part_1,trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_1[settings],strnlen(trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_1[settings],VRF_BETA_LENGTH));
+      // create the message
+      memset(data,0,strnlen(data,BUFFER_SIZE));
+      memcpy(data,"{\"vrf_public_key_round_part_1\":\"",32);
+      memcpy(data+32,VRF_data.vrf_public_key_round_part_1,VRF_PUBLIC_KEY_LENGTH);
+      memcpy(data+32+VRF_PUBLIC_KEY_LENGTH,"\"}",2);
+      if (update_document_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,data,0) == 0)
+      {
+        RECEIVE_VOTES_FROM_NODES_TIMEOUT_THREAD_ERROR("Could not update the vrf_public_key_round_part_1 in the database\nFunction: receive_votes_from_nodes_timeout_thread");
+      }
+      memset(data,0,strnlen(data,BUFFER_SIZE));
+      memcpy(data,"{\"vrf_alpha_string_round_part_1\":\"",34);
+      memcpy(data+34,VRF_data.vrf_alpha_string_round_part_1,strnlen(VRF_data.vrf_alpha_string_round_part_1,BUFFER_SIZE));
+      memcpy(data+strnlen(VRF_data.vrf_alpha_string_round_part_1,BUFFER_SIZE),"\"}",2);
+      if (update_document_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,data,0) == 0)
+      {
+        RECEIVE_VOTES_FROM_NODES_TIMEOUT_THREAD_ERROR("Could not update the vrf_alpha_string_round_part_1 in the database\nFunction: receive_votes_from_nodes_timeout_thread");
+      }
+      memset(data,0,strnlen(data,BUFFER_SIZE));
+      memcpy(data,"{\"vrf_proof_round_part_1\":\"",27);
+      memcpy(data+27,VRF_data.vrf_proof_round_part_1,VRF_PROOF_LENGTH);
+      memcpy(data+27,"\"}",2);
+      if (update_document_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,data,0) == 0)
+      {
+        RECEIVE_VOTES_FROM_NODES_TIMEOUT_THREAD_ERROR("Could not update the vrf_proof_round_part_1 in the database\nFunction: receive_votes_from_nodes_timeout_thread");
+      }
+      memset(data,0,strnlen(data,BUFFER_SIZE));
+      memcpy(data,"{\"vrf_beta_string_round_part_1\":\"",33);
+      memcpy(data+33,VRF_data.vrf_beta_string_round_part_1,VRF_BETA_LENGTH);
+      memcpy(data+33+VRF_BETA_LENGTH,"\"}",2);
+      if (update_document_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,data,0) == 0)
+      {
+        RECEIVE_VOTES_FROM_NODES_TIMEOUT_THREAD_ERROR("Could not update the vrf_beta_string_round_part_1 in the database\nFunction: receive_votes_from_nodes_timeout_thread");
+      }
+    } 
+    else if (memcmp(current_round_part,"2",1) == 0)
+    {
+      // verify the VRF data
+      settings2 = crypto_vrf_verify(trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_2[settings],trusted_block_verifiers_VRF_data.vrf_public_key_round_part_2[settings],trusted_block_verifiers_VRF_data.vrf_proof_round_part_2[settings],trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_2[settings],strnlen(trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_2[settings],BUFFER_SIZE));
+      if (settings2 == 1)
+      {
+        // The vote for false is valid
+        settings = 3;
+        goto end;
+      }
+      memset(VRF_data.vrf_public_key_round_part_2,0,strnlen(VRF_data.vrf_public_key_round_part_2,VRF_PUBLIC_KEY_LENGTH));
+      memset(VRF_data.vrf_alpha_string_round_part_2,0,strnlen(VRF_data.vrf_alpha_string_round_part_2,BUFFER_SIZE));
+      memset(VRF_data.vrf_proof_round_part_2,0,strnlen(VRF_data.vrf_proof_round_part_2,VRF_PROOF_LENGTH));
+      memset(VRF_data.vrf_beta_string_round_part_2,0,strnlen(VRF_data.vrf_beta_string_round_part_2,VRF_BETA_LENGTH));
+      memcpy(VRF_data.vrf_public_key_round_part_2,trusted_block_verifiers_VRF_data.vrf_public_key_round_part_2[settings],strnlen(trusted_block_verifiers_VRF_data.vrf_public_key_round_part_2[settings],VRF_PUBLIC_KEY_LENGTH));
+      memcpy(VRF_data.vrf_alpha_string_round_part_2,trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_2[settings],strnlen(trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_2[settings],BUFFER_SIZE));
+      memcpy(VRF_data.vrf_proof_round_part_2,trusted_block_verifiers_VRF_data.vrf_proof_round_part_2[settings],strnlen(trusted_block_verifiers_VRF_data.vrf_proof_round_part_2[settings],VRF_PROOF_LENGTH));
+      memcpy(VRF_data.vrf_beta_string_round_part_2,trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_2[settings],strnlen(trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_2[settings],VRF_BETA_LENGTH));
+      // create the message
+      memset(data,0,strnlen(data,BUFFER_SIZE));
+      memcpy(data,"{\"vrf_public_key_round_part_2\":\"",32);
+      memcpy(data+32,VRF_data.vrf_public_key_round_part_2,VRF_PUBLIC_KEY_LENGTH);
+      memcpy(data+32+VRF_PUBLIC_KEY_LENGTH,"\"}",2);
+      if (update_document_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,data,0) == 0)
+      {
+        RECEIVE_VOTES_FROM_NODES_TIMEOUT_THREAD_ERROR("Could not update the vrf_public_key_round_part_2 in the database\nFunction: receive_votes_from_nodes_timeout_thread");
+      }
+      memset(data,0,strnlen(data,BUFFER_SIZE));
+      memcpy(data,"{\"vrf_alpha_string_round_part_2\":\"",34);
+      memcpy(data+34,VRF_data.vrf_alpha_string_round_part_2,strnlen(VRF_data.vrf_alpha_string_round_part_1,BUFFER_SIZE));
+      memcpy(data+strnlen(VRF_data.vrf_alpha_string_round_part_1,BUFFER_SIZE),"\"}",2);
+      if (update_document_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,data,0) == 0)
+      {
+        RECEIVE_VOTES_FROM_NODES_TIMEOUT_THREAD_ERROR("Could not update the vrf_alpha_string_round_part_2 in the database\nFunction: receive_votes_from_nodes_timeout_thread");
+      }
+      memset(data,0,strnlen(data,BUFFER_SIZE));
+      memcpy(data,"{\"vrf_proof_round_part_2\":\"",27);
+      memcpy(data+27,VRF_data.vrf_proof_round_part_2,VRF_PROOF_LENGTH);
+      memcpy(data+27+VRF_PROOF_LENGTH,"\"}",2);
+      if (update_document_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,data,0) == 0)
+      {
+        RECEIVE_VOTES_FROM_NODES_TIMEOUT_THREAD_ERROR("Could not update the vrf_proof_round_part_2 in the database\nFunction: receive_votes_from_nodes_timeout_thread");
+      }
+      memset(data,0,strnlen(data,BUFFER_SIZE));
+      memcpy(data,"{\"vrf_beta_string_round_part_2\":\"",33);
+      memcpy(data+33,VRF_data.vrf_beta_string_round_part_2,VRF_BETA_LENGTH);
+      memcpy(data+33+VRF_BETA_LENGTH,"\"}",2);
+      if (update_document_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,data,0) == 0)
+      {
+        RECEIVE_VOTES_FROM_NODES_TIMEOUT_THREAD_ERROR("Could not update the vrf_beta_string_round_part_2 in the database\nFunction: receive_votes_from_nodes_timeout_thread");
+      }
+    }
+    else if (memcmp(current_round_part,"3",1) == 0)
+    {
+      // verify the VRF data
+      settings2 = crypto_vrf_verify(trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_3[settings],trusted_block_verifiers_VRF_data.vrf_public_key_round_part_3[settings],trusted_block_verifiers_VRF_data.vrf_proof_round_part_3[settings],trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_3[settings],strnlen(trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_3[settings],BUFFER_SIZE));
+      if (settings2 == 1)
+      {
+        // The vote for false is valid
+        settings = 3;
+        goto end;
+      }
+      memset(VRF_data.vrf_public_key_round_part_3,0,strnlen(VRF_data.vrf_public_key_round_part_3,VRF_PUBLIC_KEY_LENGTH));
+      memset(VRF_data.vrf_alpha_string_round_part_3,0,strnlen(VRF_data.vrf_alpha_string_round_part_3,BUFFER_SIZE));
+      memset(VRF_data.vrf_proof_round_part_3,0,strnlen(VRF_data.vrf_proof_round_part_3,VRF_PROOF_LENGTH));
+      memset(VRF_data.vrf_beta_string_round_part_3,0,strnlen(VRF_data.vrf_beta_string_round_part_3,VRF_BETA_LENGTH));
+      memcpy(VRF_data.vrf_public_key_round_part_3,trusted_block_verifiers_VRF_data.vrf_public_key_round_part_3[settings],strnlen(trusted_block_verifiers_VRF_data.vrf_public_key_round_part_3[settings],VRF_PUBLIC_KEY_LENGTH));
+      memcpy(VRF_data.vrf_alpha_string_round_part_3,trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_3[settings],strnlen(trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_3[settings],BUFFER_SIZE));
+      memcpy(VRF_data.vrf_proof_round_part_3,trusted_block_verifiers_VRF_data.vrf_proof_round_part_3[settings],strnlen(trusted_block_verifiers_VRF_data.vrf_proof_round_part_3[settings],VRF_PROOF_LENGTH));
+      memcpy(VRF_data.vrf_beta_string_round_part_3,trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_3[settings],strnlen(trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_3[settings],VRF_BETA_LENGTH));
+      // create the message
+      memset(data,0,strnlen(data,BUFFER_SIZE));
+      memcpy(data,"{\"vrf_public_key_round_part_3\":\"",32);
+      memcpy(data+32,VRF_data.vrf_public_key_round_part_3,VRF_PUBLIC_KEY_LENGTH);
+      memcpy(data+32+VRF_PUBLIC_KEY_LENGTH,"\"}",2);
+      if (update_document_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,data,0) == 0)
+      {
+        RECEIVE_VOTES_FROM_NODES_TIMEOUT_THREAD_ERROR("Could not update the vrf_public_key_round_part_3 in the database\nFunction: receive_votes_from_nodes_timeout_thread");
+      }
+      memset(data,0,strnlen(data,BUFFER_SIZE));
+      memcpy(data,"{\"vrf_alpha_string_round_part_3\":\"",34);
+      memcpy(data+34,VRF_data.vrf_alpha_string_round_part_3,strnlen(VRF_data.vrf_alpha_string_round_part_1,BUFFER_SIZE));
+      memcpy(data+strnlen(VRF_data.vrf_alpha_string_round_part_1,BUFFER_SIZE),"\"}",2);
+      if (update_document_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,data,0) == 0)
+      {
+        RECEIVE_VOTES_FROM_NODES_TIMEOUT_THREAD_ERROR("Could not update the vrf_alpha_string_round_part_3 in the database\nFunction: receive_votes_from_nodes_timeout_thread");
+      }
+      memset(data,0,strnlen(data,BUFFER_SIZE));
+      memcpy(data,"{\"vrf_proof_round_part_3\":\"",27);
+      memcpy(data+27,VRF_data.vrf_proof_round_part_3,VRF_PROOF_LENGTH);
+      memcpy(data+27+VRF_PROOF_LENGTH,"\"}",2);
+      if (update_document_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,data,0) == 0)
+      {
+        RECEIVE_VOTES_FROM_NODES_TIMEOUT_THREAD_ERROR("Could not update the vrf_proof_round_part_3 in the database\nFunction: receive_votes_from_nodes_timeout_thread");
+      }
+      memset(data,0,strnlen(data,BUFFER_SIZE));
+      memcpy(data,"{\"vrf_beta_string_round_part_3\":\"",33);
+      memcpy(data+33,VRF_data.vrf_beta_string_round_part_3,VRF_BETA_LENGTH);
+      memcpy(data+33+VRF_BETA_LENGTH,"\"}",2);
+      if (update_document_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,data,0) == 0)
+      {
+        RECEIVE_VOTES_FROM_NODES_TIMEOUT_THREAD_ERROR("Could not update the vrf_beta_string_round_part_3 in the database\nFunction: receive_votes_from_nodes_timeout_thread");
+      }
+    }
+    else if (memcmp(current_round_part,"4",1) == 0)
+    {
+      settings2 = 0;
+      memset(VRF_data.block_blob,0,strnlen(VRF_data.block_blob,BUFFER_SIZE));
+      memcpy(VRF_data.block_blob,trusted_block_verifiers_VRF_data.block_blob[settings],strnlen(trusted_block_verifiers_VRF_data.block_blob[settings],BUFFER_SIZE));
+      // create the message
+      memset(data,0,strnlen(data,BUFFER_SIZE));
+      memcpy(data,"{\"block_blob\":\"",32);
+      memcpy(data+32,VRF_data.block_blob,strnlen(VRF_data.block_blob,BUFFER_SIZE));
+      memcpy(data+strnlen(VRF_data.block_blob,BUFFER_SIZE),"\"}",2);
+      if (update_document_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,data,0) == 0)
+      {
+        RECEIVE_VOTES_FROM_NODES_TIMEOUT_THREAD_ERROR("Could not update the vrf_public_key_round_part_3 in the database\nFunction: receive_votes_from_nodes_timeout_thread");
+      }
+    }                      
+  }
+  else
+  {
+    // The vote is false is valid
+    settings = 3;
+    goto end;
+  }
+  settings = 0;
 
   // check the mainnode_timeout vote results
   if (mainnode_timeout.vote_round_change_timeout >= BLOCK_VERIFIERS_VALID_AMOUNT)
@@ -230,12 +379,9 @@ void* receive_votes_from_nodes_timeout_thread()
           counter++;
         }
       }
-    }
-
-    // verify the VRF data for the current part of the round and set the result to settings2
+    }    
     
-    
-    if (counter >= TRUSTED_BLOCK_VERIFIERS_AMOUNT && settings2 == 1)
+    if (counter >= TRUSTED_BLOCK_VERIFIERS_AMOUNT && settings2 == 0)
     {
       // The vote for false is valid
       settings = 3;
@@ -263,11 +409,8 @@ void* receive_votes_from_nodes_timeout_thread()
         }
       }
     }
-
-    // verify the VRF data for the current part of the round and set the result to settings2
     
-    
-    if (counter >= TRUSTED_BLOCK_VERIFIERS_AMOUNT && settings2 == 1)
+    if (counter >= TRUSTED_BLOCK_VERIFIERS_AMOUNT && settings2 == 0)
     {
       // The vote for true is valid
       settings = 5;
@@ -286,6 +429,8 @@ void* receive_votes_from_nodes_timeout_thread()
   {
     settings = 7;
   }
+
+  end:
 
 
 
@@ -324,18 +469,20 @@ void* receive_votes_from_nodes_timeout_thread()
     for (count = 0; count < TRUSTED_BLOCK_VERIFIERS_AMOUNT; count++)
     {
       memset(trusted_block_verifiers_VRF_data.public_address[count],0,strnlen(trusted_block_verifiers_VRF_data.public_address[count],XCASH_WALLET_LENGTH+1));
-      memset(trusted_block_verifiers_VRF_data.vrf_public_key_round_part_1[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_public_key_round_part_1[count],BUFFER_SIZE));
+      memset(trusted_block_verifiers_VRF_data.vrf_public_key_round_part_1[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_public_key_round_part_1[count],VRF_PUBLIC_KEY_LENGTH));
       memset(trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_1[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_1[count],BUFFER_SIZE));
-      memset(trusted_block_verifiers_VRF_data.vrf_proof_round_part_1[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_proof_round_part_1[count],BUFFER_SIZE));
-      memset(trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_1[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_1[count],BUFFER_SIZE));
-      memset(trusted_block_verifiers_VRF_data.vrf_public_key_round_part_2[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_public_key_round_part_2[count],BUFFER_SIZE));
+      memset(trusted_block_verifiers_VRF_data.vrf_proof_round_part_1[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_proof_round_part_1[count],VRF_PROOF_LENGTH));
+      memset(trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_1[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_1[count],VRF_BETA_LENGTH));
+      memset(trusted_block_verifiers_VRF_data.vrf_public_key_round_part_2[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_public_key_round_part_2[count],VRF_PUBLIC_KEY_LENGTH));
       memset(trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_2[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_2[count],BUFFER_SIZE));
-      memset(trusted_block_verifiers_VRF_data.vrf_proof_round_part_2[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_proof_round_part_2[count],BUFFER_SIZE));
-      memset(trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_2[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_2[count],BUFFER_SIZE));
-      memset(trusted_block_verifiers_VRF_data.vrf_public_key_round_part_3[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_public_key_round_part_3[count],BUFFER_SIZE));
+      memset(trusted_block_verifiers_VRF_data.vrf_proof_round_part_2[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_proof_round_part_2[count],VRF_PROOF_LENGTH));
+      memset(trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_2[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_2[count],VRF_BETA_LENGTH));
+      memset(trusted_block_verifiers_VRF_data.vrf_public_key_round_part_3[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_public_key_round_part_3[count],VRF_PUBLIC_KEY_LENGTH));
       memset(trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_3[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_3[count],BUFFER_SIZE));
-      memset(trusted_block_verifiers_VRF_data.vrf_proof_round_part_3[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_proof_round_part_3[count],BUFFER_SIZE));
-      memset(trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_3[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_3[count],BUFFER_SIZE));
+      memset(trusted_block_verifiers_VRF_data.vrf_proof_round_part_3[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_proof_round_part_3[count],VRF_PROOF_LENGTH));
+      memset(trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_3[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_3[count],VRF_BETA_LENGTH));
+      memset(trusted_block_verifiers_VRF_data.block_blob[count],0,strnlen(trusted_block_verifiers_VRF_data.block_blob[count],BUFFER_SIZE));
+      memset(trusted_block_verifiers_VRF_data.data_hash[count],0,strnlen(trusted_block_verifiers_VRF_data.data_hash[count],DATA_HASH_LENGTH));
     }
   }
 

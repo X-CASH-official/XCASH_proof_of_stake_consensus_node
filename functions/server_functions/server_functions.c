@@ -26,7 +26,7 @@
 #include "server_functions.h"
 #include "string_functions.h"
 #include "thread_server_functions.h"
-
+#include "sha512EL.h"
 
 /*
 -----------------------------------------------------------------------------------------------------------
@@ -1653,6 +1653,7 @@ int server_receive_data_socket_node_to_node_vote(char* message)
   char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
   char* data2 = (char*)calloc(BUFFER_SIZE,sizeof(char));
   size_t count;
+  size_t counter;
 
   // define macros
   #define pointer_reset_all \
@@ -1757,8 +1758,19 @@ int server_receive_data_socket_node_to_node_vote(char* message)
         {
           SERVER_RECEIVE_DATA_SOCKET_NOTE_TO_NODE_VOTE_ERROR("Could not parse data\nFunction: server_receive_data_socket_node_to_node_vote\nReceive Message: NODES_TO_CONSENSUS_NODE_VOTE_RESULTS");
         }
-      }
-      trusted_block_verifiers_VRF_data.count++;
+        // SHA2-512 hash all of the VRF data
+        memset(data,0,strnlen(data,BUFFER_SIZE));
+        memcpy(data,trusted_block_verifiers_VRF_data.vrf_public_key_round_part_1[trusted_block_verifiers_VRF_data.count],strnlen(trusted_block_verifiers_VRF_data.vrf_public_key_round_part_1[trusted_block_verifiers_VRF_data.count],VRF_PUBLIC_KEY_LENGTH));
+        counter = strnlen(trusted_block_verifiers_VRF_data.vrf_public_key_round_part_1[trusted_block_verifiers_VRF_data.count],VRF_PUBLIC_KEY_LENGTH);
+        memcpy(data+counter,trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_1[trusted_block_verifiers_VRF_data.count],strnlen(trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_1[trusted_block_verifiers_VRF_data.count],BUFFER_SIZE));
+        counter += strnlen(trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_1[trusted_block_verifiers_VRF_data.count],BUFFER_SIZE);
+        memcpy(data+counter,trusted_block_verifiers_VRF_data.vrf_proof_round_part_1[trusted_block_verifiers_VRF_data.count],strnlen(trusted_block_verifiers_VRF_data.vrf_proof_round_part_1[trusted_block_verifiers_VRF_data.count],VRF_PROOF_LENGTH));
+        counter += strnlen(trusted_block_verifiers_VRF_data.vrf_proof_round_part_1[trusted_block_verifiers_VRF_data.count],VRF_PROOF_LENGTH);
+        memcpy(data+counter,trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_1[trusted_block_verifiers_VRF_data.count],strnlen(trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_1[trusted_block_verifiers_VRF_data.count],VRF_BETA_LENGTH));
+        counter += strnlen(trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_1[trusted_block_verifiers_VRF_data.count],VRF_BETA_LENGTH);
+        crypto_hash_sha512((unsigned char*)trusted_block_verifiers_VRF_data.data_hash[trusted_block_verifiers_VRF_data.count],(unsigned char*)data,(unsigned long long)strnlen(data,BUFFER_SIZE));
+        trusted_block_verifiers_VRF_data.count++;
+      }      
     }
   }  
 
