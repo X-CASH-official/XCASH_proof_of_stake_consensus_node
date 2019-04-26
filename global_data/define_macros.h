@@ -60,6 +60,9 @@ Using define statements instead of constants for increased efficiency
 #define NETWORK_BLOCK_TIME 300 // The network block time for the network in seconds (5 minutes)
 #define UPDATE_BLOCK_VERIFIERS_TIME 120 // The time it takes the consensus node to update all of the block verifiers (2 minutes)
 #define NETWORK_VERSION "0000" // the network version
+#define BLOCKCHAIN_RESERVED_BYTES_START "7c424c4f434b434841494e5f52455345525645445f42595445535f53544152547c"
+#define BLOCKCHAIN_DATA_SEGMENT_STRING "7c424c4f434b434841494e5f444154415f5345474d454e545f535452494e477c"
+#define BLOCKCHAIN_RESERVED_BYTES_END "7c424c4f434b434841494e5f52455345525645445f42595445535f454e447c"
 #define BLOCK_PRODUCER_NETWORK_BLOCK_NONCE "00000000" // the network block nonce used when the block producer creates the block
 #define CONSENSUS_NODE_NETWORK_BLOCK_NONCE "11111111" // the network block nonce used when the consensus node creates the block
 #define RESERVE_PROOFS_LIST_MAXIMUM_AMOUNT 20000 // the maximum amount of reserve proofs (total_supply / xcash_proof_of_stake_minimum_amount)
