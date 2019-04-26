@@ -160,7 +160,7 @@ void* receive_votes_from_nodes_timeout_thread()
     if (memcmp(current_round_part,"1",1) == 0)
     {
       // verify the VRF data
-      settings2 = crypto_vrf_verify(trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_1[settings],trusted_block_verifiers_VRF_data.vrf_public_key_round_part_1[settings],trusted_block_verifiers_VRF_data.vrf_proof_round_part_1[settings],trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_1[settings],strnlen(trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_1[settings],BUFFER_SIZE));
+      settings2 = crypto_vrf_verify((unsigned char*)trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_1[settings],(const unsigned char*)trusted_block_verifiers_VRF_data.vrf_public_key_round_part_1[settings],(const unsigned char*)trusted_block_verifiers_VRF_data.vrf_proof_round_part_1[settings],(const unsigned char*)trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_1[settings],(unsigned long long)strnlen(trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_1[settings],BUFFER_SIZE));
       if (settings2 == 1)
       {
         // The vote for false is valid
@@ -212,7 +212,7 @@ void* receive_votes_from_nodes_timeout_thread()
     else if (memcmp(current_round_part,"2",1) == 0)
     {
       // verify the VRF data
-      settings2 = crypto_vrf_verify(trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_2[settings],trusted_block_verifiers_VRF_data.vrf_public_key_round_part_2[settings],trusted_block_verifiers_VRF_data.vrf_proof_round_part_2[settings],trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_2[settings],strnlen(trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_2[settings],BUFFER_SIZE));
+      settings2 = crypto_vrf_verify((unsigned char*)trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_2[settings],(const unsigned char*)trusted_block_verifiers_VRF_data.vrf_public_key_round_part_2[settings],(const unsigned char*)trusted_block_verifiers_VRF_data.vrf_proof_round_part_2[settings],(const unsigned char*)trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_2[settings],(unsigned long long)strnlen(trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_2[settings],BUFFER_SIZE));
       if (settings2 == 1)
       {
         // The vote for false is valid
@@ -264,7 +264,7 @@ void* receive_votes_from_nodes_timeout_thread()
     else if (memcmp(current_round_part,"3",1) == 0)
     {
       // verify the VRF data
-      settings2 = crypto_vrf_verify(trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_3[settings],trusted_block_verifiers_VRF_data.vrf_public_key_round_part_3[settings],trusted_block_verifiers_VRF_data.vrf_proof_round_part_3[settings],trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_3[settings],strnlen(trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_3[settings],BUFFER_SIZE));
+      settings2 = crypto_vrf_verify((unsigned char*)trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_3[settings],(const unsigned char*)trusted_block_verifiers_VRF_data.vrf_public_key_round_part_3[settings],(const unsigned char*)trusted_block_verifiers_VRF_data.vrf_proof_round_part_3[settings],(const unsigned char*)trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_3[settings],(unsigned long long)strnlen(trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_3[settings],BUFFER_SIZE));
       if (settings2 == 1)
       {
         // The vote for false is valid
