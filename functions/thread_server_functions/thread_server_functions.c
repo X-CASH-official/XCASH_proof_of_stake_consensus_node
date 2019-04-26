@@ -828,7 +828,6 @@ void* update_block_verifiers_timer()
   long long int amount;
   mongoc_collection_t* collection;
   mongoc_cursor_t* document_settings;
-  bson_error_t error;
   bson_t* document = NULL;  
   char* message;
   char* message_copy1;
@@ -1050,7 +1049,7 @@ void* update_block_verifiers_timer()
           message_copy2 = strstr(message_copy1,"\"");
           memcpy(data3,message_copy1,message_copy2 - message_copy1);
 
-          memcpy(reserve_proofs_list.public_address_created_reserve_proof[count],data3,XCASH_WALLET_LENGTH);
+          memcpy(reserve_proofs_list.public_address_created_reserve_proof[reserve_proofs_list.count],data3,XCASH_WALLET_LENGTH);
           memset(data2,0,strnlen(data2,BUFFER_SIZE));
           memset(data3,0,strnlen(data3,BUFFER_SIZE));
 
@@ -1063,7 +1062,7 @@ void* update_block_verifiers_timer()
           message_copy2 = strstr(message_copy1,"\"");
           memcpy(data3,message_copy1,message_copy2 - message_copy1);
 
-          memcpy(reserve_proofs_list.public_address_voted_for[count],data3,XCASH_WALLET_LENGTH);
+          memcpy(reserve_proofs_list.public_address_voted_for[reserve_proofs_list.count],data3,XCASH_WALLET_LENGTH);
           memset(data2,0,strnlen(data2,BUFFER_SIZE));
           memset(data3,0,strnlen(data3,BUFFER_SIZE));
 
@@ -1076,13 +1075,13 @@ void* update_block_verifiers_timer()
           message_copy2 = strstr(message_copy1,"\"");
           memcpy(data3,message_copy1,message_copy2 - message_copy1);
 
-          memcpy(reserve_proofs_list.reserve_proof[count],data3,strnlen(data3,BUFFER_SIZE));
+          memcpy(reserve_proofs_list.reserve_proof[reserve_proofs_list.count],data3,strnlen(data3,BUFFER_SIZE));
           memset(data2,0,strnlen(data2,BUFFER_SIZE));
           memset(data3,0,strnlen(data3,BUFFER_SIZE));
 
-          reserve_proofs_list.settings[count] = 0;
-          reserve_proofs_list.amount[count] = 0;
-          reserve_proofs_list.number[count] = 0;
+          reserve_proofs_list.settings[reserve_proofs_list.count] = 0;
+          reserve_proofs_list.amount[reserve_proofs_list.count] = 0;
+          reserve_proofs_list.number[reserve_proofs_list.count] = 0;
 
           reserve_proofs_list.count++;
         }  

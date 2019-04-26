@@ -99,9 +99,8 @@ int get_block_verifiers_list()
   const bson_t* current_document;
 
   // Variables
-  mongoc_client_t* database_client_thread;
   mongoc_collection_t* collection;
-  mongoc_cursor_t* document_settings;
+  mongoc_cursor_t* document_settings = NULL;
   bson_t* document = NULL;  
   char* message;
   char* message_copy1;
@@ -110,7 +109,6 @@ int get_block_verifiers_list()
   char* settings = (char*)calloc(BUFFER_SIZE,sizeof(char));
   size_t count = 0;
   size_t count2 = 0;
-  size_t field_name_length;
 
   // define macros
   #define DATABASE_COLLECTION "delegates"
@@ -653,7 +651,6 @@ int mainode_consensus()
   // Variables
   char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
   char* data2 = (char*)calloc(BUFFER_SIZE,sizeof(char));
-  size_t count;
 
   // define macros
   #define DATABASE_COLLECTION "nodes"
@@ -2929,13 +2926,11 @@ int add_round_statistics()
   size_t most_VRF_node_public_and_private_key_total_rounds_count2 = 0;
   size_t most_VRF_node_random_data_total_rounds_count = 0;
   size_t most_VRF_node_random_data_total_rounds_count2 = 0;
-  size_t counter;
   double total;
   double total2;
   double total3;
   mongoc_collection_t* collection;
   mongoc_cursor_t* document_settings;
-  bson_error_t error;
   bson_t* document = NULL;  
   char* message;
   char* message_copy1;
@@ -3663,10 +3658,8 @@ Return: 0 if an error has occured, 1 if successfull
 
 int create_server(const int MESSAGE_SETTINGS)
 {
-  // Constants
-  const char* HTTP_HEADERS[] = {"Content-Type: application/json","Accept: application/json"};   
-  const int SOCKET_OPTION = 1;  
-  const size_t HTTP_HEADERS_LENGTH = sizeof(HTTP_HEADERS)/sizeof(HTTP_HEADERS[0]);
+  // Constants 
+  const int SOCKET_OPTION = 1; 
 
   // Variables
   char buffer[BUFFER_SIZE];
@@ -3675,8 +3668,7 @@ int create_server(const int MESSAGE_SETTINGS)
   char* string = (char*)calloc(BUFFER_SIZE,sizeof(char)); 
   int len;
   int receive_data_result; 
-  struct sockaddr_in addr, cl_addr;  
-  struct sockaddr_in serv_addr;
+  struct sockaddr_in addr, cl_addr;
 
   // define macros
   #define SOCKET_FILE_DESCRIPTORS_LENGTH 1

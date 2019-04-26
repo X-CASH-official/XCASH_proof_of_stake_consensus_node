@@ -980,9 +980,6 @@ Return: 1 if the IP address is online, 0 if the IP address is offline
 
 int get_delegate_online_status(char* HOST)
 {
-  // Constants
-  const size_t HOST_LENGTH = strnlen(HOST,BUFFER_SIZE); 
-
   // Variables
   struct sockaddr_in serv_addr;
   struct pollfd socket_file_descriptors;

@@ -30,7 +30,7 @@ int create_database_connection()
 {
   // Variables
   mongoc_uri_t* uri;
-  bson_t* command;
+  bson_t* command = NULL;
   bson_t reply;
   bson_error_t error;
 
@@ -208,9 +208,9 @@ int read_document_from_collection(const char* DATABASE, const char* COLLECTION, 
   const bson_t* current_document;
 
   // Variables
-  mongoc_client_t* database_client_thread;
+  mongoc_client_t* database_client_thread = NULL;
   mongoc_collection_t* collection;
-  mongoc_cursor_t* document_settings;
+  mongoc_cursor_t* document_settings = NULL;
   bson_error_t error;
   bson_t* document = NULL;  
   char* message;
@@ -285,9 +285,9 @@ int read_document_field_from_collection(const char* DATABASE, const char* COLLEC
   const bson_t* current_document;
 
   // Variables
-  mongoc_client_t* database_client_thread;
+  mongoc_client_t* database_client_thread = NULL;
   mongoc_collection_t* collection;
-  mongoc_cursor_t* document_settings;
+  mongoc_cursor_t* document_settings = NULL;
   bson_error_t error;
   bson_t* document = NULL;  
   char* message;
@@ -512,9 +512,9 @@ int read_document_all_fields_from_collection(const char* DATABASE, const char* C
   const bson_t* current_document;
 
   // Variables
-  mongoc_client_t* database_client_thread;
+  mongoc_client_t* database_client_thread = NULL;
   mongoc_collection_t* collection;
-  mongoc_cursor_t* document_settings;
+  mongoc_cursor_t* document_settings = NULL;
   bson_error_t error;
   bson_t* document = NULL;  
   char* message;
@@ -615,9 +615,9 @@ int read_multiple_documents_all_fields_from_collection(const char* DATABASE, con
   const bson_t* current_document;
 
   // Variables
-  mongoc_client_t* database_client_thread;
+  mongoc_client_t* database_client_thread = NULL;
   mongoc_collection_t* collection;
-  mongoc_cursor_t* document_settings;
+  mongoc_cursor_t* document_settings = NULL;
   bson_t* document = NULL;  
   char* message;
   char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
@@ -727,7 +727,7 @@ Return: 0 if an error has occured, 1 if successfull
 int update_document_from_collection(const char* DATABASE, const char* COLLECTION, const char* DATA, const char* FIELD_NAME_AND_DATA, const int THREAD_SETTINGS)
 {
   // Variables
-  mongoc_client_t* database_client_thread;
+  mongoc_client_t* database_client_thread = NULL;
   mongoc_collection_t* collection;
   bson_error_t error;
   bson_t* update = NULL;
@@ -822,7 +822,7 @@ Return: 0 if an error has occured, 1 if successfull
 int update_all_documents_from_collection(const char* DATABASE, const char* COLLECTION, const char* DATA, const int THREAD_SETTINGS)
 {
   // Variables
-  mongoc_client_t* database_client_thread;
+  mongoc_client_t* database_client_thread = NULL;
   mongoc_collection_t* collection;
   bson_error_t error;
   bson_t* update = NULL;
@@ -918,7 +918,7 @@ Return: 0 if an error has occured, 1 if successfull
 int delete_document_from_collection(const char* DATABASE, const char* COLLECTION, const char* DATA, const int THREAD_SETTINGS)
 {
   // Variables
-  mongoc_client_t* database_client_thread;
+  mongoc_client_t* database_client_thread = NULL;
   mongoc_collection_t* collection;
   bson_error_t error;
   bson_t* document;
@@ -984,7 +984,7 @@ Return: 0 if an error has occured, 1 if successfull
 int delete_collection_from_database(const char* DATABASE, const char* COLLECTION, const int THREAD_SETTINGS)
 {
    // Variables
-  mongoc_client_t* database_client_thread;
+  mongoc_client_t* database_client_thread = NULL;
   mongoc_collection_t* collection;
   bson_error_t error;
 
@@ -1042,7 +1042,7 @@ Return: -1 if an error has occured, otherwise the amount of documents that match
 int count_documents_in_collection(const char* DATABASE, const char* COLLECTION, const char* DATA, const int THREAD_SETTINGS)
 {
   // Variables
-  mongoc_client_t* database_client_thread;
+  mongoc_client_t* database_client_thread = NULL;
   mongoc_collection_t* collection;
   bson_error_t error;
   bson_t* document;
@@ -1109,7 +1109,7 @@ Return: -1 if an error has occured, otherwise the amount of documents in the col
 int count_all_documents_in_collection(const char* DATABASE, const char* COLLECTION, const int THREAD_SETTINGS)
 {
   // Variables
-  mongoc_client_t* database_client_thread;
+  mongoc_client_t* database_client_thread = NULL;
   mongoc_collection_t* collection;
   bson_error_t error;
   bson_t* document;
@@ -1179,9 +1179,9 @@ int update_delegates_online_status(const char* DATABASE, const char* COLLECTION,
   const bson_t* current_document;
 
   // Variables
-  mongoc_client_t* database_client_thread;
+  mongoc_client_t* database_client_thread = NULL;
   mongoc_collection_t* collection;
-  mongoc_cursor_t* document_settings;
+  mongoc_cursor_t* document_settings = NULL;
   bson_t* document = NULL;  
   bson_error_t error;
   bson_t* update = NULL;
@@ -1193,7 +1193,6 @@ int update_delegates_online_status(const char* DATABASE, const char* COLLECTION,
   char* IP_address = (char*)calloc(BUFFER_SIZE,sizeof(char));
   char* message_copy1;
   char* message_copy2;
-  int count = 0;
 
   // define macros
   #define pointer_reset_all \
@@ -1337,4 +1336,3 @@ int update_delegates_online_status(const char* DATABASE, const char* COLLECTION,
   #undef pointer_reset_all
   #undef database_reset_all
 }
-
