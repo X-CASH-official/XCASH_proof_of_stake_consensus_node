@@ -771,6 +771,37 @@ int mainode_consensus()
     MAINNODE_CONSENSUS_ERROR("Could not update the current_round_part and current_round_part_backup_node in the database\nFunction: mainode_consensus");
   }
 
+  // set the round_part_backup_node in the database for the specific round
+  memset(data,0,strnlen(data,BUFFER_SIZE));
+  if (memcmp(current_round_part,"1",1) == 0)
+  {
+    memcpy(data,"{\"round_part_1_backup_node_count\":\"",35);
+    memcpy(data,current_round_part_backup_node,1);
+    memcpy(data,"\"}",2);
+  }
+  if (memcmp(current_round_part,"2",1) == 0)
+  {
+    memcpy(data,"{\"round_part_2_backup_node_count\":\"",35);
+    memcpy(data,current_round_part_backup_node,1);
+    memcpy(data,"\"}",2);
+  }
+  if (memcmp(current_round_part,"3",1) == 0)
+  {
+    memcpy(data,"{\"round_part_3_backup_node_count\":\"",35);
+    memcpy(data,current_round_part_backup_node,1);
+    memcpy(data,"\"}",2);
+  }
+  if (memcmp(current_round_part,"4",1) == 0)
+  {
+    memcpy(data,"{\"round_part_4_backup_node_count\":\"",35);
+    memcpy(data,current_round_part_backup_node,1);
+    memcpy(data,"\"}",2);
+  }
+  if (update_document_from_collection(DATABASE_NAME,"current_round",MESSAGE,data,0) == 0)
+  {
+    MAINNODE_CONSENSUS_ERROR("Could not update the current_round_part_backup_node in the database\nFunction: mainode_consensus");
+  }
+
   pointer_reset_all;
   return 1;
 
