@@ -47,6 +47,7 @@ Main function
 
 int main(int parameters_count, char* parameters[])
 {
+
   // iniltize the random number generator
   srand(time(0));
 
