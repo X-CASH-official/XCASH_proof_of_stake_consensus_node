@@ -188,9 +188,8 @@ struct reserve_proofs_list {
     char* public_address_created_reserve_proof[RESERVE_PROOFS_LIST_MAXIMUM_AMOUNT]; // The public address that created the reserve proof
     char* public_address_voted_for[RESERVE_PROOFS_LIST_MAXIMUM_AMOUNT]; // The public address that was voted for in the reserve proof
     char* reserve_proof[RESERVE_PROOFS_LIST_MAXIMUM_AMOUNT]; // The reserve proof
-    int settings[RESERVE_PROOFS_LIST_MAXIMUM_AMOUNT]; // 0 if invalid, 1 if valid
     long long int amount[RESERVE_PROOFS_LIST_MAXIMUM_AMOUNT]; // The amount the reserve proof was created for
-    int number[RESERVE_PROOFS_LIST_MAXIMUM_AMOUNT]; // the number of reserve proofs in the reserve_proofs_list struct
+    int number[RESERVE_PROOFS_LIST_MAXIMUM_AMOUNT]; // the number of reserve proofs for a delegate
     size_t count; // the amount of reserve proofs in the reserve_proofs_list struct
 };     
 
