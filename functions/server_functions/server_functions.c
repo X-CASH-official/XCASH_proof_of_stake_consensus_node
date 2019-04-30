@@ -354,6 +354,16 @@ int consensus_node_create_new_block()
   memset(blockchain_data.nonce_data,0,strnlen(blockchain_data.nonce_data,9));
   memcpy(blockchain_data.nonce_data,CONSENSUS_NODE_NETWORK_BLOCK_NONCE,8);
 
+  // add the block_validation_node_signature_data_length to the blockchain_data
+  blockchain_data.blockchain_reserve_bytes.block_validation_node_signature_data_length = BLOCK_VALIDATION_NODE_SIGNED_BLOCK_LENGTH;
+
+  // add 0's for the block validation nodes signature
+  memcpy(blockchain_data.blockchain_reserve_bytes.block_validation_node_signature_data[0],GET_BLOCK_TEMPLATE_RESERVED_BYTES,BLOCK_VALIDATION_NODE_SIGNED_BLOCK_LENGTH);
+  memcpy(blockchain_data.blockchain_reserve_bytes.block_validation_node_signature_data[1],GET_BLOCK_TEMPLATE_RESERVED_BYTES,BLOCK_VALIDATION_NODE_SIGNED_BLOCK_LENGTH);
+  memcpy(blockchain_data.blockchain_reserve_bytes.block_validation_node_signature_data[2],GET_BLOCK_TEMPLATE_RESERVED_BYTES,BLOCK_VALIDATION_NODE_SIGNED_BLOCK_LENGTH);
+  memcpy(blockchain_data.blockchain_reserve_bytes.block_validation_node_signature_data[3],GET_BLOCK_TEMPLATE_RESERVED_BYTES,BLOCK_VALIDATION_NODE_SIGNED_BLOCK_LENGTH);
+  memcpy(blockchain_data.blockchain_reserve_bytes.block_validation_node_signature_data[4],GET_BLOCK_TEMPLATE_RESERVED_BYTES,BLOCK_VALIDATION_NODE_SIGNED_BLOCK_LENGTH);
+
   // convert the blockchain_data to a network_block_string
   memset(data,0,strnlen(data,BUFFER_SIZE));
   if (blockchain_data_to_network_block_string(data) == 0)
@@ -373,9 +383,6 @@ int consensus_node_create_new_block()
     CONSENSUS_NODE_CREATE_NEW_BLOCK_ERROR("Could not sign_data\nFunction: consensus_node_create_new_block\nReceive Message: BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK\nSend Message: CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK");
   }
 
-  // add the block_validation_node_signature_data_length to the blockchain_data
-  blockchain_data.blockchain_reserve_bytes.block_validation_node_signature_data_length = 196;
-
   // send the network_block_string to the block validation nodes
   memset(data,0,strnlen(data,BUFFER_SIZE));
   for (count = 0; count < BLOCK_VALIDATION_NODES_AMOUNT; count++)
@@ -390,7 +397,8 @@ int consensus_node_create_new_block()
       }
 
       // add the block validation signature to the blockchain_data
-      memcpy(blockchain_data.blockchain_reserve_bytes.block_validation_node_signature_data[count],data2,196);
+      memset(blockchain_data.blockchain_reserve_bytes.block_validation_node_signature_data[count],0,strlen(blockchain_data.blockchain_reserve_bytes.block_validation_node_signature_data[count]));
+      memcpy(blockchain_data.blockchain_reserve_bytes.block_validation_node_signature_data[count],data2,BLOCK_VALIDATION_NODE_SIGNED_BLOCK_LENGTH);
       memcpy(blockchain_data.blockchain_reserve_bytes.block_validation_node_signature[count],data,XCASH_SIGN_DATA_LENGTH);
     }
   }
@@ -2731,6 +2739,16 @@ int create_new_block()
   memset(blockchain_data.nonce_data,0,strnlen(blockchain_data.nonce_data,9));
   memcpy(blockchain_data.nonce_data,BLOCK_PRODUCER_NETWORK_BLOCK_NONCE,8);
 
+  // add the block_validation_node_signature_data_length to the blockchain_data
+  blockchain_data.blockchain_reserve_bytes.block_validation_node_signature_data_length = BLOCK_VALIDATION_NODE_SIGNED_BLOCK_LENGTH;
+
+  // add 0's for the block validation nodes signature
+  memcpy(blockchain_data.blockchain_reserve_bytes.block_validation_node_signature_data[0],GET_BLOCK_TEMPLATE_RESERVED_BYTES,BLOCK_VALIDATION_NODE_SIGNED_BLOCK_LENGTH);
+  memcpy(blockchain_data.blockchain_reserve_bytes.block_validation_node_signature_data[1],GET_BLOCK_TEMPLATE_RESERVED_BYTES,BLOCK_VALIDATION_NODE_SIGNED_BLOCK_LENGTH);
+  memcpy(blockchain_data.blockchain_reserve_bytes.block_validation_node_signature_data[2],GET_BLOCK_TEMPLATE_RESERVED_BYTES,BLOCK_VALIDATION_NODE_SIGNED_BLOCK_LENGTH);
+  memcpy(blockchain_data.blockchain_reserve_bytes.block_validation_node_signature_data[3],GET_BLOCK_TEMPLATE_RESERVED_BYTES,BLOCK_VALIDATION_NODE_SIGNED_BLOCK_LENGTH);
+  memcpy(blockchain_data.blockchain_reserve_bytes.block_validation_node_signature_data[4],GET_BLOCK_TEMPLATE_RESERVED_BYTES,BLOCK_VALIDATION_NODE_SIGNED_BLOCK_LENGTH);
+
   // convert the blockchain_data to a network_block_string
   memset(data,0,strnlen(data,BUFFER_SIZE));
   if (blockchain_data_to_network_block_string(data) == 0)
@@ -2750,9 +2768,6 @@ int create_new_block()
     CREATE_NEW_BLOCK_ERROR("Could not sign_data\nFunction: create_new_block\nReceive Message: BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CREATE_NEW_BLOCK\nSend Message: CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CREATE_NEW_BLOCK");
   }
 
-  // add the block_validation_node_signature_data_length to the blockchain_data
-  blockchain_data.blockchain_reserve_bytes.block_validation_node_signature_data_length = 196;
-
   // send the network_block_string to the block validation nodes
   memset(data,0,strnlen(data,BUFFER_SIZE));
   for (count = 0; count < BLOCK_VALIDATION_NODES_AMOUNT; count++)
@@ -2767,7 +2782,8 @@ int create_new_block()
       }
 
       // add the block validation signature to the blockchain_data
-      memcpy(blockchain_data.blockchain_reserve_bytes.block_validation_node_signature_data[count],data2,196);
+      memset(blockchain_data.blockchain_reserve_bytes.block_validation_node_signature_data[count],0,strlen(blockchain_data.blockchain_reserve_bytes.block_validation_node_signature_data[count]));
+      memcpy(blockchain_data.blockchain_reserve_bytes.block_validation_node_signature_data[count],data2,BLOCK_VALIDATION_NODE_SIGNED_BLOCK_LENGTH);
       memcpy(blockchain_data.blockchain_reserve_bytes.block_validation_node_signature[count],data,XCASH_SIGN_DATA_LENGTH);
     }
   }
