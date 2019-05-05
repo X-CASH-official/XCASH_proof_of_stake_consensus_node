@@ -2347,7 +2347,7 @@ int send_round_change()
     memset(current_round_part_backup_node,0,strnlen(current_round_part_backup_node,BUFFER_SIZE));
     if (read_document_field_from_collection(DATABASE_NAME,DATABASE_COLLECTION,MESSAGE,"current_round_part_backup_node_round_part_3",current_round_part_backup_node,0) == 0)
     {
-      START_NEW_PART_OF_ROUND_ERROR("Could not read the current_round_part_backup_node from the database\nFunction: start_new_part_of_round\nSend Message: CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEW_PART_OF_ROUND");
+      SEND_ROUND_CHANGE_ERROR("Could not read the current_round_part_backup_node from the databaseFunction: send_round_change\nSend Message: CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_ROUND_CHANGE");
     }
     memcpy(data,"{\"current_round_part_backup_node\":\"",35);
     memcpy(data+35,current_round_part_backup_node,1);
