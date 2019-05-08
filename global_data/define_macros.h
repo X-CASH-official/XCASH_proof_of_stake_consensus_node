@@ -72,11 +72,12 @@ Using define statements instead of constants for increased efficiency
 #define BLOCKCHAIN_RESERVED_BYTES_END "7c424c4f434b434841494e5f52455345525645445f42595445535f454e447c"
 #define BLOCK_PRODUCER_NETWORK_BLOCK_NONCE "00000000" // the network block nonce used when the block producer creates the block
 #define CONSENSUS_NODE_NETWORK_BLOCK_NONCE "11111111" // the network block nonce used when the consensus node creates the block
+#define MAXIMUM_TRANSACATIONS_PER_BLOCK 1000000 // The maximum amount of transaction per block
 #define RESERVE_PROOFS_LIST_MAXIMUM_AMOUNT 20000 // the maximum amount of reserve proofs (total_supply / xcash_proof_of_stake_minimum_amount)
 #define XCASH_PROOF_OF_STAKE_MINIMUM_AMOUNT 5000000000000 // the minimum amount the reserve proof can be created for
-#define BLOCK_VALIDATION_NODES_TOTAL_AMOUNT 100 // The total amount of block validation nodes
+#define BLOCK_VALIDATION_NODES_TOTAL_AMOUNT 5 // The total amount of block validation nodes
 #define DATA_HASH_LENGTH 128 // The length of the SHA2-512 hash
-#define BLOCK_VALIDATION_NODES_AMOUNT 100 // The amount of block validation nodes needed to make the network block valid
+#define BLOCK_VALIDATION_NODES_AMOUNT 4 // The amount of block validation nodes needed to make the network block valid
 #define BLOCK_VERIFIERS_AMOUNT 100 // The amount of block verifiers in a round
 #define BLOCK_VERIFIERS_VALID_AMOUNT 67 // The amount of block verifiers that need to vote true for the part of the round to be valid.
 #define TRUSTED_BLOCK_VERIFIERS_TOTAL_AMOUNT 100 // The total amount of trusted block verifiers
