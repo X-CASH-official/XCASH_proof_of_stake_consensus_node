@@ -322,7 +322,7 @@ int main(int parameters_count, char* parameters[])
   blockchain_data.transaction_amount_data = (char*)calloc(BUFFER_SIZE_NETWORK_BLOCK_DATA,sizeof(char));
   for (count = 0; count < MAXIMUM_TRANSACATIONS_PER_BLOCK; count++)
   {
-    blockchain_data.transactions[count] = (char*)calloc(BUFFER_SIZE_NETWORK_BLOCK_DATA,sizeof(char));
+    blockchain_data.transactions[count] = (char*)calloc(BUFFER_SIZE_NETWORK_BLOCK_TRANSACTIONS_DATA,sizeof(char));
 
     // check if the memory needed was allocated on the heap successfully
     if (blockchain_data.transactions[count] == NULL)
@@ -379,8 +379,6 @@ int main(int parameters_count, char* parameters[])
   }
   node_to_node_vote.vote_next_round_true = 0;
   node_to_node_vote.vote_next_round_false = 0;
-
-  // Add each block validation nodes data to the block_validation_nodes_list struct
 
   // Add each block validation nodes data to the block_validation_nodes_list struct
 

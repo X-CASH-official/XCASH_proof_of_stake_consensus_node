@@ -16,8 +16,8 @@ struct block_verifiers_list {
 };
 
 struct block_validation_nodes_list {
-    char* block_validation_nodes_public_address[BLOCK_VALIDATION_NODES_AMOUNT]; // The block validation nodes public address
-    char* block_validation_nodes_IP_address[BLOCK_VALIDATION_NODES_AMOUNT]; // The block validation nodes IP address
+    char* block_validation_nodes_public_address[BLOCK_VALIDATION_NODES_TOTAL_AMOUNT]; // The block validation nodes public address
+    char* block_validation_nodes_IP_address[BLOCK_VALIDATION_NODES_TOTAL_AMOUNT]; // The block validation nodes IP address
 };
 
 struct trusted_block_verifiers {
