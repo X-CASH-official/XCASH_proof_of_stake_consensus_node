@@ -2232,53 +2232,50 @@ int server_receive_data_socket_node_to_node_vote(char* message)
     node_to_node_vote.vote_next_round_false++;
   }
 
-  // if the block verifiers public address is a trusted block verifier, add the VRF data to the trusted_block_verifiers_VRF_data
-  for (count = 0; count < TRUSTED_BLOCK_VERIFIERS_AMOUNT; count++)
+  // add the VRF data to the block_verifiers_VRF_data
+  for (count = 0; count < BLOCK_VERIFIERS_VALID_AMOUNT; count++)
   {
-    if (memcmp(trusted_block_verifiers.trusted_block_verifiers_public_address[count],data,XCASH_WALLET_LENGTH) == 0)
-    {
       // parse the message
       if (memcmp(current_round_part,"1",1) == 0)
       {
-        if (parse_json_data(message,"vrf_public_key",trusted_block_verifiers_VRF_data.vrf_public_key_round_part_1[trusted_block_verifiers_VRF_data.count]) == 0 || parse_json_data(message,"vrf_alpha_string",trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_1[trusted_block_verifiers_VRF_data.count]) == 0 || parse_json_data(message,"vrf_proof",trusted_block_verifiers_VRF_data.vrf_proof_round_part_1[trusted_block_verifiers_VRF_data.count]) == 0 || parse_json_data(message,"vrf_beta_string",trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_1[trusted_block_verifiers_VRF_data.count]) == 0)
+        if (parse_json_data(message,"vrf_public_key",block_verifiers_VRF_data.vrf_public_key_round_part_1[block_verifiers_VRF_data.count]) == 0 || parse_json_data(message,"vrf_alpha_string",block_verifiers_VRF_data.vrf_alpha_string_round_part_1[block_verifiers_VRF_data.count]) == 0 || parse_json_data(message,"vrf_proof",block_verifiers_VRF_data.vrf_proof_round_part_1[block_verifiers_VRF_data.count]) == 0 || parse_json_data(message,"vrf_beta_string",block_verifiers_VRF_data.vrf_beta_string_round_part_1[block_verifiers_VRF_data.count]) == 0)
         {
           SERVER_RECEIVE_DATA_SOCKET_NOTE_TO_NODE_VOTE_ERROR("Could not parse data\nFunction: server_receive_data_socket_node_to_node_vote\nReceive Message: NODES_TO_CONSENSUS_NODE_VOTE_RESULTS");
         }
       }
       else if (memcmp(current_round_part,"2",1) == 0)
       {
-        if (parse_json_data(message,"vrf_public_key",trusted_block_verifiers_VRF_data.vrf_public_key_round_part_2[trusted_block_verifiers_VRF_data.count]) == 0 || parse_json_data(message,"vrf_alpha_string",trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_2[trusted_block_verifiers_VRF_data.count]) == 0 || parse_json_data(message,"vrf_proof",trusted_block_verifiers_VRF_data.vrf_proof_round_part_2[trusted_block_verifiers_VRF_data.count]) == 0 || parse_json_data(message,"vrf_beta_string",trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_2[trusted_block_verifiers_VRF_data.count]) == 0)
+        if (parse_json_data(message,"vrf_public_key",block_verifiers_VRF_data.vrf_public_key_round_part_2[block_verifiers_VRF_data.count]) == 0 || parse_json_data(message,"vrf_alpha_string",block_verifiers_VRF_data.vrf_alpha_string_round_part_2[block_verifiers_VRF_data.count]) == 0 || parse_json_data(message,"vrf_proof",block_verifiers_VRF_data.vrf_proof_round_part_2[block_verifiers_VRF_data.count]) == 0 || parse_json_data(message,"vrf_beta_string",block_verifiers_VRF_data.vrf_beta_string_round_part_2[block_verifiers_VRF_data.count]) == 0)
         {
           SERVER_RECEIVE_DATA_SOCKET_NOTE_TO_NODE_VOTE_ERROR("Could not parse data\nFunction: server_receive_data_socket_node_to_node_vote\nReceive Message: NODES_TO_CONSENSUS_NODE_VOTE_RESULTS");
         }
       }
       else if (memcmp(current_round_part,"3",1) == 0)
       {
-        if (parse_json_data(message,"vrf_public_key",trusted_block_verifiers_VRF_data.vrf_public_key_round_part_3[trusted_block_verifiers_VRF_data.count]) == 0 || parse_json_data(message,"vrf_alpha_string",trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_3[trusted_block_verifiers_VRF_data.count]) == 0 || parse_json_data(message,"vrf_proof",trusted_block_verifiers_VRF_data.vrf_proof_round_part_3[trusted_block_verifiers_VRF_data.count]) == 0 || parse_json_data(message,"vrf_beta_string",trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_3[trusted_block_verifiers_VRF_data.count]) == 0)
+        if (parse_json_data(message,"vrf_public_key",block_verifiers_VRF_data.vrf_public_key_round_part_3[block_verifiers_VRF_data.count]) == 0 || parse_json_data(message,"vrf_alpha_string",block_verifiers_VRF_data.vrf_alpha_string_round_part_3[block_verifiers_VRF_data.count]) == 0 || parse_json_data(message,"vrf_proof",block_verifiers_VRF_data.vrf_proof_round_part_3[block_verifiers_VRF_data.count]) == 0 || parse_json_data(message,"vrf_beta_string",block_verifiers_VRF_data.vrf_beta_string_round_part_3[block_verifiers_VRF_data.count]) == 0)
         {
           SERVER_RECEIVE_DATA_SOCKET_NOTE_TO_NODE_VOTE_ERROR("Could not parse data\nFunction: server_receive_data_socket_node_to_node_vote\nReceive Message: NODES_TO_CONSENSUS_NODE_VOTE_RESULTS");
         }
       }
       else if (memcmp(current_round_part,"4",1) == 0)
       {
-        if (parse_json_data(message,"block_blob",trusted_block_verifiers_VRF_data.block_blob[trusted_block_verifiers_VRF_data.count]) == 0)
+        if (parse_json_data(message,"block_blob",block_verifiers_VRF_data.block_blob[block_verifiers_VRF_data.count]) == 0)
         {
           SERVER_RECEIVE_DATA_SOCKET_NOTE_TO_NODE_VOTE_ERROR("Could not parse data\nFunction: server_receive_data_socket_node_to_node_vote\nReceive Message: NODES_TO_CONSENSUS_NODE_VOTE_RESULTS");
         }
         // SHA2-512 hash all of the VRF data
         memset(data,0,strnlen(data,BUFFER_SIZE));
-        memcpy(data,trusted_block_verifiers_VRF_data.vrf_public_key_round_part_1[trusted_block_verifiers_VRF_data.count],strnlen(trusted_block_verifiers_VRF_data.vrf_public_key_round_part_1[trusted_block_verifiers_VRF_data.count],VRF_PUBLIC_KEY_LENGTH));
-        counter = strnlen(trusted_block_verifiers_VRF_data.vrf_public_key_round_part_1[trusted_block_verifiers_VRF_data.count],VRF_PUBLIC_KEY_LENGTH);
-        memcpy(data+counter,trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_1[trusted_block_verifiers_VRF_data.count],strnlen(trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_1[trusted_block_verifiers_VRF_data.count],BUFFER_SIZE));
-        counter += strnlen(trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_1[trusted_block_verifiers_VRF_data.count],BUFFER_SIZE);
-        memcpy(data+counter,trusted_block_verifiers_VRF_data.vrf_proof_round_part_1[trusted_block_verifiers_VRF_data.count],strnlen(trusted_block_verifiers_VRF_data.vrf_proof_round_part_1[trusted_block_verifiers_VRF_data.count],VRF_PROOF_LENGTH));
-        counter += strnlen(trusted_block_verifiers_VRF_data.vrf_proof_round_part_1[trusted_block_verifiers_VRF_data.count],VRF_PROOF_LENGTH);
-        memcpy(data+counter,trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_1[trusted_block_verifiers_VRF_data.count],strnlen(trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_1[trusted_block_verifiers_VRF_data.count],VRF_BETA_LENGTH));
-        counter += strnlen(trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_1[trusted_block_verifiers_VRF_data.count],VRF_BETA_LENGTH);
-        crypto_hash_sha512((unsigned char*)trusted_block_verifiers_VRF_data.data_hash[trusted_block_verifiers_VRF_data.count],(const unsigned char*)data,(unsigned long long)strnlen(data,BUFFER_SIZE));
-        trusted_block_verifiers_VRF_data.count++;
-      }      
-    }
+        memcpy(data,block_verifiers_VRF_data.vrf_public_key_round_part_1[block_verifiers_VRF_data.count],strnlen(block_verifiers_VRF_data.vrf_public_key_round_part_1[block_verifiers_VRF_data.count],VRF_PUBLIC_KEY_LENGTH));
+        counter = strnlen(block_verifiers_VRF_data.vrf_public_key_round_part_1[block_verifiers_VRF_data.count],VRF_PUBLIC_KEY_LENGTH);
+        memcpy(data+counter,block_verifiers_VRF_data.vrf_alpha_string_round_part_1[block_verifiers_VRF_data.count],strnlen(block_verifiers_VRF_data.vrf_alpha_string_round_part_1[block_verifiers_VRF_data.count],BUFFER_SIZE));
+        counter += strnlen(block_verifiers_VRF_data.vrf_alpha_string_round_part_1[block_verifiers_VRF_data.count],BUFFER_SIZE);
+        memcpy(data+counter,block_verifiers_VRF_data.vrf_proof_round_part_1[block_verifiers_VRF_data.count],strnlen(block_verifiers_VRF_data.vrf_proof_round_part_1[block_verifiers_VRF_data.count],VRF_PROOF_LENGTH));
+        counter += strnlen(block_verifiers_VRF_data.vrf_proof_round_part_1[block_verifiers_VRF_data.count],VRF_PROOF_LENGTH);
+        memcpy(data+counter,block_verifiers_VRF_data.vrf_beta_string_round_part_1[block_verifiers_VRF_data.count],strnlen(block_verifiers_VRF_data.vrf_beta_string_round_part_1[block_verifiers_VRF_data.count],VRF_BETA_LENGTH));
+        counter += strnlen(block_verifiers_VRF_data.vrf_beta_string_round_part_1[block_verifiers_VRF_data.count],VRF_BETA_LENGTH);
+        crypto_hash_sha512((unsigned char*)block_verifiers_VRF_data.data_hash[block_verifiers_VRF_data.count],(const unsigned char*)data,(unsigned long long)strnlen(data,BUFFER_SIZE));
+        block_verifiers_VRF_data.count++;
+      } 
   }  
 
   return 1;
@@ -2611,82 +2608,6 @@ int start_next_round(const int SETTINGS)
   #undef DATABASE_COLLECTION
   #undef MESSAGE
   #undef START_NEXT_ROUND_ERROR
-}
-
-
-
-/*
------------------------------------------------------------------------------------------------------------
-Name: update_block_producer_eligibility
-Description: Sets the update_block_producer_eligibility field to false for all block verifiers that voted for the invalid vote
-Parameters:
-   SETTINGS - 0 to set all block verifiers that voted for the mainnode_timeout to false, 1 to set all block verifiers that voted for the vote_next_round_false to false, 2 to set all block verifiers that voted for the vote_next_round_true to false.
------------------------------------------------------------------------------------------------------------
-*/
-
-void update_block_producer_eligibility(const int SETTINGS)
-{
-  // Variables
-  char* data = (char*)calloc(BUFFER_SIZE,sizeof(char));
-  size_t count;
-  size_t data_length;
-
-  // define macros
-  #define DATABASE_COLLECTION "delegates"
-
-  // check if the memory needed was allocated on the heap successfully
-  if (data == NULL)
-  {
-    color_print("Could not allocate the memory needed on the heap","red");
-    exit(0);
-  }
-
-  if (SETTINGS == 0)
-  {
-    // set all block verifiers that voted for the mainnode_timeout to false
-    for (count = 0; count < mainnode_timeout.vote_round_change_timeout; count++)
-    {
-      // create the message
-      data_length = strnlen(mainnode_timeout.block_verifiers_public_address[count],BUFFER_SIZE);
-      memset(data,0,strnlen(data,BUFFER_SIZE));
-      memcpy(data,"{\"public_address\":\"",19);
-      memcpy(data+19,mainnode_timeout.block_verifiers_public_address[count],data_length);
-      memcpy(data+19+data_length,"\"}",2);
-      update_document_from_collection(DATABASE_NAME,DATABASE_COLLECTION,data,"{\"block_producer_eligibility\":\"false\"}",0);      
-    }
-  }
-  else if (SETTINGS == 1)
-  {
-    // set all block verifiers that voted for the vote_next_round_false to false
-    for (count = 0; count < node_to_node_vote.vote_next_round_false; count++)
-    {
-      // create the message
-      data_length = strnlen(node_to_node_vote.block_verifiers_public_address_vote_next_round_false[count],BUFFER_SIZE);
-      memset(data,0,strnlen(data,BUFFER_SIZE));
-      memcpy(data,"{\"public_address\":\"",19);
-      memcpy(data+19,node_to_node_vote.block_verifiers_public_address_vote_next_round_false[count],data_length);
-      memcpy(data+19+data_length,"\"}",2);
-      update_document_from_collection(DATABASE_NAME,DATABASE_COLLECTION,data,"{\"block_producer_eligibility\":\"false\"}",0);      
-    }
-  }
-  else if (SETTINGS == 2)
-  {
-    // set all block verifiers that voted for the vote_next_round_true to false
-    for (count = 0; count < node_to_node_vote.vote_next_round_true; count++)
-    {
-      // create the message
-      data_length = strnlen(node_to_node_vote.block_verifiers_public_address_vote_next_round_true[count],BUFFER_SIZE);
-      memset(data,0,strnlen(data,BUFFER_SIZE));
-      memcpy(data,"{\"public_address\":\"",19);
-      memcpy(data+19,node_to_node_vote.block_verifiers_public_address_vote_next_round_true[count],data_length);
-      memcpy(data+19+data_length,"\"}",2);
-      update_document_from_collection(DATABASE_NAME,DATABASE_COLLECTION,data,"{\"block_producer_eligibility\":\"false\"}",0);      
-    }
-  }
-
-  return;
-
-  #undef DATABASE_COLLECTION
 }
 
 

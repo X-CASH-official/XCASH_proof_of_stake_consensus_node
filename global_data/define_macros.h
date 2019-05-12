@@ -54,8 +54,8 @@ Using define statements instead of constants for increased efficiency
 #define BLOCK_VALIDATION_NODES_AMOUNT 4 // The amount of block validation nodes needed to make the network block valid
 #define BLOCK_VERIFIERS_AMOUNT 100 // The amount of block verifiers in a round
 #define BLOCK_VERIFIERS_VALID_AMOUNT 67 // The amount of block verifiers that need to vote true for the part of the round to be valid.
-#define TRUSTED_BLOCK_VERIFIERS_TOTAL_AMOUNT 100 // The total amount of trusted block verifiers
-#define TRUSTED_BLOCK_VERIFIERS_AMOUNT 100 // The amount of trusted block verifiers needed to make the vote valid
+//#define TRUSTED_BLOCK_VERIFIERS_TOTAL_AMOUNT 100 // The total amount of trusted block verifiers
+//#define TRUSTED_BLOCK_VERIFIERS_AMOUNT 100 // The amount of trusted block verifiers needed to make the vote valid
 #define BLOCK_VERIFIERS_NAME_TOTAL_LENGTH 100 // The maximum length of the block verifiers name
 #define BLOCK_VERIFIERS_IP_ADDRESS_TOTAL_LENGTH 100 // The maximum length of the block verifiers IP address
 #define DATABASE_CONNECTION "mongodb://localhost:27017" // the database connection string

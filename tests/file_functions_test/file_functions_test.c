@@ -64,17 +64,17 @@ int read_and_write_file_test()
 
   // read the file
   memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
-  if (read_file(data_test,NODES_PUBLIC_ADDRESS_LIST_FILE_NAME_COPY) == 0)
+  if (read_file(data_test,NODES_PUBLIC_ADDRESS_LIST_FILE_NAME_COPY) == 0 || strncmp(data_test,MESSAGE,BUFFER_SIZE) != 0)
   {
+printf("%d",read_file(data_test,NODES_PUBLIC_ADDRESS_LIST_FILE_NAME_COPY));
     color_print("FAILED! Test for reading the file","red");
   }
-  if (strncmp(data_test,MESSAGE,BUFFER_SIZE) != 0)
+  else
   {
-    color_print("FAILED! Test for reading the file","red");
+    color_print("PASSED! Test for reading the file","green");
+    count_test++;
+    remove(NODES_PUBLIC_ADDRESS_LIST_FILE_NAME_COPY);
   }
-  color_print("PASSED! Test for reading the file","green");
-  count_test++;
-  remove(NODES_PUBLIC_ADDRESS_LIST_FILE_NAME_COPY);
 
 
 

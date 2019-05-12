@@ -137,12 +137,12 @@ void* receive_votes_from_nodes_timeout_thread()
      RECEIVE_VOTES_FROM_NODES_TIMEOUT_THREAD_ERROR("Could not read the current_round_part or the current_round_part_backup_node from the database\nFunction: receive_votes_from_nodes_timeout_thread");
   }
 
-  // check if the trusted nodes for at least TRUSTED_BLOCK_VERIFIERS_AMOUNT have the same result and get the VRF from the trusted nodes
+  // check if the trusted nodes for at least BLOCK_VERIFIERS_VALID_AMOUNT have the same result and get the VRF from the trusted nodes
   memset(data,0,strnlen(data,BUFFER_SIZE));
-  memcpy(data,trusted_block_verifiers_VRF_data.data_hash[0],strnlen(trusted_block_verifiers_VRF_data.data_hash[0],DATA_HASH_LENGTH));
-  for (count = 1, count2 = 0, settings = 0; count < trusted_block_verifiers_VRF_data.count; count++)
+  memcpy(data,block_verifiers_VRF_data.data_hash[0],strnlen(block_verifiers_VRF_data.data_hash[0],DATA_HASH_LENGTH));
+  for (count = 1, count2 = 0, settings = 0; count < block_verifiers_VRF_data.count; count++)
   {
-    if (memcmp(trusted_block_verifiers_VRF_data.data_hash[count],data,DATA_HASH_LENGTH) == 0)
+    if (memcmp(block_verifiers_VRF_data.data_hash[count],data,DATA_HASH_LENGTH) == 0)
     {
       settings = count;
       count2++;
@@ -150,31 +150,31 @@ void* receive_votes_from_nodes_timeout_thread()
     else
     {
       memset(data,0,strnlen(data,BUFFER_SIZE));
-      memcpy(data,trusted_block_verifiers_VRF_data.data_hash[count],strnlen(trusted_block_verifiers_VRF_data.data_hash[0],DATA_HASH_LENGTH));
+      memcpy(data,block_verifiers_VRF_data.data_hash[count],strnlen(block_verifiers_VRF_data.data_hash[0],DATA_HASH_LENGTH));
     }
   }
 
-  if (count2 >= TRUSTED_BLOCK_VERIFIERS_AMOUNT)
+  if (count2 >= BLOCK_VERIFIERS_VALID_AMOUNT)
   {    
     // Add the VRF data for this part of the round to the VRF_data and the database
     if (memcmp(current_round_part,"1",1) == 0)
     {
       // verify the VRF data
-      settings2 = crypto_vrf_verify((unsigned char*)trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_1[settings],(const unsigned char*)trusted_block_verifiers_VRF_data.vrf_public_key_round_part_1[settings],(const unsigned char*)trusted_block_verifiers_VRF_data.vrf_proof_round_part_1[settings],(const unsigned char*)trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_1[settings],(unsigned long long)strnlen(trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_1[settings],BUFFER_SIZE));
+      settings2 = crypto_vrf_verify((unsigned char*)block_verifiers_VRF_data.vrf_beta_string_round_part_1[settings],(const unsigned char*)block_verifiers_VRF_data.vrf_public_key_round_part_1[settings],(const unsigned char*)block_verifiers_VRF_data.vrf_proof_round_part_1[settings],(const unsigned char*)block_verifiers_VRF_data.vrf_alpha_string_round_part_1[settings],(unsigned long long)strnlen(block_verifiers_VRF_data.vrf_alpha_string_round_part_1[settings],BUFFER_SIZE));
       if (settings2 == 1)
       {
         // The vote for false is valid
-        settings = 3;
+        settings = 2;
         goto end;
       }
       memset(VRF_data.vrf_public_key_round_part_1,0,strnlen(VRF_data.vrf_public_key_round_part_1,VRF_PUBLIC_KEY_LENGTH));
       memset(VRF_data.vrf_alpha_string_round_part_1,0,strnlen(VRF_data.vrf_alpha_string_round_part_1,BUFFER_SIZE));
       memset(VRF_data.vrf_proof_round_part_1,0,strnlen(VRF_data.vrf_proof_round_part_1,VRF_PROOF_LENGTH));
       memset(VRF_data.vrf_beta_string_round_part_1,0,strnlen(VRF_data.vrf_beta_string_round_part_1,VRF_BETA_LENGTH));
-      memcpy(VRF_data.vrf_public_key_round_part_1,trusted_block_verifiers_VRF_data.vrf_public_key_round_part_1[settings],strnlen(trusted_block_verifiers_VRF_data.vrf_public_key_round_part_1[settings],VRF_PUBLIC_KEY_LENGTH));
-      memcpy(VRF_data.vrf_alpha_string_round_part_1,trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_1[settings],strnlen(trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_1[settings],BUFFER_SIZE));
-      memcpy(VRF_data.vrf_proof_round_part_1,trusted_block_verifiers_VRF_data.vrf_proof_round_part_1[settings],strnlen(trusted_block_verifiers_VRF_data.vrf_proof_round_part_1[settings],VRF_PROOF_LENGTH));
-      memcpy(VRF_data.vrf_beta_string_round_part_1,trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_1[settings],strnlen(trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_1[settings],VRF_BETA_LENGTH));
+      memcpy(VRF_data.vrf_public_key_round_part_1,block_verifiers_VRF_data.vrf_public_key_round_part_1[settings],strnlen(block_verifiers_VRF_data.vrf_public_key_round_part_1[settings],VRF_PUBLIC_KEY_LENGTH));
+      memcpy(VRF_data.vrf_alpha_string_round_part_1,block_verifiers_VRF_data.vrf_alpha_string_round_part_1[settings],strnlen(block_verifiers_VRF_data.vrf_alpha_string_round_part_1[settings],BUFFER_SIZE));
+      memcpy(VRF_data.vrf_proof_round_part_1,block_verifiers_VRF_data.vrf_proof_round_part_1[settings],strnlen(block_verifiers_VRF_data.vrf_proof_round_part_1[settings],VRF_PROOF_LENGTH));
+      memcpy(VRF_data.vrf_beta_string_round_part_1,block_verifiers_VRF_data.vrf_beta_string_round_part_1[settings],strnlen(block_verifiers_VRF_data.vrf_beta_string_round_part_1[settings],VRF_BETA_LENGTH));
       // create the message
       memset(data,0,strnlen(data,BUFFER_SIZE));
       memcpy(data,"{\"vrf_public_key_round_part_1\":\"",32);
@@ -212,21 +212,21 @@ void* receive_votes_from_nodes_timeout_thread()
     else if (memcmp(current_round_part,"2",1) == 0)
     {
       // verify the VRF data
-      settings2 = crypto_vrf_verify((unsigned char*)trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_2[settings],(const unsigned char*)trusted_block_verifiers_VRF_data.vrf_public_key_round_part_2[settings],(const unsigned char*)trusted_block_verifiers_VRF_data.vrf_proof_round_part_2[settings],(const unsigned char*)trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_2[settings],(unsigned long long)strnlen(trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_2[settings],BUFFER_SIZE));
+      settings2 = crypto_vrf_verify((unsigned char*)block_verifiers_VRF_data.vrf_beta_string_round_part_2[settings],(const unsigned char*)block_verifiers_VRF_data.vrf_public_key_round_part_2[settings],(const unsigned char*)block_verifiers_VRF_data.vrf_proof_round_part_2[settings],(const unsigned char*)block_verifiers_VRF_data.vrf_alpha_string_round_part_2[settings],(unsigned long long)strnlen(block_verifiers_VRF_data.vrf_alpha_string_round_part_2[settings],BUFFER_SIZE));
       if (settings2 == 1)
       {
         // The vote for false is valid
-        settings = 3;
+        settings = 2;
         goto end;
       }
       memset(VRF_data.vrf_public_key_round_part_2,0,strnlen(VRF_data.vrf_public_key_round_part_2,VRF_PUBLIC_KEY_LENGTH));
       memset(VRF_data.vrf_alpha_string_round_part_2,0,strnlen(VRF_data.vrf_alpha_string_round_part_2,BUFFER_SIZE));
       memset(VRF_data.vrf_proof_round_part_2,0,strnlen(VRF_data.vrf_proof_round_part_2,VRF_PROOF_LENGTH));
       memset(VRF_data.vrf_beta_string_round_part_2,0,strnlen(VRF_data.vrf_beta_string_round_part_2,VRF_BETA_LENGTH));
-      memcpy(VRF_data.vrf_public_key_round_part_2,trusted_block_verifiers_VRF_data.vrf_public_key_round_part_2[settings],strnlen(trusted_block_verifiers_VRF_data.vrf_public_key_round_part_2[settings],VRF_PUBLIC_KEY_LENGTH));
-      memcpy(VRF_data.vrf_alpha_string_round_part_2,trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_2[settings],strnlen(trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_2[settings],BUFFER_SIZE));
-      memcpy(VRF_data.vrf_proof_round_part_2,trusted_block_verifiers_VRF_data.vrf_proof_round_part_2[settings],strnlen(trusted_block_verifiers_VRF_data.vrf_proof_round_part_2[settings],VRF_PROOF_LENGTH));
-      memcpy(VRF_data.vrf_beta_string_round_part_2,trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_2[settings],strnlen(trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_2[settings],VRF_BETA_LENGTH));
+      memcpy(VRF_data.vrf_public_key_round_part_2,block_verifiers_VRF_data.vrf_public_key_round_part_2[settings],strnlen(block_verifiers_VRF_data.vrf_public_key_round_part_2[settings],VRF_PUBLIC_KEY_LENGTH));
+      memcpy(VRF_data.vrf_alpha_string_round_part_2,block_verifiers_VRF_data.vrf_alpha_string_round_part_2[settings],strnlen(block_verifiers_VRF_data.vrf_alpha_string_round_part_2[settings],BUFFER_SIZE));
+      memcpy(VRF_data.vrf_proof_round_part_2,block_verifiers_VRF_data.vrf_proof_round_part_2[settings],strnlen(block_verifiers_VRF_data.vrf_proof_round_part_2[settings],VRF_PROOF_LENGTH));
+      memcpy(VRF_data.vrf_beta_string_round_part_2,block_verifiers_VRF_data.vrf_beta_string_round_part_2[settings],strnlen(block_verifiers_VRF_data.vrf_beta_string_round_part_2[settings],VRF_BETA_LENGTH));
       // create the message
       memset(data,0,strnlen(data,BUFFER_SIZE));
       memcpy(data,"{\"vrf_public_key_round_part_2\":\"",32);
@@ -264,21 +264,21 @@ void* receive_votes_from_nodes_timeout_thread()
     else if (memcmp(current_round_part,"3",1) == 0)
     {
       // verify the VRF data
-      settings2 = crypto_vrf_verify((unsigned char*)trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_3[settings],(const unsigned char*)trusted_block_verifiers_VRF_data.vrf_public_key_round_part_3[settings],(const unsigned char*)trusted_block_verifiers_VRF_data.vrf_proof_round_part_3[settings],(const unsigned char*)trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_3[settings],(unsigned long long)strnlen(trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_3[settings],BUFFER_SIZE));
+      settings2 = crypto_vrf_verify((unsigned char*)block_verifiers_VRF_data.vrf_beta_string_round_part_3[settings],(const unsigned char*)block_verifiers_VRF_data.vrf_public_key_round_part_3[settings],(const unsigned char*)block_verifiers_VRF_data.vrf_proof_round_part_3[settings],(const unsigned char*)block_verifiers_VRF_data.vrf_alpha_string_round_part_3[settings],(unsigned long long)strnlen(block_verifiers_VRF_data.vrf_alpha_string_round_part_3[settings],BUFFER_SIZE));
       if (settings2 == 1)
       {
         // The vote for false is valid
-        settings = 3;
+        settings = 2;
         goto end;
       }
       memset(VRF_data.vrf_public_key_round_part_3,0,strnlen(VRF_data.vrf_public_key_round_part_3,VRF_PUBLIC_KEY_LENGTH));
       memset(VRF_data.vrf_alpha_string_round_part_3,0,strnlen(VRF_data.vrf_alpha_string_round_part_3,BUFFER_SIZE));
       memset(VRF_data.vrf_proof_round_part_3,0,strnlen(VRF_data.vrf_proof_round_part_3,VRF_PROOF_LENGTH));
       memset(VRF_data.vrf_beta_string_round_part_3,0,strnlen(VRF_data.vrf_beta_string_round_part_3,VRF_BETA_LENGTH));
-      memcpy(VRF_data.vrf_public_key_round_part_3,trusted_block_verifiers_VRF_data.vrf_public_key_round_part_3[settings],strnlen(trusted_block_verifiers_VRF_data.vrf_public_key_round_part_3[settings],VRF_PUBLIC_KEY_LENGTH));
-      memcpy(VRF_data.vrf_alpha_string_round_part_3,trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_3[settings],strnlen(trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_3[settings],BUFFER_SIZE));
-      memcpy(VRF_data.vrf_proof_round_part_3,trusted_block_verifiers_VRF_data.vrf_proof_round_part_3[settings],strnlen(trusted_block_verifiers_VRF_data.vrf_proof_round_part_3[settings],VRF_PROOF_LENGTH));
-      memcpy(VRF_data.vrf_beta_string_round_part_3,trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_3[settings],strnlen(trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_3[settings],VRF_BETA_LENGTH));
+      memcpy(VRF_data.vrf_public_key_round_part_3,block_verifiers_VRF_data.vrf_public_key_round_part_3[settings],strnlen(block_verifiers_VRF_data.vrf_public_key_round_part_3[settings],VRF_PUBLIC_KEY_LENGTH));
+      memcpy(VRF_data.vrf_alpha_string_round_part_3,block_verifiers_VRF_data.vrf_alpha_string_round_part_3[settings],strnlen(block_verifiers_VRF_data.vrf_alpha_string_round_part_3[settings],BUFFER_SIZE));
+      memcpy(VRF_data.vrf_proof_round_part_3,block_verifiers_VRF_data.vrf_proof_round_part_3[settings],strnlen(block_verifiers_VRF_data.vrf_proof_round_part_3[settings],VRF_PROOF_LENGTH));
+      memcpy(VRF_data.vrf_beta_string_round_part_3,block_verifiers_VRF_data.vrf_beta_string_round_part_3[settings],strnlen(block_verifiers_VRF_data.vrf_beta_string_round_part_3[settings],VRF_BETA_LENGTH));
       // create the message
       memset(data,0,strnlen(data,BUFFER_SIZE));
       memcpy(data,"{\"vrf_public_key_round_part_3\":\"",32);
@@ -317,7 +317,7 @@ void* receive_votes_from_nodes_timeout_thread()
     {
       settings2 = 0;
       memset(VRF_data.block_blob,0,strnlen(VRF_data.block_blob,BUFFER_SIZE));
-      memcpy(VRF_data.block_blob,trusted_block_verifiers_VRF_data.block_blob[settings],strnlen(trusted_block_verifiers_VRF_data.block_blob[settings],BUFFER_SIZE));
+      memcpy(VRF_data.block_blob,block_verifiers_VRF_data.block_blob[settings],strnlen(block_verifiers_VRF_data.block_blob[settings],BUFFER_SIZE));
       // create the message
       memset(data,0,strnlen(data,BUFFER_SIZE));
       memcpy(data,"{\"block_blob\":\"",32);
@@ -332,36 +332,16 @@ void* receive_votes_from_nodes_timeout_thread()
   else
   {
     // The vote is false is valid
-    settings = 3;
+    settings = 2;
     goto end;
   }
   settings = 0;
 
   // check the mainnode_timeout vote results
   if (mainnode_timeout.vote_round_change_timeout >= BLOCK_VERIFIERS_VALID_AMOUNT)
-  {
-    // check if at least TRUSTED_BLOCK_VERIFIERS_AMOUNT have voted for a round change due to a main node timeout
-    for (count = 0, count2 = 0, counter = 0; count < mainnode_timeout.vote_round_change_timeout; count++)
-    {
-      for (count2 = 0; count2 < TRUSTED_BLOCK_VERIFIERS_TOTAL_AMOUNT; count2++)
-      {
-        if (memcmp(mainnode_timeout.block_verifiers_public_address[count],trusted_block_verifiers.trusted_block_verifiers_public_address[count2],XCASH_WALLET_LENGTH) == 0)
-        {
-          counter++;
-        }
-      }
-    }
-
-    if (counter >= TRUSTED_BLOCK_VERIFIERS_AMOUNT)
-    {
-      // The main node timeout is valid
-      settings = 1;      
-    }
-    else
-    {
-      // The main node timeout is invalid
-      settings = 2;
-    }
+  { 
+    // The main node timeout is valid
+    settings = 1; 
   }
 
 
@@ -369,28 +349,8 @@ void* receive_votes_from_nodes_timeout_thread()
   // check if the the node_to_node_vote vote results are false
   if (mainnode_timeout.vote_round_change_timeout < BLOCK_VERIFIERS_VALID_AMOUNT && node_to_node_vote.vote_next_round_false >= BLOCK_VERIFIERS_VALID_AMOUNT)
   {
-    // check if at least TRUSTED_BLOCK_VERIFIERS_AMOUNT have voted false
-    for (count = 0, count2 = 0, counter = 0; count < node_to_node_vote.vote_next_round_false; count++)
-    {
-      for (count2 = 0; count2 < TRUSTED_BLOCK_VERIFIERS_TOTAL_AMOUNT; count2++)
-      {
-        if (memcmp(mainnode_timeout.block_verifiers_public_address[count],trusted_block_verifiers.trusted_block_verifiers_public_address[count2],XCASH_WALLET_LENGTH) == 0)
-        {
-          counter++;
-        }
-      }
-    }    
-    
-    if (counter >= TRUSTED_BLOCK_VERIFIERS_AMOUNT && settings2 == 0)
-    {
-      // The vote for false is valid
-      settings = 3;
-    }
-    else
-    {
-      // The vote for false is invalid
-      settings = 4;
-    }
+    // The vote for false is valid
+    settings = 2;
   }
 
 
@@ -398,28 +358,8 @@ void* receive_votes_from_nodes_timeout_thread()
   // check if the the node_to_node_vote vote results are true
   if (mainnode_timeout.vote_round_change_timeout < BLOCK_VERIFIERS_VALID_AMOUNT && node_to_node_vote.vote_next_round_true >= BLOCK_VERIFIERS_VALID_AMOUNT)
   {
-    // check if at least TRUSTED_BLOCK_VERIFIERS_AMOUNT have voted true
-    for (count = 0, count2 = 0, counter = 0; count < node_to_node_vote.vote_next_round_true; count++)
-    {
-      for (count2 = 0; count2 < TRUSTED_BLOCK_VERIFIERS_TOTAL_AMOUNT; count2++)
-      {
-        if (memcmp(mainnode_timeout.block_verifiers_public_address[count],trusted_block_verifiers.trusted_block_verifiers_public_address[count2],XCASH_WALLET_LENGTH) == 0)
-        {
-          counter++;
-        }
-      }
-    }
-    
-    if (counter >= TRUSTED_BLOCK_VERIFIERS_AMOUNT && settings2 == 0)
-    {
-      // The vote for true is valid
-      settings = 5;
-    }
-    else
-    {
-      // The vote for true is invalid
-      settings = 6;
-    }
+    // The vote for true is valid
+    settings = 3;
   }
 
 
@@ -427,7 +367,7 @@ void* receive_votes_from_nodes_timeout_thread()
   // check if no vote result was greater than BLOCK_VERIFIERS_VALID_AMOUNT
   if (mainnode_timeout.vote_round_change_timeout < BLOCK_VERIFIERS_VALID_AMOUNT && node_to_node_vote.vote_next_round_false < BLOCK_VERIFIERS_VALID_AMOUNT && node_to_node_vote.vote_next_round_true < BLOCK_VERIFIERS_VALID_AMOUNT)
   {
-    settings = 7;
+    settings = 4;
   }
 
   end:
@@ -450,7 +390,7 @@ void* receive_votes_from_nodes_timeout_thread()
   node_to_node_vote.vote_next_round_true = 0;
   node_to_node_vote.vote_next_round_false = 0;
 
-  // reset the VRF_data and the trusted_block_verifiers_VRF_data if it is current_round_part 4
+  // reset the VRF_data and the block_verifiers_VRF_data if it is current_round_part 4
   if (memcmp(current_round_part,"4",1) == 0)
   {
     memset(VRF_data.vrf_public_key_round_part_1,0,strnlen(VRF_data.vrf_public_key_round_part_1,BUFFER_SIZE));
@@ -466,23 +406,23 @@ void* receive_votes_from_nodes_timeout_thread()
     memset(VRF_data.vrf_proof_round_part_3,0,strnlen(VRF_data.vrf_proof_round_part_3,BUFFER_SIZE));
     memset(VRF_data.vrf_beta_string_round_part_3,0,strnlen(VRF_data.vrf_beta_string_round_part_3,BUFFER_SIZE)); 
 
-    for (count = 0; count < TRUSTED_BLOCK_VERIFIERS_AMOUNT; count++)
+    for (count = 0; count < BLOCK_VERIFIERS_VALID_AMOUNT; count++)
     {
-      memset(trusted_block_verifiers_VRF_data.public_address[count],0,strnlen(trusted_block_verifiers_VRF_data.public_address[count],XCASH_WALLET_LENGTH+1));
-      memset(trusted_block_verifiers_VRF_data.vrf_public_key_round_part_1[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_public_key_round_part_1[count],VRF_PUBLIC_KEY_LENGTH));
-      memset(trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_1[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_1[count],BUFFER_SIZE));
-      memset(trusted_block_verifiers_VRF_data.vrf_proof_round_part_1[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_proof_round_part_1[count],VRF_PROOF_LENGTH));
-      memset(trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_1[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_1[count],VRF_BETA_LENGTH));
-      memset(trusted_block_verifiers_VRF_data.vrf_public_key_round_part_2[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_public_key_round_part_2[count],VRF_PUBLIC_KEY_LENGTH));
-      memset(trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_2[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_2[count],BUFFER_SIZE));
-      memset(trusted_block_verifiers_VRF_data.vrf_proof_round_part_2[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_proof_round_part_2[count],VRF_PROOF_LENGTH));
-      memset(trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_2[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_2[count],VRF_BETA_LENGTH));
-      memset(trusted_block_verifiers_VRF_data.vrf_public_key_round_part_3[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_public_key_round_part_3[count],VRF_PUBLIC_KEY_LENGTH));
-      memset(trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_3[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_3[count],BUFFER_SIZE));
-      memset(trusted_block_verifiers_VRF_data.vrf_proof_round_part_3[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_proof_round_part_3[count],VRF_PROOF_LENGTH));
-      memset(trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_3[count],0,strnlen(trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_3[count],VRF_BETA_LENGTH));
-      memset(trusted_block_verifiers_VRF_data.block_blob[count],0,strnlen(trusted_block_verifiers_VRF_data.block_blob[count],BUFFER_SIZE));
-      memset(trusted_block_verifiers_VRF_data.data_hash[count],0,strnlen(trusted_block_verifiers_VRF_data.data_hash[count],DATA_HASH_LENGTH));
+      memset(block_verifiers_VRF_data.public_address[count],0,strnlen(block_verifiers_VRF_data.public_address[count],XCASH_WALLET_LENGTH+1));
+      memset(block_verifiers_VRF_data.vrf_public_key_round_part_1[count],0,strnlen(block_verifiers_VRF_data.vrf_public_key_round_part_1[count],VRF_PUBLIC_KEY_LENGTH));
+      memset(block_verifiers_VRF_data.vrf_alpha_string_round_part_1[count],0,strnlen(block_verifiers_VRF_data.vrf_alpha_string_round_part_1[count],BUFFER_SIZE));
+      memset(block_verifiers_VRF_data.vrf_proof_round_part_1[count],0,strnlen(block_verifiers_VRF_data.vrf_proof_round_part_1[count],VRF_PROOF_LENGTH));
+      memset(block_verifiers_VRF_data.vrf_beta_string_round_part_1[count],0,strnlen(block_verifiers_VRF_data.vrf_beta_string_round_part_1[count],VRF_BETA_LENGTH));
+      memset(block_verifiers_VRF_data.vrf_public_key_round_part_2[count],0,strnlen(block_verifiers_VRF_data.vrf_public_key_round_part_2[count],VRF_PUBLIC_KEY_LENGTH));
+      memset(block_verifiers_VRF_data.vrf_alpha_string_round_part_2[count],0,strnlen(block_verifiers_VRF_data.vrf_alpha_string_round_part_2[count],BUFFER_SIZE));
+      memset(block_verifiers_VRF_data.vrf_proof_round_part_2[count],0,strnlen(block_verifiers_VRF_data.vrf_proof_round_part_2[count],VRF_PROOF_LENGTH));
+      memset(block_verifiers_VRF_data.vrf_beta_string_round_part_2[count],0,strnlen(block_verifiers_VRF_data.vrf_beta_string_round_part_2[count],VRF_BETA_LENGTH));
+      memset(block_verifiers_VRF_data.vrf_public_key_round_part_3[count],0,strnlen(block_verifiers_VRF_data.vrf_public_key_round_part_3[count],VRF_PUBLIC_KEY_LENGTH));
+      memset(block_verifiers_VRF_data.vrf_alpha_string_round_part_3[count],0,strnlen(block_verifiers_VRF_data.vrf_alpha_string_round_part_3[count],BUFFER_SIZE));
+      memset(block_verifiers_VRF_data.vrf_proof_round_part_3[count],0,strnlen(block_verifiers_VRF_data.vrf_proof_round_part_3[count],VRF_PROOF_LENGTH));
+      memset(block_verifiers_VRF_data.vrf_beta_string_round_part_3[count],0,strnlen(block_verifiers_VRF_data.vrf_beta_string_round_part_3[count],VRF_BETA_LENGTH));
+      memset(block_verifiers_VRF_data.block_blob[count],0,strnlen(block_verifiers_VRF_data.block_blob[count],BUFFER_SIZE));
+      memset(block_verifiers_VRF_data.data_hash[count],0,strnlen(block_verifiers_VRF_data.data_hash[count],DATA_HASH_LENGTH));
     }
   }
 
@@ -500,20 +440,6 @@ void* receive_votes_from_nodes_timeout_thread()
   }
   else if (settings == 2)
   {
-    // The main node timeout is invalid
-
-    // set all of the block verifiers block_producer_eligibility to false that voted for the invalid result
-    update_block_producer_eligibility(0);
-
-    // start the next round, and for this round have the consensus node add the block to the network
-    if (start_next_round(1) == 0)
-    {
-      // have the consensus node add a block to the network
-      consensus_node_create_new_block();
-    }
-  }
-  else if (settings == 3)
-  {
     // The vote for false is valid
 
     // startnew part of round
@@ -523,21 +449,7 @@ void* receive_votes_from_nodes_timeout_thread()
       consensus_node_create_new_block();
     }
   }
-  else if (settings == 4)
-  {
-    // The vote for false is invalid
-
-    // set all of the block verifiers block_producer_eligibility to false that voted for the invalid result
-    update_block_producer_eligibility(1);
-
-    // start the next round, and for this round have the consensus node add the block to the network
-    if (start_next_round(1) == 0)
-    {
-      // have the consensus node add a block to the network
-      consensus_node_create_new_block();
-    }
-  }
-  else if (settings == 5)
+  else if (settings == 3)
   {
     // The vote for true is valid
 
@@ -566,21 +478,7 @@ void* receive_votes_from_nodes_timeout_thread()
       RECEIVE_VOTES_FROM_NODES_TIMEOUT_THREAD_ERROR("Could not update the current_round_part and current_round_part_backup_node in the database\nFunction: receive_votes_from_nodes_timeout_thread");
     }    
   }
-  else if (settings == 6)
-  {
-    // The vote for true invalid
-
-    // set all of the block verifiers block_producer_eligibility to false that voted for the invalid result
-    update_block_producer_eligibility(2);
-
-    // start the next round, and for this round have the consensus node add the block to the network
-    if (start_next_round(1) == 0)
-    {
-      // have the consensus node add a block to the network
-      consensus_node_create_new_block();
-    }
-  }
-  else if (settings == 7)
+  else if (settings == 4)
   {
     // no vote result was greater than BLOCK_VERIFIERS_VALID_AMOUNT
 
@@ -939,12 +837,6 @@ void* update_block_verifiers_timer()
           message_copy1 = strstr(data,data2) + strnlen(data2,BUFFER_SIZE);
           message_copy2 = strstr(message_copy1,"\"");
           memcpy(data3,message_copy1,message_copy2 - message_copy1);
-
-          // set the block_producer_eligibility to true for all delegates
-          if (update_document_from_collection(DATABASE_NAME,"delegates",settings,"{\"block_producer_eligibility\":\"true\"}",0) == 0)
-          {
-            color_print("Could not update the block_producer_eligibility in the database\nFunction: update_block_verifiers_timer","red");
-          }
 
           // get their online status and update the online status in the database
           if (send_data_socket(data3,SEND_DATA_PORT,"","check if delegate is online",0) == 0)

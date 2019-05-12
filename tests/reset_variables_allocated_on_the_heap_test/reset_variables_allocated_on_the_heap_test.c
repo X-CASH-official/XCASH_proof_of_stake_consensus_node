@@ -21,6 +21,10 @@
 #include "server_functions.h"
 #include "string_functions.h"
 #include "thread_functions.h"
+#include "vrf.h"
+#include "crypto_vrf.h"
+#include "VRF_functions.h"
+#include "sha512EL.h"
 
 #include "define_macros_test.h"
 #include "variables_test.h"
@@ -94,6 +98,12 @@ int reset_variables_allocated_on_the_heap_test()
   // Constants
   const char STR1_TEST [BUFFER_SIZE] = "test string 1";
   const char* STR2_TEST = "test string 2";
+  const unsigned char data2[crypto_vrf_SEEDBYTES] = {0x4c,0xcd,0x08,0x9b,0x28,0xff,0x96,0xda,0x9d,0xb6,0xc3,0x46,0xec,0x11,0x4e,0x0f,0x5b,0x8a,0x31,0x9f,0x35,0xab,0xa6,0x24,0xda,0x8c,0xf6,0xed,0x4f,0xb8,0xa6,0xfb};
+  const unsigned char public_key[crypto_vrf_PUBLICKEYBYTES] = {0x3d,0x40,0x17,0xc3,0xe8,0x43,0x89,0x5a,0x92,0xb7,0x0a,0xa7,0x4d,0x1b,0x7e,0xbc,0x9c,0x98,0x2c,0xcf,0x2e,0xc4,0x96,0x8c,0xc0,0xcd,0x55,0xf1,0x2a,0xf4,0x66,0x0c};
+  const unsigned char proof[crypto_vrf_PROOFBYTES] = {0xae,0x5b,0x66,0xbd,0xf0,0x4b,0x4c,0x01,0x0b,0xfe,0x32,0xb2,0xfc,0x12,0x6e,0xad,0x21,0x07,0xb6,0x97,0x63,0x4f,0x6f,0x73,0x37,0xb9,0xbf,0xf8,0x78,0x5e,0xe1,0x11,0x20,0x00,0x95,0xec,0xe8,0x7d,0xde,0x4d,0xbe,0x87,0x34,0x3f,0x6d,0xf3,0xb1,0x07,0xd9,0x17,0x98,0xc8,0xa7,0xeb,0x12,0x45,0xd3,0xbb,0x9c,0x5a,0xaf,0xb0,0x93,0x35,0x8c,0x13,0xe6,0xae,0x11,0x11,0xa5,0x57,0x17,0xe8,0x95,0xfd,0x15,0xf9,0x9f,0x07};
+  const unsigned char alpha_string[1] = {"\x72"};
+  const unsigned char beta_string[crypto_vrf_OUTPUTBYTES] = {0x94,0xf4,0x48,0x7e,0x1b,0x2f,0xec,0x95,0x43,0x09,0xef,0x12,0x89,0xec,0xb2,0xe1,0x50,0x43,0xa2,0x46,0x1e,0xcc,0x7b,0x2a,0xe7,0xd4,0x47,0x06,0x07,0xef,0x82,0xeb,0x1c,0xfa,0x97,0xd8,0x49,0x91,0xfe,0x4a,0x7b,0xfd,0xfd,0x71,0x56,0x06,0xbc,0x27,0xe2,0x96,0x7a,0x6c,0x55,0x7c,0xfb,0x58,0x75,0x87,0x9b,0x67,0x17,0x40,0xb7,0xd8};
+
 
   // Variables
   char* process_id_file = (char*)calloc(BUFFER_SIZE,sizeof(char));
@@ -107,6 +117,10 @@ int reset_variables_allocated_on_the_heap_test()
   size_t counter = 0;
   struct database_document_fields database_data;
   struct database_multiple_documents_fields database_multiple_documents_fields;
+  unsigned char vrf_public_key[crypto_vrf_PUBLICKEYBYTES];
+  unsigned char vrf_secret_key[crypto_vrf_SECRETKEYBYTES];
+  unsigned char vrf_proof[crypto_vrf_PROOFBYTES];
+  unsigned char vrf_beta[crypto_vrf_OUTPUTBYTES];
   pthread_t thread_id;
   int settings2 = 1;
 
@@ -300,7 +314,7 @@ int reset_variables_allocated_on_the_heap_test()
 
   // run the test
 
-  // append_string   
+/*  // append_string   
   // read the current system memory usage
   previous_system_memory_usage = get_program_memory_usage(process_id_file);
   for (count = 0; count <= 1000; count++)
@@ -1590,6 +1604,124 @@ int reset_variables_allocated_on_the_heap_test()
 
 
 
+  // get_public_address 
+  // read the current system memory usage
+  if (settings2 == 1)
+  {
+    previous_system_memory_usage = get_program_memory_usage(process_id_file);
+    for (count = 0; count <= 1000; count++)
+    {
+      fprintf(stderr,"Current progress for get_previous_block_hash: %zu / 1000",count);
+      fprintf(stderr,"\r");
+      memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
+      get_public_address(0);
+      if (count == 0)
+      {    
+        current_memory_usage = get_program_memory_usage(process_id_file) - previous_system_memory_usage;
+      }
+      if (count == 10)
+      {
+        current_system_memory_usage = get_program_memory_usage(process_id_file);
+        if ((current_system_memory_usage - previous_system_memory_usage) > current_memory_usage * 9 && current_memory_usage > 0)
+        {
+          color_print("FAILED! get_public_address has not reset all variables allocated on the heap","red");
+          settings2 = 0;
+          break;
+        }  
+      } 
+      if (count == 100)
+      {
+        current_system_memory_usage = get_program_memory_usage(process_id_file);
+        if ((current_system_memory_usage - previous_system_memory_usage) > current_memory_usage * 50 && current_memory_usage > 0)
+        {
+          color_print("FAILED! get_public_address has not reset all variables allocated on the heap","red");
+          settings2 = 0;
+          break;
+        }  
+      } 
+      if (count == 1000)
+      {
+        current_system_memory_usage = get_program_memory_usage(process_id_file);
+        if ((current_system_memory_usage - previous_system_memory_usage) > current_memory_usage * 100 && current_memory_usage > 0)
+        {
+          color_print("FAILED! get_public_address has not reset all variables allocated on the heap","red");
+          settings2 = 0;
+          break;
+        }  
+        else
+        {
+          color_print("PASSED! get_public_address has reset all variables allocated on the heap","green");
+          count_test++;
+        }      
+      } 
+    }
+  }
+  else
+  {
+    color_print("All other test will not be run","red");
+  }
+
+
+
+  // data_verify 
+  // read the current system memory usage
+  if (settings2 == 1)
+  {
+    previous_system_memory_usage = get_program_memory_usage(process_id_file);
+    for (count = 0; count <= 1000; count++)
+    {
+      fprintf(stderr,"Current progress for get_previous_block_hash: %zu / 1000",count);
+      fprintf(stderr,"\r");
+      memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
+      get_previous_block_hash(data_test,0);
+      if (count == 0)
+      {    
+        current_memory_usage = get_program_memory_usage(process_id_file) - previous_system_memory_usage;
+      }
+      if (count == 10)
+      {
+        current_system_memory_usage = get_program_memory_usage(process_id_file);
+        if ((current_system_memory_usage - previous_system_memory_usage) > current_memory_usage * 9 && current_memory_usage > 0)
+        {
+          color_print("FAILED! data_verify has not reset all variables allocated on the heap","red");
+          settings2 = 0;
+          break;
+        }  
+      } 
+      if (count == 100)
+      {
+        current_system_memory_usage = get_program_memory_usage(process_id_file);
+        if ((current_system_memory_usage - previous_system_memory_usage) > current_memory_usage * 50 && current_memory_usage > 0)
+        {
+          color_print("FAILED! data_verify has not reset all variables allocated on the heap","red");
+          settings2 = 0;
+          break;
+        }  
+      } 
+      if (count == 1000)
+      {
+        current_system_memory_usage = get_program_memory_usage(process_id_file);
+        if ((current_system_memory_usage - previous_system_memory_usage) > current_memory_usage * 100 && current_memory_usage > 0)
+        {
+          color_print("FAILED! data_verify has not reset all variables allocated on the heap","red");
+          settings2 = 0;
+          break;
+        }  
+        else
+        {
+          color_print("PASSED! data_verify has reset all variables allocated on the heap","green");
+          count_test++;
+        }      
+      } 
+    }
+  }
+  else
+  {
+    color_print("All other test will not be run","red");
+  }
+
+
+
   // set the current_round_part and current_round_part_backup_node
   memset(current_round_part,0,strnlen(current_round_part,BUFFER_SIZE));
   memset(current_round_part_backup_node,0,strnlen(current_round_part_backup_node,BUFFER_SIZE));
@@ -1835,6 +1967,170 @@ int reset_variables_allocated_on_the_heap_test()
           count_test++;
         }      
       } 
+    }
+  }
+  else
+  {
+    color_print("All other test will not be run","red");
+  }*/
+
+
+
+  // create_random_VRF_keys 
+  if (settings2 == 1)
+  {
+    previous_system_memory_usage = get_program_memory_usage(process_id_file);
+    for (count = 0; count <= 1000; count++)
+    {
+      create_random_VRF_keys((unsigned char*)vrf_public_key,(unsigned char*)vrf_secret_key);
+      if (count == 0)
+      {    
+        current_memory_usage = get_program_memory_usage(process_id_file) - previous_system_memory_usage;
+      }
+      if (count == 10)
+      {
+        current_system_memory_usage = get_program_memory_usage(process_id_file);
+        if ((current_system_memory_usage - previous_system_memory_usage) > current_memory_usage * 9 && current_memory_usage > 0)
+        {
+          color_print("FAILED! create_random_VRF_keys has not reset all variables allocated on the heap","red");
+          settings2 = 0;
+          break;
+        }      
+      }
+      if (count == 100)
+      {
+        current_system_memory_usage = get_program_memory_usage(process_id_file);
+        if ((current_system_memory_usage - previous_system_memory_usage) > current_memory_usage * 50 && current_memory_usage > 0)
+        {
+          color_print("FAILED! create_random_VRF_keys has not reset all variables allocated on the heap","red");
+          settings2 = 0;
+          break;
+        }  
+      }
+      if (count == 1000)
+      {
+        current_system_memory_usage = get_program_memory_usage(process_id_file);
+        if ((current_system_memory_usage - previous_system_memory_usage) > current_memory_usage * 100 && current_memory_usage > 0)
+        {
+          color_print("FAILED! create_random_VRF_keys has not reset all variables allocated on the heap","red");
+          settings2 = 0;
+          break;
+        }
+        else
+        {
+          color_print("PASSED! create_random_VRF_keys has reset all variables allocated on the heap","green");
+          count_test++;
+        }   
+      }  
+    }
+  }
+  else
+  {
+    color_print("All other test will not be run","red");
+  }
+
+
+
+  // crypto_vrf_is_valid_key 
+  if (settings2 == 1)
+  {
+    previous_system_memory_usage = get_program_memory_usage(process_id_file);
+    for (count = 0; count <= 1000; count++)
+    {
+      count2 = crypto_vrf_is_valid_key((const unsigned char*)vrf_public_key);
+      if (count == 0)
+      {    
+        current_memory_usage = get_program_memory_usage(process_id_file) - previous_system_memory_usage;
+      }
+      if (count == 10)
+      {
+        current_system_memory_usage = get_program_memory_usage(process_id_file);
+        if ((current_system_memory_usage - previous_system_memory_usage) > current_memory_usage * 9 && current_memory_usage > 0)
+        {
+          color_print("FAILED! crypto_vrf_is_valid_key has not reset all variables allocated on the heap","red");
+          settings2 = 0;
+          break;
+        }      
+      }
+      if (count == 100)
+      {
+        current_system_memory_usage = get_program_memory_usage(process_id_file);
+        if ((current_system_memory_usage - previous_system_memory_usage) > current_memory_usage * 50 && current_memory_usage > 0)
+        {
+          color_print("FAILED! crypto_vrf_is_valid_key has not reset all variables allocated on the heap","red");
+          settings2 = 0;
+          break;
+        }  
+      }
+      if (count == 1000)
+      {
+        current_system_memory_usage = get_program_memory_usage(process_id_file);
+        if ((current_system_memory_usage - previous_system_memory_usage) > current_memory_usage * 100 && current_memory_usage > 0)
+        {
+          color_print("FAILED! crypto_vrf_is_valid_key has not reset all variables allocated on the heap","red");
+          settings2 = 0;
+          break;
+        }
+        else
+        {
+          color_print("PASSED! crypto_vrf_is_valid_key has reset all variables allocated on the heap","green");
+          count_test++;
+        }   
+      }  
+    }
+  }
+  else
+  {
+    color_print("All other test will not be run","red");
+  }
+
+
+  // crypto_vrf_keypair_from_seed 
+  if (settings2 == 1)
+  {
+    previous_system_memory_usage = get_program_memory_usage(process_id_file);
+    for (count = 0; count <= 1000; count++)
+    {
+      crypto_vrf_keypair_from_seed((unsigned char*)vrf_public_key, (unsigned char*)vrf_secret_key, (const unsigned char*)data2);
+      if (count == 0)
+      {    
+        current_memory_usage = get_program_memory_usage(process_id_file) - previous_system_memory_usage;
+      }
+      if (count == 10)
+      {
+        current_system_memory_usage = get_program_memory_usage(process_id_file);
+        if ((current_system_memory_usage - previous_system_memory_usage) > current_memory_usage * 9 && current_memory_usage > 0)
+        {
+          color_print("FAILED! crypto_vrf_keypair_from_seed has not reset all variables allocated on the heap","red");
+          settings2 = 0;
+          break;
+        }      
+      }
+      if (count == 100)
+      {
+        current_system_memory_usage = get_program_memory_usage(process_id_file);
+        if ((current_system_memory_usage - previous_system_memory_usage) > current_memory_usage * 50 && current_memory_usage > 0)
+        {
+          color_print("FAILED! crypto_vrf_keypair_from_seed has not reset all variables allocated on the heap","red");
+          settings2 = 0;
+          break;
+        }  
+      }
+      if (count == 1000)
+      {
+        current_system_memory_usage = get_program_memory_usage(process_id_file);
+        if ((current_system_memory_usage - previous_system_memory_usage) > current_memory_usage * 100 && current_memory_usage > 0)
+        {
+          color_print("FAILED! crypto_vrf_keypair_from_seed has not reset all variables allocated on the heap","red");
+          settings2 = 0;
+          break;
+        }
+        else
+        {
+          color_print("PASSED! crypto_vrf_keypair_from_seed has reset all variables allocated on the heap","green");
+          count_test++;
+        }   
+      }  
     }
   }
   else

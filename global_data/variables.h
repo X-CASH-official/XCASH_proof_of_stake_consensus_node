@@ -18,8 +18,7 @@ mongoc_client_pool_t* database_client_thread_pool;
 char* xcash_wallet_public_address; // Holds your wallets public address
 struct block_verifiers_list block_verifiers_list; // The list of the enabled nodes name, public address and IP address
 struct block_validation_nodes_list block_validation_nodes_list; // The list of block validation nodes public address
-struct trusted_block_verifiers trusted_block_verifiers; // The list of trusted block verifiers.
-struct trusted_block_verifiers_VRF_data trusted_block_verifiers_VRF_data; // The list of VRF data for all of the trusted block verifiers.
+struct block_verifiers_VRF_data block_verifiers_VRF_data; // The list of VRF data for all of the trusted block verifiers.
 struct VRF_data VRF_data; // The list of all of the VRF data to send to the block producer.
 struct blockchain_data blockchain_data; // The data for a new block to be added to the network.
 struct reserve_proofs_list reserve_proofs_list; // Holds all of the reserve proofs in the database when updating the block verifiers list

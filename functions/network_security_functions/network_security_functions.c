@@ -381,6 +381,7 @@ int verify_data(const char* MESSAGE, const int HTTP_SETTINGS, const int VERIFY_C
     
   // create the message
   message_length = strnlen(result,BUFFER_SIZE);
+  memset(string,0,strnlen(string,BUFFER_SIZE));
   memcpy(string,"{\"jsonrpc\":\"2.0\",\"id\":\"0\",\"method\":\"verify\",\"params\":{\"data\":\"",62);
   memcpy(string+62,result,message_length);
   memcpy(string+62+message_length,"\",\"address\":\"",13);

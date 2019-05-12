@@ -373,7 +373,7 @@ int database_test()
       database_multiple_documents_fields.item[count][counter] = (char*)calloc(BUFFER_SIZE,sizeof(char));
       database_multiple_documents_fields.value[count][counter] = (char*)calloc(BUFFER_SIZE,sizeof(char));
 
-      if (database_multiple_documents_fields.item[count][counter] || database_multiple_documents_fields.value[count][counter] == NULL)
+      if (database_multiple_documents_fields.item[count][counter] == NULL || database_multiple_documents_fields.value[count][counter] == NULL)
       {
         color_print("Could not allocate the memory needed on the heap","red");
         exit(0);
@@ -450,7 +450,7 @@ int database_test()
       database_multiple_documents_fields.item[count][counter] = (char*)calloc(BUFFER_SIZE,sizeof(char));
       database_multiple_documents_fields.value[count][counter] = (char*)calloc(BUFFER_SIZE,sizeof(char));
 
-      if (database_multiple_documents_fields.item[count][counter] || database_multiple_documents_fields.value[count][counter] == NULL)
+      if (database_multiple_documents_fields.item[count][counter] == NULL || database_multiple_documents_fields.value[count][counter] == NULL)
       {
         color_print("Could not allocate the memory needed on the heap","red");
         exit(0);

@@ -20,26 +20,22 @@ struct block_validation_nodes_list {
     char* block_validation_nodes_IP_address[BLOCK_VALIDATION_NODES_TOTAL_AMOUNT]; // The block validation nodes IP address
 };
 
-struct trusted_block_verifiers {
-    char* trusted_block_verifiers_public_address[TRUSTED_BLOCK_VERIFIERS_AMOUNT]; // The public address of the trusted block verifiers
-};
-
-struct trusted_block_verifiers_VRF_data {
-    char* public_address[TRUSTED_BLOCK_VERIFIERS_AMOUNT]; // The public_address of the trusted block verifier
-    char* vrf_public_key_round_part_1[TRUSTED_BLOCK_VERIFIERS_AMOUNT]; // The vrf_public_key_round_part_1 that the trusted block verifier received
-    char* vrf_alpha_string_round_part_1[TRUSTED_BLOCK_VERIFIERS_AMOUNT]; // The vrf_alpha_string_round_part_1 that the trusted block verifier received
-    char* vrf_proof_round_part_1[TRUSTED_BLOCK_VERIFIERS_AMOUNT]; // The vrf_proof_round_part_1 that the trusted block verifier received
-    char* vrf_beta_string_round_part_1[TRUSTED_BLOCK_VERIFIERS_AMOUNT]; // The vrf_beta_string_round_part_1 that the trusted block verifier received
-    char* vrf_public_key_round_part_2[TRUSTED_BLOCK_VERIFIERS_AMOUNT]; // The vrf_public_key_round_part_2 that the trusted block verifier received
-    char* vrf_alpha_string_round_part_2[TRUSTED_BLOCK_VERIFIERS_AMOUNT]; // The vrf_alpha_string_round_part_2 that the trusted block verifier received
-    char* vrf_proof_round_part_2[TRUSTED_BLOCK_VERIFIERS_AMOUNT]; // The vrf_proof_round_part_2 that the trusted block verifier received
-    char* vrf_beta_string_round_part_2[TRUSTED_BLOCK_VERIFIERS_AMOUNT]; // The vrf_beta_string_round_part_2 that the trusted block verifier received
-    char* vrf_public_key_round_part_3[TRUSTED_BLOCK_VERIFIERS_AMOUNT]; // The vrf_public_key_round_part_3 that the trusted block verifier received
-    char* vrf_alpha_string_round_part_3[TRUSTED_BLOCK_VERIFIERS_AMOUNT]; // The vrf_alpha_string_round_part_3 that the trusted block verifier received
-    char* vrf_proof_round_part_3[TRUSTED_BLOCK_VERIFIERS_AMOUNT]; // The vrf_proof_round_part_3 that the trusted block verifier received
-    char* vrf_beta_string_round_part_3[TRUSTED_BLOCK_VERIFIERS_AMOUNT]; // The vrf_beta_string_round_part_3 that the trusted block verifier received
-    char* block_blob[TRUSTED_BLOCK_VERIFIERS_AMOUNT]; // The block_blob that the trusted block verifier received
-    char* data_hash[TRUSTED_BLOCK_VERIFIERS_AMOUNT]; // The SHA2-512 hash of all of the data for each trusted block verifier
+struct block_verifiers_VRF_data {
+    char* public_address[BLOCK_VERIFIERS_AMOUNT]; // The public_address of the trusted block verifier
+    char* vrf_public_key_round_part_1[BLOCK_VERIFIERS_AMOUNT]; // The vrf_public_key_round_part_1 that the trusted block verifier received
+    char* vrf_alpha_string_round_part_1[BLOCK_VERIFIERS_AMOUNT]; // The vrf_alpha_string_round_part_1 that the trusted block verifier received
+    char* vrf_proof_round_part_1[BLOCK_VERIFIERS_AMOUNT]; // The vrf_proof_round_part_1 that the trusted block verifier received
+    char* vrf_beta_string_round_part_1[BLOCK_VERIFIERS_AMOUNT]; // The vrf_beta_string_round_part_1 that the trusted block verifier received
+    char* vrf_public_key_round_part_2[BLOCK_VERIFIERS_AMOUNT]; // The vrf_public_key_round_part_2 that the trusted block verifier received
+    char* vrf_alpha_string_round_part_2[BLOCK_VERIFIERS_AMOUNT]; // The vrf_alpha_string_round_part_2 that the trusted block verifier received
+    char* vrf_proof_round_part_2[BLOCK_VERIFIERS_AMOUNT]; // The vrf_proof_round_part_2 that the trusted block verifier received
+    char* vrf_beta_string_round_part_2[BLOCK_VERIFIERS_AMOUNT]; // The vrf_beta_string_round_part_2 that the trusted block verifier received
+    char* vrf_public_key_round_part_3[BLOCK_VERIFIERS_AMOUNT]; // The vrf_public_key_round_part_3 that the trusted block verifier received
+    char* vrf_alpha_string_round_part_3[BLOCK_VERIFIERS_AMOUNT]; // The vrf_alpha_string_round_part_3 that the trusted block verifier received
+    char* vrf_proof_round_part_3[BLOCK_VERIFIERS_AMOUNT]; // The vrf_proof_round_part_3 that the trusted block verifier received
+    char* vrf_beta_string_round_part_3[BLOCK_VERIFIERS_AMOUNT]; // The vrf_beta_string_round_part_3 that the trusted block verifier received
+    char* block_blob[BLOCK_VERIFIERS_AMOUNT]; // The block_blob that the trusted block verifier received
+    char* data_hash[BLOCK_VERIFIERS_AMOUNT]; // The SHA2-512 hash of all of the data for each trusted block verifier
     size_t count; // How many items are in the trusted_block_verifiers_VRF_data struct
 };
 
@@ -139,8 +135,8 @@ struct blockchain_reserve_bytes {
     size_t vrf_data_length; // The length of the VRF data for all of the round parts
     char* previous_block_hash_data; // The previous_block_hash
     size_t previous_block_hash_data_length; // The amount of characters of the previous_block_hash_data
-    char* block_validation_node_signature_data[BLOCK_VALIDATION_NODES_AMOUNT]; // The block_validation_node_signature
-    char* block_validation_node_signature[BLOCK_VALIDATION_NODES_AMOUNT]; // The block_validation_node_signature_data text
+    char* block_validation_node_signature_data[BLOCK_VALIDATION_NODES_TOTAL_AMOUNT]; // The block_validation_node_signature
+    char* block_validation_node_signature[BLOCK_VALIDATION_NODES_TOTAL_AMOUNT]; // The block_validation_node_signature_data text
     size_t block_validation_node_signature_data_length; // The amount of characters of the block_validation_node_signature_data
 };
 

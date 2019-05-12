@@ -165,40 +165,27 @@ int main(int parameters_count, char* parameters[])
     }
   }  
 
-  // initialize the trusted_block_verifiers struct 
-  for (count = 0; count < TRUSTED_BLOCK_VERIFIERS_AMOUNT; count++)
-  {
-    trusted_block_verifiers.trusted_block_verifiers_public_address[count] = (char*)calloc(XCASH_WALLET_LENGTH+1,sizeof(char));
-
-    // check if the memory needed was allocated on the heap successfully
-    if (trusted_block_verifiers.trusted_block_verifiers_public_address[count] == NULL)
-    {
-      color_print("Could not allocate the memory needed on the heap","red");
-      exit(0);
-    }
-  }
-
-  // initialize the trusted_block_verifiers_VRF_data struct 
+  // initialize the block_verifiers_VRF_data struct 
   for (count = 0; count < BLOCK_VERIFIERS_AMOUNT; count++)
   {
-    trusted_block_verifiers_VRF_data.public_address[count] = (char*)calloc(XCASH_WALLET_LENGTH+1,sizeof(char));
-    trusted_block_verifiers_VRF_data.vrf_public_key_round_part_1[count] = (char*)calloc(VRF_PUBLIC_KEY_LENGTH+1,sizeof(char));
-    trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_1[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
-    trusted_block_verifiers_VRF_data.vrf_proof_round_part_1[count] = (char*)calloc(VRF_PROOF_LENGTH+1,sizeof(char));
-    trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_1[count] = (char*)calloc(VRF_BETA_LENGTH+1,sizeof(char));
-    trusted_block_verifiers_VRF_data.vrf_public_key_round_part_2[count] = (char*)calloc(VRF_PUBLIC_KEY_LENGTH+1,sizeof(char));
-    trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_2[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
-    trusted_block_verifiers_VRF_data.vrf_proof_round_part_2[count] = (char*)calloc(VRF_PROOF_LENGTH+1,sizeof(char));
-    trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_2[count] = (char*)calloc(VRF_BETA_LENGTH+1,sizeof(char));
-    trusted_block_verifiers_VRF_data.vrf_public_key_round_part_3[count] = (char*)calloc(VRF_PUBLIC_KEY_LENGTH+1,sizeof(char));
-    trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_3[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
-    trusted_block_verifiers_VRF_data.vrf_proof_round_part_3[count] = (char*)calloc(VRF_PROOF_LENGTH+1,sizeof(char));
-    trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_3[count] = (char*)calloc(VRF_BETA_LENGTH+1,sizeof(char));
-    trusted_block_verifiers_VRF_data.block_blob[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
-    trusted_block_verifiers_VRF_data.data_hash[count] = (char*)calloc(DATA_HASH_LENGTH,sizeof(char));
+    block_verifiers_VRF_data.public_address[count] = (char*)calloc(XCASH_WALLET_LENGTH+1,sizeof(char));
+    block_verifiers_VRF_data.vrf_public_key_round_part_1[count] = (char*)calloc(VRF_PUBLIC_KEY_LENGTH+1,sizeof(char));
+    block_verifiers_VRF_data.vrf_alpha_string_round_part_1[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
+    block_verifiers_VRF_data.vrf_proof_round_part_1[count] = (char*)calloc(VRF_PROOF_LENGTH+1,sizeof(char));
+    block_verifiers_VRF_data.vrf_beta_string_round_part_1[count] = (char*)calloc(VRF_BETA_LENGTH+1,sizeof(char));
+    block_verifiers_VRF_data.vrf_public_key_round_part_2[count] = (char*)calloc(VRF_PUBLIC_KEY_LENGTH+1,sizeof(char));
+    block_verifiers_VRF_data.vrf_alpha_string_round_part_2[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
+    block_verifiers_VRF_data.vrf_proof_round_part_2[count] = (char*)calloc(VRF_PROOF_LENGTH+1,sizeof(char));
+    block_verifiers_VRF_data.vrf_beta_string_round_part_2[count] = (char*)calloc(VRF_BETA_LENGTH+1,sizeof(char));
+    block_verifiers_VRF_data.vrf_public_key_round_part_3[count] = (char*)calloc(VRF_PUBLIC_KEY_LENGTH+1,sizeof(char));
+    block_verifiers_VRF_data.vrf_alpha_string_round_part_3[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
+    block_verifiers_VRF_data.vrf_proof_round_part_3[count] = (char*)calloc(VRF_PROOF_LENGTH+1,sizeof(char));
+    block_verifiers_VRF_data.vrf_beta_string_round_part_3[count] = (char*)calloc(VRF_BETA_LENGTH+1,sizeof(char));
+    block_verifiers_VRF_data.block_blob[count] = (char*)calloc(BUFFER_SIZE,sizeof(char));
+    block_verifiers_VRF_data.data_hash[count] = (char*)calloc(DATA_HASH_LENGTH,sizeof(char));
 
     // check if the memory needed was allocated on the heap successfully
-    if (trusted_block_verifiers_VRF_data.public_address[count] == NULL || trusted_block_verifiers_VRF_data.vrf_public_key_round_part_1[count] == NULL  || trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_1[count] == NULL  || trusted_block_verifiers_VRF_data.vrf_proof_round_part_1[count] == NULL  || trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_1[count] == NULL || trusted_block_verifiers_VRF_data.vrf_public_key_round_part_2[count] == NULL  || trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_2[count] == NULL  || trusted_block_verifiers_VRF_data.vrf_proof_round_part_2[count] == NULL  || trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_2[count] == NULL || trusted_block_verifiers_VRF_data.vrf_public_key_round_part_3[count] == NULL  || trusted_block_verifiers_VRF_data.vrf_alpha_string_round_part_3[count] == NULL  || trusted_block_verifiers_VRF_data.vrf_proof_round_part_3[count] == NULL  || trusted_block_verifiers_VRF_data.vrf_beta_string_round_part_3[count] == NULL || trusted_block_verifiers_VRF_data.block_blob[count] == NULL)
+    if (block_verifiers_VRF_data.public_address[count] == NULL || block_verifiers_VRF_data.vrf_public_key_round_part_1[count] == NULL  || block_verifiers_VRF_data.vrf_alpha_string_round_part_1[count] == NULL  || block_verifiers_VRF_data.vrf_proof_round_part_1[count] == NULL  || block_verifiers_VRF_data.vrf_beta_string_round_part_1[count] == NULL || block_verifiers_VRF_data.vrf_public_key_round_part_2[count] == NULL  || block_verifiers_VRF_data.vrf_alpha_string_round_part_2[count] == NULL  || block_verifiers_VRF_data.vrf_proof_round_part_2[count] == NULL  || block_verifiers_VRF_data.vrf_beta_string_round_part_2[count] == NULL || block_verifiers_VRF_data.vrf_public_key_round_part_3[count] == NULL  || block_verifiers_VRF_data.vrf_alpha_string_round_part_3[count] == NULL  || block_verifiers_VRF_data.vrf_proof_round_part_3[count] == NULL  || block_verifiers_VRF_data.vrf_beta_string_round_part_3[count] == NULL || block_verifiers_VRF_data.block_blob[count] == NULL)
     {
       color_print("Could not allocate the memory needed on the heap","red");
       exit(0);
@@ -306,7 +293,7 @@ int main(int parameters_count, char* parameters[])
     color_print("Could not allocate the memory needed on the heap","red");
     exit(0);
   }
-  for (count = 0; count < BLOCK_VALIDATION_NODES_AMOUNT; count++)
+  for (count = 0; count < BLOCK_VALIDATION_NODES_TOTAL_AMOUNT; count++)
   {
     blockchain_data.blockchain_reserve_bytes.block_validation_node_signature_data[count] = (char*)calloc(BUFFER_SIZE_NETWORK_BLOCK_DATA,sizeof(char));
     blockchain_data.blockchain_reserve_bytes.block_validation_node_signature[count] = (char*)calloc(BUFFER_SIZE_NETWORK_BLOCK_DATA,sizeof(char));
