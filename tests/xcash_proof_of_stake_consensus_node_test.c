@@ -36,7 +36,7 @@ void test()
   int xcash_proof_of_stake_total_passed_test = 0;
 
   // define macros
-  #define XCASH_PROOF_OF_STAKE_TOTAL_TEST 113
+  #define XCASH_PROOF_OF_STAKE_TOTAL_TEST 128
 
   // write the test message
   printf("Starting Test\n\n");
@@ -66,22 +66,14 @@ void test()
   } 
 
   // run the tests
-  //xcash_proof_of_stake_total_passed_test += append_string_test();
-  //xcash_proof_of_stake_total_passed_test += parse_json_data_test();
-  //xcash_proof_of_stake_total_passed_test += random_string_test();
-  //xcash_proof_of_stake_total_passed_test += create_json_data_from_database_document_array_test();   
-  //xcash_proof_of_stake_total_passed_test += string_count_test(); 
-  //xcash_proof_of_stake_total_passed_test += string_replace_test();
-  //xcash_proof_of_stake_total_passed_test += blockchain_test(); 
-  //xcash_proof_of_stake_total_passed_test += send_wallet_http_request_test(); 
-  //xcash_proof_of_stake_total_passed_test += read_and_write_file_test(); 
-  //xcash_proof_of_stake_total_passed_test += database_test(); 
-  xcash_proof_of_stake_total_passed_test += send_and_receive_data_socket_test();
-  //xcash_proof_of_stake_total_passed_test += VRF_test();
-  //xcash_proof_of_stake_total_passed_test += reset_variables_allocated_on_the_heap_test();
-  //xcash_proof_of_stake_total_passed_test += analysing_code_test(); 
-  
-
+  xcash_proof_of_stake_total_passed_test += blockchain_functions_test();
+  xcash_proof_of_stake_total_passed_test += database_test(); 
+  xcash_proof_of_stake_total_passed_test += file_functions_test();
+  xcash_proof_of_stake_total_passed_test += network_functions_test();
+  xcash_proof_of_stake_total_passed_test += string_functions_test();
+  xcash_proof_of_stake_total_passed_test += VRF_functions_test();
+  xcash_proof_of_stake_total_passed_test += reset_variables_allocated_on_the_heap_test();
+  //xcash_proof_of_stake_total_passed_test += analysing_code_test();
 
   // write the end test message
   if (xcash_proof_of_stake_total_passed_test == XCASH_PROOF_OF_STAKE_TOTAL_TEST)

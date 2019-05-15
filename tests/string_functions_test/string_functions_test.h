@@ -7,10 +7,5 @@ Function prototypes
 -----------------------------------------------------------------------------------------------------------
 */
 
-int append_string_test();
-int parse_json_data_test();
-int random_string_test();
-int create_json_data_from_database_document_array_test();
-int string_count_test();
-int string_replace_test();
+int string_functions_test();
 #endif

@@ -25,13 +25,13 @@ Functions
 
 /*
 -----------------------------------------------------------------------------------------------------------
-Name: VRF_test
+Name: VRF_functions_test
 Description: Test the VRF functions
-Return: The number of passed VRF test
+Return: The number of passed VRF_functions test
 -----------------------------------------------------------------------------------------------------------
 */
 
-int VRF_test()
+int VRF_functions_test()
 {
   // Constants
   const unsigned char data[crypto_vrf_SEEDBYTES] = {0x4c,0xcd,0x08,0x9b,0x28,0xff,0x96,0xda,0x9d,0xb6,0xc3,0x46,0xec,0x11,0x4e,0x0f,0x5b,0x8a,0x31,0x9f,0x35,0xab,0xa6,0x24,0xda,0x8c,0xf6,0xed,0x4f,0xb8,0xa6,0xfb};
@@ -47,8 +47,9 @@ int VRF_test()
   int count2;
   unsigned char vrf_public_key[crypto_vrf_PUBLICKEYBYTES];
   unsigned char vrf_secret_key[crypto_vrf_SECRETKEYBYTES];
-  unsigned char vrf_proof[crypto_vrf_PROOFBYTES];
-  unsigned char vrf_beta[crypto_vrf_OUTPUTBYTES];
+  unsigned char vrf_proof[crypto_vrf_PROOFBYTES];unsigned char vrf_proof2[crypto_vrf_PROOFBYTES];
+  unsigned char* vrf_beta = (unsigned char*)calloc(250,sizeof(char)); unsigned char* vrf_beta2 = (unsigned char*)calloc(250,sizeof(char));
+  unsigned char* alpha = (unsigned char*)calloc(500,sizeof(char)); 
 
   // define macros
   #define DATA_HASH_TEXT "X-CASH Proof Of Stake"
@@ -83,11 +84,9 @@ int VRF_test()
 
   // write the start test message
   color_print(TEST_OUTLINE,"blue");
-  printf("\033[1;34mVRF test - Total test: %d\033[0m\n",VRF_TOTAL_TEST);
+  printf("\033[1;34mVRF functions test - Total test: %d\033[0m\n",VRF_TOTAL_TEST);
   color_print(TEST_OUTLINE,"blue");
   printf("\n");
-
-  // run the test
 
   // create a random VRF public key and secret key
   if (create_random_VRF_keys((unsigned char*)vrf_public_key,(unsigned char*)vrf_secret_key) == 1 && crypto_vrf_is_valid_key((const unsigned char*)vrf_public_key) == 1)
@@ -181,7 +180,7 @@ int VRF_test()
   {
     printf("\n");
     color_print(TEST_OUTLINE,"green");
-    printf("\033[1;32mVRF test - Passed test: %d, Failed test: 0\033[0m\n",VRF_TOTAL_TEST);
+    printf("\033[1;32mVRF functions test - Passed test: %d, Failed test: 0\033[0m\n",VRF_TOTAL_TEST);
     color_print(TEST_OUTLINE,"green");
     printf("\n\n");
   }
@@ -189,7 +188,7 @@ int VRF_test()
   {
     printf("\n");
     color_print(TEST_OUTLINE,"red");
-    printf("\033[1;31mVRF test - Passed test: %d, Failed test: %d\033[0m\n",count_test,VRF_TOTAL_TEST-count_test);
+    printf("\033[1;31mVRF functions test - Passed test: %d, Failed test: %d\033[0m\n",count_test,VRF_TOTAL_TEST-count_test);
     color_print(TEST_OUTLINE,"red");
     printf("\n\n");
   } 

@@ -25,9 +25,9 @@ Functions
 Name: get_block_template
 Description: Gets the block template for creating a new block
 Parameters:
-  result - The result to store the block_blob in
-  reserve_bytes_length - The amount of reserve bytes to create in the block template
-  MESSAGE_SETTINGS - 1 to print the messages, otherwise 0. This is used for the testing flag to not print any success or error messages
+  result - The block template
+  reserve_bytes_length - The amount of reserve bytes to use in creating the block template
+  HTTP_SETTINGS - 1 to print the messages, otherwise 0. This is used for the testing flag to not print any success or error messages
 Return: 0 if an error has occured, 1 if successfull
 -----------------------------------------------------------------------------------------------------------
 */
@@ -224,13 +224,15 @@ int submit_block_template(char* data, const int HTTP_SETTINGS)
 Name: verify_blockchain_network_transactions
 Description: Gets the transaction details
 Parameters:
-  data - The transactions to verify
+  transactions - The array or transactions
+  AMOUNT_OF_TRANSACTIONS - The amount of transactions
+  TRANSACTION_SETTINGS - 0 if the transaction is valid if it its in the blockchain or waiting to be added to the blockchain, 1 if valid if only wating to be added to the blockchain
   MESSAGE_SETTINGS - 1 to print the messages, otherwise 0. This is used for the testing flag to not print any success or error messages
 Return: 0 if an error has occured, 1 if successfull
 -----------------------------------------------------------------------------------------------------------
 */
 
-int verify_blockchain_network_transactions(char* transactions[], const size_t AMOUNT_OF_TRANSACTIONS, const int MESSAGE_SETTINGS)
+int verify_blockchain_network_transactions(char* transactions[], const size_t AMOUNT_OF_TRANSACTIONS, const int TRANSACTION_SETTINGS, const int MESSAGE_SETTINGS)
 {
   // Constants
   const char* HTTP_HEADERS[] = {"Content-Type: application/json","Accept: application/json"}; 
@@ -286,10 +288,21 @@ int verify_blockchain_network_transactions(char* transactions[], const size_t AM
 
   // verify the blockchain_network_transactions
   // if the results contain missed_tx or "in_pool": false then the transactions are not verified  
-  if (strstr(data,"missed_tx") != NULL || strstr(data,"\"in_pool\": false") != NULL)
+  if (TRANSACTION_SETTINGS == 0)
   {
-    pointer_reset_all;   
-    return 0;
+    if (strstr(data,"missed_tx") != NULL)
+    {
+      pointer_reset_all;   
+      return 0;
+    }
+  }
+  else
+  {
+    if (strstr(data,"missed_tx") != NULL || strstr(data,"\"in_pool\": false") != NULL)
+    {
+      pointer_reset_all;   
+      return 0;
+    }
   }
     
   pointer_reset_all; 

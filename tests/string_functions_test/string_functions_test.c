@@ -20,129 +20,27 @@ Functions
 
 /*
 -----------------------------------------------------------------------------------------------------------
-Name: append_string_test
-Description: Test the append_string macro
-Return: The number of passed append_string test
+Name: string_functions_test
+Description: Test the string functions
+Return: The number of passed string_functions test
 -----------------------------------------------------------------------------------------------------------
 */
 
-int append_string_test()
-{  
-  // Constants
-  const char STR1_TEST [BUFFER_SIZE] = "test string 1";
-  const char* STR2_TEST = "test string 2";
-
-  // define macros
-  #define APPEND_STRING_TOTAL_TEST 4
-
-  // reset the variables
-  memset(&string1_test,0,sizeof(string1_test)); 
-  memset(string2_test,0,strnlen(string2_test,BUFFER_SIZE)); 
-  count_test = 0;
-
-  // write the start test message
-  color_print(TEST_OUTLINE,"blue");
-  printf("\033[1;34mappend_string test - Total test: %d\033[0m\n",APPEND_STRING_TOTAL_TEST);
-  color_print(TEST_OUTLINE,"blue");
-  printf("\n");
-
-  // run the test
-  
-  // test for using append_string on an empty statically allocated char
-  append_string(string1_test,STR1_TEST);
-  if (strncmp(string1_test,STR1_TEST,BUFFER_SIZE) == 0)
-  {
-    color_print("PASSED! Test for using append_string on an empty statically allocated char","green");
-    count_test++;
-  }
-  else
-  {
-    color_print("FAILED! Test for using append_string on an empty statically allocated char","red");
-  }
-
-  // test for using append_string on a statically allocated char
-  append_string(string1_test," ");
-  append_string(string1_test,STR1_TEST);
-  if (strncmp(string1_test,"test string 1 test string 1",BUFFER_SIZE) == 0)
-  {
-    color_print("PASSED! Test for using append_string on a statically allocated char","green");
-    count_test++;
-  }
-  else
-  {
-    color_print("FAILED! Test for using append_string on a statically allocated char","red");
-  }
-    
-  // test for using append_string on an empty dynamically allocated char
-  append_string(string2_test,STR2_TEST);
-  if (strncmp(string2_test,STR2_TEST,BUFFER_SIZE) == 0)
-  {
-    color_print("PASSED! Test for using append_string on an empty dynamically allocated char","green");
-    count_test++;
-  }
-  else
-  {
-    color_print("FAILED! Test for using append_string on an empty dynamically allocated char","red");
-  }
-
-  // test for using append_string on a dynamically allocated char
-  append_string(string2_test," ");
-  append_string(string2_test,STR2_TEST);
-  if (strncmp(string2_test,"test string 2 test string 2",BUFFER_SIZE) == 0)
-  {
-    color_print("PASSED! Test for using append_string on a dynamically allocated char","green");
-    count_test++;
-  }
-  else
-  {
-    color_print("FAILED! Test for using append_string on a dynamically allocated char","red");
-  }
-
-
-
-  // write the end test message
-  if (count_test == APPEND_STRING_TOTAL_TEST)
-  {
-    printf("\n");
-    color_print(TEST_OUTLINE,"green");
-    printf("\033[1;32mappend_string test - Passed test: %d, Failed test: 0\033[0m\n",APPEND_STRING_TOTAL_TEST);
-    color_print(TEST_OUTLINE,"green");
-    printf("\n\n");
-  }
-  else
-  {
-    printf("\n");
-    color_print(TEST_OUTLINE,"red");
-    printf("\033[1;31mappend_string test - Passed test: %d, Failed test: %d\033[0m\n",count_test,APPEND_STRING_TOTAL_TEST-count_test);
-    color_print(TEST_OUTLINE,"red");
-    printf("\n\n");
-  } 
-  return count_test;
-
-  #undef APPEND_STRING_TOTAL_TEST
-}
-
-
-/*
------------------------------------------------------------------------------------------------------------
-Name: parse_json_data_test
-Description: Test the parse_json_data function
-Return: The number of passed parse_json_data test
------------------------------------------------------------------------------------------------------------
-*/
-
-int parse_json_data_test()
+int string_functions_test()
 {  
   // Variables
   int settings = 1;
 
   // define macros
-  #define PARSE_JSON_DATA_TOTAL_TEST 31
+  #define STRING_FUNCTIONS_TOTAL_TEST 35
+
+  #define DATA1 "{\"username\":\"XCASH\",\"most_total_rounds_delegate_name\":\"DELEGATE_NAME\",\"most_total_rounds\":\"5\",\"best_block_verifier_online_percentage_delegate_name\":\"DELEGATE_NAME\",\"best_block_verifier_online_percentage\":\"10\",\"most_block_producer_total_rounds_delegate_name\":\"DELEGATE_NAME\",\"most_block_producer_total_rounds\":\"15\",\"most_VRF_node_public_and_private_key_total_rounds_delegate_name\":\"DELEGATE_NAME\",\"most_VRF_node_public_and_private_key_total_rounds\":\"5\",\"most_VRF_node_random_data_total_rounds_delegate_name\":\"DELEGATE_NAME\",\"most_VRF_node_random_data_total_rounds\":\"10\",\"total_XCASH_proof_of_stake_rounds\":\"15\",\"total_coins_in_proof_of_stake\":\"5\",\"total_circulating_supply_percentage_in_proof_of_stake\":\"10\"}"
+  #define DATA2 "[{\"username\":\"XCASH\",\"most_total_rounds_delegate_name\":\"DELEGATE_NAME\",\"most_total_rounds\":\"5\",\"best_block_verifier_online_percentage_delegate_name\":\"DELEGATE_NAME\",\"best_block_verifier_online_percentage\":\"10\",\"most_block_producer_total_rounds_delegate_name\":\"DELEGATE_NAME\",\"most_block_producer_total_rounds\":\"15\",\"most_VRF_node_public_and_private_key_total_rounds_delegate_name\":\"DELEGATE_NAME\",\"most_VRF_node_public_and_private_key_total_rounds\":\"5\",\"most_VRF_node_random_data_total_rounds_delegate_name\":\"DELEGATE_NAME\",\"most_VRF_node_random_data_total_rounds\":\"10\",\"total_XCASH_proof_of_stake_rounds\":\"15\",\"total_coins_in_proof_of_stake\":\"5\",\"total_circulating_supply_percentage_in_proof_of_stake\":\"10\"},{\"username\":\"XCASH\",\"most_total_rounds_delegate_name\":\"DELEGATE_NAME\",\"most_total_rounds\":\"5\",\"best_block_verifier_online_percentage_delegate_name\":\"DELEGATE_NAME\",\"best_block_verifier_online_percentage\":\"10\",\"most_block_producer_total_rounds_delegate_name\":\"DELEGATE_NAME\",\"most_block_producer_total_rounds\":\"15\",\"most_VRF_node_public_and_private_key_total_rounds_delegate_name\":\"DELEGATE_NAME\",\"most_VRF_node_public_and_private_key_total_rounds\":\"5\",\"most_VRF_node_random_data_total_rounds_delegate_name\":\"DELEGATE_NAME\",\"most_VRF_node_random_data_total_rounds\":\"10\",\"total_XCASH_proof_of_stake_rounds\":\"15\",\"total_coins_in_proof_of_stake\":\"5\",\"total_circulating_supply_percentage_in_proof_of_stake\":\"10\"}]"
  
   #define SIGN_RPC_CALL_TEST_DATA "{\r\n  \"id\": \"0\",\r\n  \"jsonrpc\": \"2.0\",\r\n  \"result\": {\r\n    \"xcash_proof_of_stake_signature\": \"SIGN_RPC_CALL_TEST_DATA\"\r\n  }\r\n}"
   #define VERIFY_RPC_CALL_TEST_DATA "{\r\n  \"id\": \"0\",\r\n  \"jsonrpc\": \"2.0\",\r\n  \"result\": {\r\n    \"good\": VERIFY_RPC_CALL_TEST_DATA\r\n  }\r\n}"
   #define GET_BLOCK_TEMPLATE_RPC_CALL_TEST_DATA "{\r\n  \"id\": \"0\",\r\n  \"jsonrpc\": \"2.0\",\r\n  \"result\": {\r\n    \"blockhashing_blob\": \"GET_BLOCK_TEMPLATE_RPC_CALL_TEST_DATA\",\r\n    \"blocktemplate_blob\": \"GET_BLOCK_TEMPLATE_RPC_CALL_TEST_DATA\",\r\n    \"difficulty\": GET_BLOCK_TEMPLATE_RPC_CALL_TEST_DATA,\r\n    \"expected_reward\": GET_BLOCK_TEMPLATE_RPC_CALL_TEST_DATA,\r\n    \"height\": GET_BLOCK_TEMPLATE_RPC_CALL_TEST_DATA,\r\n    \"prev_hash\": \"GET_BLOCK_TEMPLATE_RPC_CALL_TEST_DATA\",\r\n    \"reserved_offset\": GET_BLOCK_TEMPLATE_RPC_CALL_TEST_DATA,\r\n    \"status\": \"GET_BLOCK_TEMPLATE_RPC_CALL_TEST_DATA\",\r\n    \"untrusted\": GET_BLOCK_TEMPLATE_RPC_CALL_TEST_DATA\r\n  }\r\n}"
- 
+   
 /*
   This message is sent from the Consensus node in the node_to_consensus_node_send_current_consensus_node_IP_address function and received by the nodes in the get_current_consensus_node_IP_address function.
  
@@ -642,7 +540,12 @@ int parse_json_data_test()
   */
   #define VOTING_WEBSITE_API_PROGRAM_TO_BLOCK_VALIDATION_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS "{\r\n \"message_settings\": \"VOTING_WEBSITE_API_PROGRAM_TO_BLOCK_VALIDATION_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS\",\r\n \"public_address\": \"VOTING_WEBSITE_API_PROGRAM_TO_BLOCK_VALIDATION_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS\",\r\n \"previous_block_hash\": \"VOTING_WEBSITE_API_PROGRAM_TO_BLOCK_VALIDATION_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS\",\r\n \"current_round_part\": \"VOTING_WEBSITE_API_PROGRAM_TO_BLOCK_VALIDATION_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS\",\r\n \"current_round_part_backup_node\": \"VOTING_WEBSITE_API_PROGRAM_TO_BLOCK_VALIDATION_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS\",\r\n \"data\": \"VOTING_WEBSITE_API_PROGRAM_TO_BLOCK_VALIDATION_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS\",\r\n \"xcash_proof_of_stake_signature\": \"VOTING_WEBSITE_API_PROGRAM_TO_BLOCK_VALIDATION_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS\",\r\n}"
 
- 
+  // variables
+  int count;
+  int counter;
+  struct database_document_fields database_data;
+  struct database_multiple_documents_fields database_multiple_documents_fields;
+
   // reset the variables
   memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
   memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
@@ -650,14 +553,14 @@ int parse_json_data_test()
  
   // write the start test message
   color_print(TEST_OUTLINE,"blue");
-  printf("\033[1;34mparse_json_data test - Total test: %d\033[0m\n",PARSE_JSON_DATA_TOTAL_TEST);
+  printf("\033[1;34mstring functions test - Total test: %d\033[0m\n",STRING_FUNCTIONS_TOTAL_TEST);
   color_print(TEST_OUTLINE,"blue");
   printf("\n");
  
   // run the test
  
   // test parsing the return data for the sign RPC call for the xcash_proof_of_stake_signature field
-  append_string(result_test,SIGN_RPC_CALL_TEST_DATA);
+  memcpy(result_test,SIGN_RPC_CALL_TEST_DATA,strnlen(SIGN_RPC_CALL_TEST_DATA,BUFFER_SIZE));
   if (parse_json_data(result_test,"xcash_proof_of_stake_signature",data_test) != 0)
   {
     // check if the data is correct
@@ -679,7 +582,7 @@ int parse_json_data_test()
   // test parsing the return data for the verify RPC call for the good field
   memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
   memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
-  append_string(result_test,VERIFY_RPC_CALL_TEST_DATA);
+  memcpy(result_test,VERIFY_RPC_CALL_TEST_DATA,strnlen(VERIFY_RPC_CALL_TEST_DATA,BUFFER_SIZE));
   if (parse_json_data(result_test,"good",data_test) != 0)
   {
     // check if the data is correct
@@ -701,7 +604,7 @@ int parse_json_data_test()
   // test parsing the return data for the get_block_template RPC call for the blocktemplate_blob field
   memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
   memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
-  append_string(result_test,GET_BLOCK_TEMPLATE_RPC_CALL_TEST_DATA);
+  memcpy(result_test,GET_BLOCK_TEMPLATE_RPC_CALL_TEST_DATA,strnlen(GET_BLOCK_TEMPLATE_RPC_CALL_TEST_DATA,BUFFER_SIZE));
   if (parse_json_data(result_test,"blocktemplate_blob",data_test) != 0)
   {
     // check if the data is correct
@@ -719,44 +622,51 @@ int parse_json_data_test()
   {
     color_print("FAILED! Test for parsing the return data for the get_block_template RPC call for the blocktemplate_blob field","red");
   }
-  printf("\n");
 
   // test for parsing CONSENSUS_NODE_TO_NODE_RECEIVE_CURRENT_CONSENSUS_NODE_IP_ADDRESS
   memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
   memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
-  append_string(result_test,CONSENSUS_NODE_TO_NODE_RECEIVE_CURRENT_CONSENSUS_NODE_IP_ADDRESS);
+  memcpy(result_test,CONSENSUS_NODE_TO_NODE_RECEIVE_CURRENT_CONSENSUS_NODE_IP_ADDRESS,strnlen(CONSENSUS_NODE_TO_NODE_RECEIVE_CURRENT_CONSENSUS_NODE_IP_ADDRESS,BUFFER_SIZE));
   if (parse_json_data(result_test,"message_settings",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODE_RECEIVE_CURRENT_CONSENSUS_NODE_IP_ADDRESS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_consensus_node_IP_address",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODE_RECEIVE_CURRENT_CONSENSUS_NODE_IP_ADDRESS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"public_address",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODE_RECEIVE_CURRENT_CONSENSUS_NODE_IP_ADDRESS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"previous_block_hash",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODE_RECEIVE_CURRENT_CONSENSUS_NODE_IP_ADDRESS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODE_RECEIVE_CURRENT_CONSENSUS_NODE_IP_ADDRESS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part_backup_node",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODE_RECEIVE_CURRENT_CONSENSUS_NODE_IP_ADDRESS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"data",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODE_RECEIVE_CURRENT_CONSENSUS_NODE_IP_ADDRESS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"xcash_proof_of_stake_signature",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODE_RECEIVE_CURRENT_CONSENSUS_NODE_IP_ADDRESS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (settings == 0)
   {
     color_print("FAILED! Test for parsing CONSENSUS_NODE_TO_NODE_RECEIVE_CURRENT_CONSENSUS_NODE_IP_ADDRESS","red");
@@ -764,41 +674,49 @@ int parse_json_data_test()
   else
   {
     color_print("PASSED! Test for parsing CONSENSUS_NODE_TO_NODE_RECEIVE_CURRENT_CONSENSUS_NODE_IP_ADDRESS","green");
+    count_test++;
   }
   settings = 1;
 
   // test for parsing NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS
   memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
   memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
-  append_string(result_test,NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS);
+  memcpy(result_test,NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS,strnlen(NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS,BUFFER_SIZE));
   if (parse_json_data(result_test,"message_settings",data_test) == 0 || strncmp(data_test,"NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"public_address",data_test) == 0 || strncmp(data_test,"NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"previous_block_hash",data_test) == 0 || strncmp(data_test,"NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part",data_test) == 0 || strncmp(data_test,"NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part_backup_node",data_test) == 0 || strncmp(data_test,"NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"data",data_test) == 0 || strncmp(data_test,"NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"xcash_proof_of_stake_signature",data_test) == 0 || strncmp(data_test,"NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (settings == 0)
   {
     color_print("FAILED! Test for parsing NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS","red");
@@ -806,53 +724,64 @@ int parse_json_data_test()
   else
   {
     color_print("PASSED! Test for parsing NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS","green");
+    count_test++;
   }
   settings = 1;
 
   // test for parsing CONSENSUS_NODE_TO_NODE_RECEIVE_UPDATED_NODE_LIST
   memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
   memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
-  append_string(result_test,CONSENSUS_NODE_TO_NODE_RECEIVE_UPDATED_NODE_LIST);
+  memcpy(result_test,CONSENSUS_NODE_TO_NODE_RECEIVE_UPDATED_NODE_LIST,strnlen(CONSENSUS_NODE_TO_NODE_RECEIVE_UPDATED_NODE_LIST,BUFFER_SIZE));
   if (parse_json_data(result_test,"message_settings",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODE_RECEIVE_UPDATED_NODE_LIST",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"nodes_name_list",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODE_RECEIVE_UPDATED_NODE_LIST",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"nodes_public_address_list",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODE_RECEIVE_UPDATED_NODE_LIST",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"nodes_IP_address_list",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODE_RECEIVE_UPDATED_NODE_LIST",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"public_address",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODE_RECEIVE_UPDATED_NODE_LIST",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"previous_block_hash",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODE_RECEIVE_UPDATED_NODE_LIST",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODE_RECEIVE_UPDATED_NODE_LIST",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part_backup_node",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODE_RECEIVE_UPDATED_NODE_LIST",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"data",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODE_RECEIVE_UPDATED_NODE_LIST",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"xcash_proof_of_stake_signature",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODE_RECEIVE_UPDATED_NODE_LIST",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (settings == 0)
   {
     color_print("FAILED! Test for parsing CONSENSUS_NODE_TO_NODE_RECEIVE_UPDATED_NODE_LIST","red");
@@ -860,45 +789,54 @@ int parse_json_data_test()
   else
   {
     color_print("PASSED! Test for parsing CONSENSUS_NODE_TO_NODE_RECEIVE_UPDATED_NODE_LIST","green");
+    count_test++;
   }
   settings = 1;
 
     // test for parsing NODE_TO_CONSENSUS_NODE_SEND_UPDATED_NODE_LIST
   memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
   memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
-  append_string(result_test,NODE_TO_CONSENSUS_NODE_SEND_UPDATED_NODE_LIST);
+  memcpy(result_test,NODE_TO_CONSENSUS_NODE_SEND_UPDATED_NODE_LIST,strnlen(NODE_TO_CONSENSUS_NODE_SEND_UPDATED_NODE_LIST,BUFFER_SIZE));
   if (parse_json_data(result_test,"message_settings",data_test) == 0 || strncmp(data_test,"NODE_TO_CONSENSUS_NODE_SEND_UPDATED_NODE_LIST",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"nodes_updated_time",data_test) == 0 || strncmp(data_test,"NODE_TO_CONSENSUS_NODE_SEND_UPDATED_NODE_LIST",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"public_address",data_test) == 0 || strncmp(data_test,"NODE_TO_CONSENSUS_NODE_SEND_UPDATED_NODE_LIST",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"previous_block_hash",data_test) == 0 || strncmp(data_test,"NODE_TO_CONSENSUS_NODE_SEND_UPDATED_NODE_LIST",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part",data_test) == 0 || strncmp(data_test,"NODE_TO_CONSENSUS_NODE_SEND_UPDATED_NODE_LIST",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part_backup_node",data_test) == 0 || strncmp(data_test,"NODE_TO_CONSENSUS_NODE_SEND_UPDATED_NODE_LIST",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"data",data_test) == 0 || strncmp(data_test,"NODE_TO_CONSENSUS_NODE_SEND_UPDATED_NODE_LIST",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"xcash_proof_of_stake_signature",data_test) == 0 || strncmp(data_test,"NODE_TO_CONSENSUS_NODE_SEND_UPDATED_NODE_LIST",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (settings == 0)
   {
     color_print("FAILED! Test for parsing NODE_TO_CONSENSUS_NODE_SEND_UPDATED_NODE_LIST","red");
@@ -906,45 +844,54 @@ int parse_json_data_test()
   else
   {
     color_print("PASSED! Test for parsing NODE_TO_CONSENSUS_NODE_SEND_UPDATED_NODE_LIST","green");
+    count_test++;
   }
   settings = 1;
 
   // test for parsing CONSENSUS_NODE_TO_NODES_MAIN_NODE_PUBLIC_ADDRESS
   memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
   memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
-  append_string(result_test,CONSENSUS_NODE_TO_NODES_MAIN_NODE_PUBLIC_ADDRESS);
+  memcpy(result_test,CONSENSUS_NODE_TO_NODES_MAIN_NODE_PUBLIC_ADDRESS,strnlen(CONSENSUS_NODE_TO_NODES_MAIN_NODE_PUBLIC_ADDRESS,BUFFER_SIZE));
   if (parse_json_data(result_test,"message_settings",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_MAIN_NODE_PUBLIC_ADDRESS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"main_nodes_public_address",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_MAIN_NODE_PUBLIC_ADDRESS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"public_address",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_MAIN_NODE_PUBLIC_ADDRESS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"previous_block_hash",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_MAIN_NODE_PUBLIC_ADDRESS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_MAIN_NODE_PUBLIC_ADDRESS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part_backup_node",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_MAIN_NODE_PUBLIC_ADDRESS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"data",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_MAIN_NODE_PUBLIC_ADDRESS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"xcash_proof_of_stake_signature",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_MAIN_NODE_PUBLIC_ADDRESS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (settings == 0)
   {
     color_print("FAILED! Test for parsing CONSENSUS_NODE_TO_NODES_MAIN_NODE_PUBLIC_ADDRESS","red");
@@ -952,37 +899,44 @@ int parse_json_data_test()
   else
   {
     color_print("PASSED! Test for parsing CONSENSUS_NODE_TO_NODES_MAIN_NODE_PUBLIC_ADDRESS","green");
+    count_test++;
   }
   settings = 1;
 
   // test for parsing NODES_TO_CONSENSUS_NODE_MAIN_NODE_SOCKET_TIMEOUT_ROUND_CHANGE
   memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
   memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
-  append_string(result_test,NODES_TO_CONSENSUS_NODE_MAIN_NODE_SOCKET_TIMEOUT_ROUND_CHANGE);
+  memcpy(result_test,NODES_TO_CONSENSUS_NODE_MAIN_NODE_SOCKET_TIMEOUT_ROUND_CHANGE,strnlen(NODES_TO_CONSENSUS_NODE_MAIN_NODE_SOCKET_TIMEOUT_ROUND_CHANGE,BUFFER_SIZE));
   if (parse_json_data(result_test,"message_settings",data_test) == 0 || strncmp(data_test,"NODES_TO_CONSENSUS_NODE_MAIN_NODE_SOCKET_TIMEOUT_ROUND_CHANGE",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"public_address",data_test) == 0 || strncmp(data_test,"NODES_TO_CONSENSUS_NODE_MAIN_NODE_SOCKET_TIMEOUT_ROUND_CHANGE",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"previous_block_hash",data_test) == 0 || strncmp(data_test,"NODES_TO_CONSENSUS_NODE_MAIN_NODE_SOCKET_TIMEOUT_ROUND_CHANGE",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part",data_test) == 0 || strncmp(data_test,"NODES_TO_CONSENSUS_NODE_MAIN_NODE_SOCKET_TIMEOUT_ROUND_CHANGE",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part_backup_node",data_test) == 0 || strncmp(data_test,"NODES_TO_CONSENSUS_NODE_MAIN_NODE_SOCKET_TIMEOUT_ROUND_CHANGE",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"data",data_test) == 0 || strncmp(data_test,"NODES_TO_CONSENSUS_NODE_MAIN_NODE_SOCKET_TIMEOUT_ROUND_CHANGE",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"xcash_proof_of_stake_signature",data_test) == 0 || strncmp(data_test,"NODES_TO_CONSENSUS_NODE_MAIN_NODE_SOCKET_TIMEOUT_ROUND_CHANGE",BUFFER_SIZE) != 0)
   {
     settings = 0;
@@ -994,45 +948,54 @@ int parse_json_data_test()
   else
   {
     color_print("PASSED! Test for parsing NODES_TO_CONSENSUS_NODE_MAIN_NODE_SOCKET_TIMEOUT_ROUND_CHANGE","green");
+    count_test++;
   }
   settings = 1;
 
   // test for parsing CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND
   memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
   memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
-  append_string(result_test,CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND);
+  memcpy(result_test,CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND,strnlen(CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND,BUFFER_SIZE));
   if (parse_json_data(result_test,"message_settings",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"message",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
-  if (parse_json_data(result_test,"VRF_block_blob",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND",BUFFER_SIZE) != 0)
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
+  if (parse_json_data(result_test,"vrf_beta_string_part_3_of_round",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"public_address",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"previous_block_hash",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part_backup_node",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"data",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"xcash_proof_of_stake_signature",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
@@ -1044,57 +1007,69 @@ int parse_json_data_test()
   else
   {
     color_print("PASSED! Test for parsing CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND","green");
+    count_test++;
   }
   settings = 1;
 
   // test for parsing MAIN_NODES_TO_NODES_PART_1_OF_ROUND
   memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
   memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
-  append_string(result_test,MAIN_NODES_TO_NODES_PART_1_OF_ROUND);
+  memcpy(result_test,MAIN_NODES_TO_NODES_PART_1_OF_ROUND,strnlen(MAIN_NODES_TO_NODES_PART_1_OF_ROUND,BUFFER_SIZE));
   if (parse_json_data(result_test,"message_settings",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_1_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"vrf_public_key",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_1_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"vrf_alpha_string",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_1_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"vrf_proof",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_1_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"vrf_beta_string",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_1_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"public_address",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_1_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"previous_block_hash",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_1_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_1_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part_backup_node",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_1_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"data",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_1_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"xcash_proof_of_stake_signature",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_1_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (settings == 0)
   {
     color_print("FAILED! Test for parsing MAIN_NODES_TO_NODES_PART_1_OF_ROUND","red");
@@ -1102,61 +1077,74 @@ int parse_json_data_test()
   else
   {
     color_print("PASSED! Test for parsing MAIN_NODES_TO_NODES_PART_1_OF_ROUND","green");
+    count_test++;
   }
   settings = 1;
 
   // test for parsing MAIN_NODES_TO_NODES_PART_2_OF_ROUND
   memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
   memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
-  append_string(result_test,MAIN_NODES_TO_NODES_PART_2_OF_ROUND);
+  memcpy(result_test,MAIN_NODES_TO_NODES_PART_2_OF_ROUND,strnlen(MAIN_NODES_TO_NODES_PART_2_OF_ROUND,BUFFER_SIZE));
   if (parse_json_data(result_test,"message_settings",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_2_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"vrf_public_key",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_2_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"vrf_random_character_string",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_2_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"vrf_alpha_string",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_2_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"vrf_proof",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_2_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"vrf_beta_string",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_2_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"public_address",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_2_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"previous_block_hash",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_2_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_2_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part_backup_node",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_2_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"data",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_2_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"xcash_proof_of_stake_signature",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_2_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (settings == 0)
   {
     color_print("FAILED! Test for parsing MAIN_NODES_TO_NODES_PART_2_OF_ROUND","red");
@@ -1164,53 +1152,64 @@ int parse_json_data_test()
   else
   {
     color_print("PASSED! Test for parsing MAIN_NODES_TO_NODES_PART_2_OF_ROUND","green");
+    count_test++;
   }
   settings = 1;
 
   // test for parsing MAIN_NODES_TO_NODES_PART_3_OF_ROUND
   memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
   memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
-  append_string(result_test,MAIN_NODES_TO_NODES_PART_3_OF_ROUND);
+  memcpy(result_test,MAIN_NODES_TO_NODES_PART_3_OF_ROUND,strnlen(MAIN_NODES_TO_NODES_PART_3_OF_ROUND,BUFFER_SIZE));
   if (parse_json_data(result_test,"message_settings",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_3_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"vrf_public_key",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_3_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"vrf_alpha_string",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_3_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"vrf_proof",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_3_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"vrf_beta_string",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_3_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"public_address",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_3_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"previous_block_hash",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_3_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_3_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part_backup_node",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_3_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"data",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_3_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"xcash_proof_of_stake_signature",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_3_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
@@ -1222,45 +1221,54 @@ int parse_json_data_test()
   else
   {
     color_print("PASSED! Test for parsing MAIN_NODES_TO_NODES_PART_3_OF_ROUND","green");
+    count_test++;
   }
   settings = 1;
 
   // test for parsing MAIN_NODES_TO_NODES_PART_4_OF_ROUND
   memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
   memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
-  append_string(result_test,MAIN_NODES_TO_NODES_PART_4_OF_ROUND);
+  memcpy(result_test,MAIN_NODES_TO_NODES_PART_4_OF_ROUND,strnlen(MAIN_NODES_TO_NODES_PART_4_OF_ROUND,BUFFER_SIZE));
   if (parse_json_data(result_test,"message_settings",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_4_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"block_blob",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_4_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"public_address",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_4_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"previous_block_hash",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_4_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_4_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part_backup_node",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_4_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"data",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_4_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"xcash_proof_of_stake_signature",data_test) == 0 || strncmp(data_test,"MAIN_NODES_TO_NODES_PART_4_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (settings == 0)
   {
     color_print("FAILED! Test for parsing MAIN_NODES_TO_NODES_PART_4_OF_ROUND","red");
@@ -1268,49 +1276,59 @@ int parse_json_data_test()
   else
   {
     color_print("PASSED! Test for parsing MAIN_NODES_TO_NODES_PART_4_OF_ROUND","green");
+    count_test++;
   }
   settings = 1;
 
-    // test for parsing NODES_TO_NODES_VOTE_RESULTS
+  // test for parsing NODES_TO_NODES_VOTE_RESULTS
   memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
   memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
-  append_string(result_test,NODES_TO_NODES_VOTE_RESULTS);
+  memcpy(result_test,NODES_TO_NODES_VOTE_RESULTS,strnlen(NODES_TO_NODES_VOTE_RESULTS,BUFFER_SIZE));
   if (parse_json_data(result_test,"message_settings",data_test) == 0 || strncmp(data_test,"NODES_TO_NODES_VOTE_RESULTS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"vote_settings",data_test) == 0 || strncmp(data_test,"NODES_TO_NODES_VOTE_RESULTS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"vote_data",data_test) == 0 || strncmp(data_test,"NODES_TO_NODES_VOTE_RESULTS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"public_address",data_test) == 0 || strncmp(data_test,"NODES_TO_NODES_VOTE_RESULTS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"previous_block_hash",data_test) == 0 || strncmp(data_test,"NODES_TO_NODES_VOTE_RESULTS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part",data_test) == 0 || strncmp(data_test,"NODES_TO_NODES_VOTE_RESULTS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part_backup_node",data_test) == 0 || strncmp(data_test,"NODES_TO_NODES_VOTE_RESULTS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"data",data_test) == 0 || strncmp(data_test,"NODES_TO_NODES_VOTE_RESULTS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"xcash_proof_of_stake_signature",data_test) == 0 || strncmp(data_test,"NODES_TO_NODES_VOTE_RESULTS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (settings == 0)
   {
     color_print("FAILED! Test for parsing NODES_TO_NODES_VOTE_RESULTS","red");
@@ -1318,45 +1336,54 @@ int parse_json_data_test()
   else
   {
     color_print("PASSED! Test for parsing NODES_TO_NODES_VOTE_RESULTS","green");
+    count_test++;
   }
   settings = 1;
 
   // test for parsing NODES_TO_CONSENSUS_NODE_VOTE_RESULTS
   memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
   memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
-  append_string(result_test,NODES_TO_CONSENSUS_NODE_VOTE_RESULTS);
+  memcpy(result_test,NODES_TO_CONSENSUS_NODE_VOTE_RESULTS,strnlen(NODES_TO_CONSENSUS_NODE_VOTE_RESULTS,BUFFER_SIZE));
   if (parse_json_data(result_test,"message_settings",data_test) == 0 || strncmp(data_test,"NODES_TO_CONSENSUS_NODE_VOTE_RESULTS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"vote_result",data_test) == 0 || strncmp(data_test,"NODES_TO_CONSENSUS_NODE_VOTE_RESULTS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"public_address",data_test) == 0 || strncmp(data_test,"NODES_TO_CONSENSUS_NODE_VOTE_RESULTS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"previous_block_hash",data_test) == 0 || strncmp(data_test,"NODES_TO_CONSENSUS_NODE_VOTE_RESULTS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part",data_test) == 0 || strncmp(data_test,"NODES_TO_CONSENSUS_NODE_VOTE_RESULTS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part_backup_node",data_test) == 0 || strncmp(data_test,"NODES_TO_CONSENSUS_NODE_VOTE_RESULTS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"data",data_test) == 0 || strncmp(data_test,"NODES_TO_CONSENSUS_NODE_VOTE_RESULTS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"xcash_proof_of_stake_signature",data_test) == 0 || strncmp(data_test,"NODES_TO_CONSENSUS_NODE_VOTE_RESULTS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (settings == 0)
   {
     color_print("FAILED! Test for parsing NODES_TO_CONSENSUS_NODE_VOTE_RESULTS","red");
@@ -1364,53 +1391,64 @@ int parse_json_data_test()
   else
   {
     color_print("PASSED! Test for parsing NODES_TO_CONSENSUS_NODE_VOTE_RESULTS","green");
+    count_test++;
   }
   settings = 1;
 
   // test for parsing CONSENSUS_NODE_TO_NODES_LIST_OF_ENABLED_NODES
   memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
   memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
-  append_string(result_test,CONSENSUS_NODE_TO_NODES_LIST_OF_ENABLED_NODES);
+  memcpy(result_test,CONSENSUS_NODE_TO_NODES_LIST_OF_ENABLED_NODES,strnlen(CONSENSUS_NODE_TO_NODES_LIST_OF_ENABLED_NODES,BUFFER_SIZE));
   if (parse_json_data(result_test,"message_settings",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_LIST_OF_ENABLED_NODES",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"nodes_name_list",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_LIST_OF_ENABLED_NODES",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"nodes_public_address_list",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_LIST_OF_ENABLED_NODES",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"nodes_IP_address_list",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_LIST_OF_ENABLED_NODES",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"public_address",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_LIST_OF_ENABLED_NODES",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"previous_block_hash",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_LIST_OF_ENABLED_NODES",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_LIST_OF_ENABLED_NODES",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part_backup_node",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_LIST_OF_ENABLED_NODES",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"data",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_LIST_OF_ENABLED_NODES",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"xcash_proof_of_stake_signature",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_LIST_OF_ENABLED_NODES",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (settings == 0)
   {
     color_print("FAILED! Test for parsing CONSENSUS_NODE_TO_NODES_LIST_OF_ENABLED_NODES","red");
@@ -1418,41 +1456,49 @@ int parse_json_data_test()
   else
   {
     color_print("PASSED! Test for parsing CONSENSUS_NODE_TO_NODES_LIST_OF_ENABLED_NODES","green");
+    count_test++;
   }
   settings = 1;
 
   // test for parsing CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_ROUND_CHANGE
   memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
   memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
-  append_string(result_test,CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_ROUND_CHANGE);
+  memcpy(result_test,CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_ROUND_CHANGE,strnlen(CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_ROUND_CHANGE,BUFFER_SIZE));
   if (parse_json_data(result_test,"message_settings",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_ROUND_CHANGE",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"public_address",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_ROUND_CHANGE",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"previous_block_hash",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_ROUND_CHANGE",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_ROUND_CHANGE",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part_backup_node",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_ROUND_CHANGE",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"data",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_ROUND_CHANGE",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"xcash_proof_of_stake_signature",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_ROUND_CHANGE",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (settings == 0)
   {
     color_print("FAILED! Test for parsing CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_ROUND_CHANGE","red");
@@ -1460,53 +1506,64 @@ int parse_json_data_test()
   else
   {
     color_print("PASSED! Test for parsing CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_ROUND_CHANGE","green");
+    count_test++;
   }
   settings = 1;
 
   // test for parsing CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CHANGE
   memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
   memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
-  append_string(result_test,CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CHANGE);
+  memcpy(result_test,CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CHANGE,strnlen(CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CHANGE,BUFFER_SIZE));
   if (parse_json_data(result_test,"message_settings",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CHANGE",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"consensus_node_public_address",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CHANGE",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"consensus_node_IP_address",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CHANGE",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"public_address",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CHANGE",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"public_address",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CHANGE",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"previous_block_hash",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CHANGE",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CHANGE",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part_backup_node",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CHANGE",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"data",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CHANGE",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"xcash_proof_of_stake_signature",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CHANGE",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (settings == 0)
   {
     color_print("FAILED! Test for parsing CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CHANGE","red");
@@ -1514,41 +1571,49 @@ int parse_json_data_test()
   else
   {
     color_print("PASSED! Test for parsing CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CHANGE","green");
+    count_test++;
   }
   settings = 1;
 
   // test for parsing CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CREATE_NEW_BLOCK_MESSAGE
   memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
   memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
-  append_string(result_test,CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CREATE_NEW_BLOCK_MESSAGE);
+  memcpy(result_test,CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CREATE_NEW_BLOCK_MESSAGE,strnlen(CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CREATE_NEW_BLOCK_MESSAGE,BUFFER_SIZE));
   if (parse_json_data(result_test,"message_settings",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CREATE_NEW_BLOCK_MESSAGE",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"public_address",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CREATE_NEW_BLOCK_MESSAGE",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"previous_block_hash",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CREATE_NEW_BLOCK_MESSAGE",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CREATE_NEW_BLOCK_MESSAGE",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part_backup_node",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CREATE_NEW_BLOCK_MESSAGE",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"data",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CREATE_NEW_BLOCK_MESSAGE",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"xcash_proof_of_stake_signature",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CREATE_NEW_BLOCK_MESSAGE",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (settings == 0)
   {
     color_print("FAILED! Test for parsing CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CREATE_NEW_BLOCK_MESSAGE","red");
@@ -1556,41 +1621,49 @@ int parse_json_data_test()
   else
   {
     color_print("PASSED! Test for parsing CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CREATE_NEW_BLOCK_MESSAGE","green");
+    count_test++;
   }
   settings = 1;
 
   // test for parsing CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_RECEIVE_XCASH_PROOF_OF_STAKE_SETTINGS
   memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
   memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
-  append_string(result_test,CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_RECEIVE_XCASH_PROOF_OF_STAKE_SETTINGS);
+  memcpy(result_test,CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_RECEIVE_XCASH_PROOF_OF_STAKE_SETTINGS,strnlen(CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_RECEIVE_XCASH_PROOF_OF_STAKE_SETTINGS,BUFFER_SIZE));
   if (parse_json_data(result_test,"message_settings",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_RECEIVE_XCASH_PROOF_OF_STAKE_SETTINGS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"public_address",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_RECEIVE_XCASH_PROOF_OF_STAKE_SETTINGS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"previous_block_hash",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_RECEIVE_XCASH_PROOF_OF_STAKE_SETTINGS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_RECEIVE_XCASH_PROOF_OF_STAKE_SETTINGS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part_backup_node",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_RECEIVE_XCASH_PROOF_OF_STAKE_SETTINGS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"data",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_RECEIVE_XCASH_PROOF_OF_STAKE_SETTINGS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"xcash_proof_of_stake_signature",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_RECEIVE_XCASH_PROOF_OF_STAKE_SETTINGS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (settings == 0)
   {
     color_print("FAILED! Test for parsing CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_RECEIVE_XCASH_PROOF_OF_STAKE_SETTINGS","red");
@@ -1598,45 +1671,54 @@ int parse_json_data_test()
   else
   {
     color_print("PASSED! Test for parsing CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_RECEIVE_XCASH_PROOF_OF_STAKE_SETTINGS","green");
+    count_test++;
   }
   settings = 1;
 
   // test for parsing BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS
   memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
   memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
-  append_string(result_test,BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS);
+  memcpy(result_test,BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS,strnlen(BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS,BUFFER_SIZE));
   if (parse_json_data(result_test,"message_settings",data_test) == 0 || strncmp(data_test,"BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"xcash_proof_of_stake_settings",data_test) == 0 || strncmp(data_test,"BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"public_address",data_test) == 0 || strncmp(data_test,"BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"previous_block_hash",data_test) == 0 || strncmp(data_test,"BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part",data_test) == 0 || strncmp(data_test,"BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part_backup_node",data_test) == 0 || strncmp(data_test,"BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"data",data_test) == 0 || strncmp(data_test,"BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"xcash_proof_of_stake_signature",data_test) == 0 || strncmp(data_test,"BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (settings == 0)
   {
     color_print("FAILED! Test for parsing BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS","red");
@@ -1644,45 +1726,54 @@ int parse_json_data_test()
   else
   {
     color_print("PASSED! Test for parsing BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS","green");
+    count_test++;
   }
   settings = 1;
 
   // test for parsing CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK
   memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
   memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
-  append_string(result_test,CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK);
+  memcpy(result_test,CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK,strnlen(CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK,BUFFER_SIZE));
   if (parse_json_data(result_test,"message_settings",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"block_blob",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"public_address",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"previous_block_hash",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part_backup_node",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"data",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"xcash_proof_of_stake_signature",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (settings == 0)
   {
     color_print("FAILED! Test for parsing CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK","red");
@@ -1690,45 +1781,54 @@ int parse_json_data_test()
   else
   {
     color_print("PASSED! Test for parsing CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK","green");
+    count_test++;
   }
   settings = 1;
 
   // test for parsing BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK
   memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
   memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
-  append_string(result_test,BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK);
+  memcpy(result_test,BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK,strnlen(BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK,BUFFER_SIZE));
   if (parse_json_data(result_test,"message_settings",data_test) == 0 || strncmp(data_test,"BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"block_blob_signature",data_test) == 0 || strncmp(data_test,"BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"public_address",data_test) == 0 || strncmp(data_test,"BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"previous_block_hash",data_test) == 0 || strncmp(data_test,"BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part",data_test) == 0 || strncmp(data_test,"BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part_backup_node",data_test) == 0 || strncmp(data_test,"BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"data",data_test) == 0 || strncmp(data_test,"BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"xcash_proof_of_stake_signature",data_test) == 0 || strncmp(data_test,"BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (settings == 0)
   {
     color_print("FAILED! Test for parsing BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK","red");
@@ -1736,41 +1836,49 @@ int parse_json_data_test()
   else
   {
     color_print("PASSED! Test for parsing BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK","green");
+    count_test++;
   }
   settings = 1;
 
   // test for parsing CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEW_PART_OF_ROUND
   memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
   memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
-  append_string(result_test,CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEW_PART_OF_ROUND);
+  memcpy(result_test,CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEW_PART_OF_ROUND,strnlen(CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEW_PART_OF_ROUND,BUFFER_SIZE));
   if (parse_json_data(result_test,"message_settings",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEW_PART_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"public_address",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEW_PART_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"previous_block_hash",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEW_PART_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEW_PART_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part_backup_node",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEW_PART_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"data",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEW_PART_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"xcash_proof_of_stake_signature",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEW_PART_OF_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (settings == 0)
   {
     color_print("FAILED! Test for parsing CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEW_PART_OF_ROUND","red");
@@ -1778,41 +1886,49 @@ int parse_json_data_test()
   else
   {
     color_print("PASSED! Test for parsing CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEW_PART_OF_ROUND","green");
+    count_test++;
   }
   settings = 1;
 
   // test for parsing CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEXT_ROUND
   memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
   memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
-  append_string(result_test,CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEXT_ROUND);
+  memcpy(result_test,CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEXT_ROUND,strnlen(CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEXT_ROUND,BUFFER_SIZE));
   if (parse_json_data(result_test,"message_settings",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEXT_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"public_address",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEXT_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"previous_block_hash",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEXT_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEXT_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part_backup_node",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEXT_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"data",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEXT_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"xcash_proof_of_stake_signature",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEXT_ROUND",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (settings == 0)
   {
     color_print("FAILED! Test for parsing CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEXT_ROUND","red");
@@ -1820,45 +1936,54 @@ int parse_json_data_test()
   else
   {
     color_print("PASSED! Test for parsing CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEXT_ROUND","green");
+    count_test++;
   }
   settings = 1;
 
   // test for parsing CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CREATE_NEW_BLOCK
   memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
   memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
-  append_string(result_test,CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CREATE_NEW_BLOCK);
+  memcpy(result_test,CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CREATE_NEW_BLOCK,strnlen(CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CREATE_NEW_BLOCK,BUFFER_SIZE));
   if (parse_json_data(result_test,"message_settings",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CREATE_NEW_BLOCK",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
-  if (parse_json_data(result_test,"block_blob -",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CREATE_NEW_BLOCK",BUFFER_SIZE) != 0)
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
+  if (parse_json_data(result_test,"block_blob",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CREATE_NEW_BLOCK",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"public_address",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CREATE_NEW_BLOCK",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"previous_block_hash",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CREATE_NEW_BLOCK",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CREATE_NEW_BLOCK",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part_backup_node",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CREATE_NEW_BLOCK",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"data",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CREATE_NEW_BLOCK",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"xcash_proof_of_stake_signature",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CREATE_NEW_BLOCK",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (settings == 0)
   {
     color_print("FAILED! Test for parsing CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CREATE_NEW_BLOCK","red");
@@ -1866,45 +1991,54 @@ int parse_json_data_test()
   else
   {
     color_print("PASSED! Test for parsing CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CREATE_NEW_BLOCK","green");
+    count_test++;
   }
   settings = 1;
 
   // test for parsing BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CREATE_NEW_BLOCK
   memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
   memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
-  append_string(result_test,BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CREATE_NEW_BLOCK);
+  memcpy(result_test,BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CREATE_NEW_BLOCK,strnlen(BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CREATE_NEW_BLOCK,BUFFER_SIZE));
   if (parse_json_data(result_test,"message_settings",data_test) == 0 || strncmp(data_test,"BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CREATE_NEW_BLOCK",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"block_blob_signature",data_test) == 0 || strncmp(data_test,"BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CREATE_NEW_BLOCK",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"public_address",data_test) == 0 || strncmp(data_test,"BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CREATE_NEW_BLOCK",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"previous_block_hash",data_test) == 0 || strncmp(data_test,"BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CREATE_NEW_BLOCK",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part",data_test) == 0 || strncmp(data_test,"BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CREATE_NEW_BLOCK",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part_backup_node",data_test) == 0 || strncmp(data_test,"BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CREATE_NEW_BLOCK",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"data",data_test) == 0 || strncmp(data_test,"BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CREATE_NEW_BLOCK",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"xcash_proof_of_stake_signature",data_test) == 0 || strncmp(data_test,"BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CREATE_NEW_BLOCK",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (settings == 0)
   {
     color_print("FAILED! Test for parsing BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CREATE_NEW_BLOCK","red");
@@ -1912,41 +2046,49 @@ int parse_json_data_test()
   else
   {
     color_print("PASSED! Test for parsing BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CREATE_NEW_BLOCK","green");
+    count_test++;
   }
   settings = 1;
 
   // test for parsing CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_RECALCULATING_VOTES
   memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
   memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
-  append_string(result_test,CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_RECALCULATING_VOTES);
+  memcpy(result_test,CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_RECALCULATING_VOTES,strnlen(CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_RECALCULATING_VOTES,BUFFER_SIZE));
   if (parse_json_data(result_test,"message_settings",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_RECALCULATING_VOTES",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"public_address",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_RECALCULATING_VOTES",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"previous_block_hash",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_RECALCULATING_VOTES",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_RECALCULATING_VOTES",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part_backup_node",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_RECALCULATING_VOTES",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"data",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_RECALCULATING_VOTES",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"xcash_proof_of_stake_signature",data_test) == 0 || strncmp(data_test,"CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_RECALCULATING_VOTES",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (settings == 0)
   {
     color_print("FAILED! Test for parsing CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_RECALCULATING_VOTES","red");
@@ -1954,41 +2096,49 @@ int parse_json_data_test()
   else
   {
     color_print("PASSED! Test for parsing CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_RECALCULATING_VOTES","green");
+    count_test++;
   }
   settings = 1;
 
   // test for parsing VOTING_WEBSITE_API_PROGRAM_TO_BLOCK_VALIDATION_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS
   memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
   memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
-  append_string(result_test,VOTING_WEBSITE_API_PROGRAM_TO_BLOCK_VALIDATION_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS);
+  memcpy(result_test,VOTING_WEBSITE_API_PROGRAM_TO_BLOCK_VALIDATION_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS,strnlen(VOTING_WEBSITE_API_PROGRAM_TO_BLOCK_VALIDATION_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS,BUFFER_SIZE));
   if (parse_json_data(result_test,"message_settings",data_test) == 0 || strncmp(data_test,"VOTING_WEBSITE_API_PROGRAM_TO_BLOCK_VALIDATION_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"public_address",data_test) == 0 || strncmp(data_test,"VOTING_WEBSITE_API_PROGRAM_TO_BLOCK_VALIDATION_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"previous_block_hash",data_test) == 0 || strncmp(data_test,"VOTING_WEBSITE_API_PROGRAM_TO_BLOCK_VALIDATION_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part",data_test) == 0 || strncmp(data_test,"VOTING_WEBSITE_API_PROGRAM_TO_BLOCK_VALIDATION_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"current_round_part_backup_node",data_test) == 0 || strncmp(data_test,"VOTING_WEBSITE_API_PROGRAM_TO_BLOCK_VALIDATION_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"data",data_test) == 0 || strncmp(data_test,"VOTING_WEBSITE_API_PROGRAM_TO_BLOCK_VALIDATION_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (parse_json_data(result_test,"xcash_proof_of_stake_signature",data_test) == 0 || strncmp(data_test,"VOTING_WEBSITE_API_PROGRAM_TO_BLOCK_VALIDATION_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS",BUFFER_SIZE) != 0)
   {
     settings = 0;
   }
+  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
   if (settings == 0)
   {
     color_print("FAILED! Test for parsing VOTING_WEBSITE_API_PROGRAM_TO_BLOCK_VALIDATION_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS","red");
@@ -1996,157 +2146,20 @@ int parse_json_data_test()
   else
   {
     color_print("PASSED! Test for parsing VOTING_WEBSITE_API_PROGRAM_TO_BLOCK_VALIDATION_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS","green");
+    count_test++;
   }
   settings = 1;
 
-
- 
-  // write the end test message
-  if (count_test == PARSE_JSON_DATA_TOTAL_TEST)
-  {
-    printf("\n\n");
-    color_print(TEST_OUTLINE,"green");
-    printf("\033[1;32mparse_json_data test - Passed test: %d, Failed test: 0\033[0m\n",PARSE_JSON_DATA_TOTAL_TEST);
-    color_print(TEST_OUTLINE,"green");
-    printf("\n\n");
-  }
-  else
-  {
-    printf("\n\n");
-    color_print(TEST_OUTLINE,"red");
-    printf("\033[1;31mparse_json_data test - Passed test: %d, Failed test: %d\033[0m\n",count_test,PARSE_JSON_DATA_TOTAL_TEST-count_test);
-    color_print(TEST_OUTLINE,"red");
-    printf("\n\n");
-  }
-  return count_test;
-
-  #undef PARSE_JSON_DATA_TOTAL_TEST
-  #undef SIGN_RPC_CALL_TEST_DATA
-  #undef VERIFY_RPC_CALL_TEST_DATA
-  #undef GET_BLOCK_TEMPLATE_RPC_CALL_TEST_DATA
-  #undef CONSENSUS_NODE_TO_NODE_RECEIVE_CURRENT_CONSENSUS_NODE_IP_ADDRESS
-  #undef NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS
-  #undef CONSENSUS_NODE_TO_NODE_RECEIVE_UPDATED_NODE_LIST
-  #undef NODE_TO_CONSENSUS_NODE_SEND_UPDATED_NODE_LIST
-  #undef CONSENSUS_NODE_TO_NODES_MAIN_NODE_PUBLIC_ADDRESS
-  #undef NODES_TO_CONSENSUS_NODE_MAIN_NODE_SOCKET_TIMEOUT_ROUND_CHANGE
-  #undef CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND
-  #undef MAIN_NODES_TO_NODES_PART_1_OF_ROUND
-  #undef MAIN_NODES_TO_NODES_PART_2_OF_ROUND
-  #undef MAIN_NODES_TO_NODES_PART_3_OF_ROUND
-  #undef MAIN_NODES_TO_NODES_PART_4_OF_ROUND
-  #undef NODES_TO_NODES_VOTE_RESULTS
-  #undef NODES_TO_CONSENSUS_NODE_VOTE_RESULTS
-  #undef CONSENSUS_NODE_TO_NODES_LIST_OF_ENABLED_NODES
-  #undef CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_ROUND_CHANGE
-  #undef CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CHANGE
-  #undef CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CREATE_NEW_BLOCK_MESSAGE
-  #undef CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_RECEIVE_XCASH_PROOF_OF_STAKE_SETTINGS
-  #undef BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS
-  #undef CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK
-  #undef BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK
-  #undef CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEW_PART_OF_ROUND
-  #undef CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEXT_ROUND
-  #undef CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CREATE_NEW_BLOCK
-  #undef BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CREATE_NEW_BLOCK
-  #undef CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_RECALCULATING_VOTES
-  #undef VOTING_WEBSITE_API_PROGRAM_TO_BLOCK_VALIDATION_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS
-}
-
-
-
-/*
------------------------------------------------------------------------------------------------------------
-Name: random_string_test
-Description: Test the random_string function
-Return: The number of passed random_string test
------------------------------------------------------------------------------------------------------------
-*/
-
-int random_string_test()
-{  
-  // define macros
-  #define RANDOM_STRING_TOTAL_TEST 1
- 
-  // reset the variables
   memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
-  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
-  count_test = 0;
-
-  // write the start test message
-  color_print(TEST_OUTLINE,"blue");
-  printf("\033[1;34mrandom_string test - Total test: %d\033[0m\n",RANDOM_STRING_TOTAL_TEST);
-  color_print(TEST_OUTLINE,"blue");
-  printf("\n");
-
-  // run the test
   if (random_string(result_test,RANDOM_STRING_LENGTH) == 1)
   {   
-    color_print("PASSED! Test for creating a 100 character random string","green");
+    color_print("PASSED! Test for creating a random string","green");
     count_test++;
   }
   else
   {
-    color_print("FAILED! Test for creating a 100 character random string","red");
+    color_print("FAILED! Test for creating a random string","red");
   }
-
-
-
-  // write the end test message
-  if (count_test == RANDOM_STRING_TOTAL_TEST)
-  {
-    printf("\n");
-    color_print(TEST_OUTLINE,"green");
-    printf("\033[1;32mrandom_string test - Passed test: %d, Failed test: 0\033[0m\n",RANDOM_STRING_TOTAL_TEST);
-    color_print(TEST_OUTLINE,"green");
-    printf("\n\n");
-  }
-  else
-  {
-    printf("\n");
-    color_print(TEST_OUTLINE,"red");
-    printf("\033[1;31msend_http_request_and_get_public_address test - Passed test: %d, Failed test: %d\033[0m\n",count_test,RANDOM_STRING_TOTAL_TEST-count_test);
-    color_print(TEST_OUTLINE,"red");
-    printf("\n\n");
-  } 
-  return count_test;
-
-  #undef RANDOM_STRING_TOTAL_TEST
-}
-
-
-
-/*
------------------------------------------------------------------------------------------------------------
-Name: create_json_data_from_database_document_array test
-Description: Test the create_json_data_from_database_document_array function
-Return: The number of passed create_json_data_from_database_document_array test
------------------------------------------------------------------------------------------------------------
-*/
-
-int create_json_data_from_database_document_array_test()
-{  
-  // define macros
-  #define create_json_data_from_database_document_array_TOTAL_TEST 2
-  #define DATA1 "{\"username\":\"XCASH\",\"most_total_rounds_delegate_name\":\"DELEGATE_NAME\",\"most_total_rounds\":\"5\",\"best_block_verifier_online_percentage_delegate_name\":\"DELEGATE_NAME\",\"best_block_verifier_online_percentage\":\"10\",\"most_block_producer_total_rounds_delegate_name\":\"DELEGATE_NAME\",\"most_block_producer_total_rounds\":\"15\",\"most_VRF_node_public_and_private_key_total_rounds_delegate_name\":\"DELEGATE_NAME\",\"most_VRF_node_public_and_private_key_total_rounds\":\"5\",\"most_VRF_node_random_data_total_rounds_delegate_name\":\"DELEGATE_NAME\",\"most_VRF_node_random_data_total_rounds\":\"10\",\"total_XCASH_proof_of_stake_rounds\":\"15\",\"total_coins_in_proof_of_stake\":\"5\",\"total_circulating_supply_percentage_in_proof_of_stake\":\"10\"}"
-  #define DATA2 "[{\"username\":\"XCASH\",\"most_total_rounds_delegate_name\":\"DELEGATE_NAME\",\"most_total_rounds\":\"5\",\"best_block_verifier_online_percentage_delegate_name\":\"DELEGATE_NAME\",\"best_block_verifier_online_percentage\":\"10\",\"most_block_producer_total_rounds_delegate_name\":\"DELEGATE_NAME\",\"most_block_producer_total_rounds\":\"15\",\"most_VRF_node_public_and_private_key_total_rounds_delegate_name\":\"DELEGATE_NAME\",\"most_VRF_node_public_and_private_key_total_rounds\":\"5\",\"most_VRF_node_random_data_total_rounds_delegate_name\":\"DELEGATE_NAME\",\"most_VRF_node_random_data_total_rounds\":\"10\",\"total_XCASH_proof_of_stake_rounds\":\"15\",\"total_coins_in_proof_of_stake\":\"5\",\"total_circulating_supply_percentage_in_proof_of_stake\":\"10\"},{\"username\":\"XCASH\",\"most_total_rounds_delegate_name\":\"DELEGATE_NAME\",\"most_total_rounds\":\"5\",\"best_block_verifier_online_percentage_delegate_name\":\"DELEGATE_NAME\",\"best_block_verifier_online_percentage\":\"10\",\"most_block_producer_total_rounds_delegate_name\":\"DELEGATE_NAME\",\"most_block_producer_total_rounds\":\"15\",\"most_VRF_node_public_and_private_key_total_rounds_delegate_name\":\"DELEGATE_NAME\",\"most_VRF_node_public_and_private_key_total_rounds\":\"5\",\"most_VRF_node_random_data_total_rounds_delegate_name\":\"DELEGATE_NAME\",\"most_VRF_node_random_data_total_rounds\":\"10\",\"total_XCASH_proof_of_stake_rounds\":\"15\",\"total_coins_in_proof_of_stake\":\"5\",\"total_circulating_supply_percentage_in_proof_of_stake\":\"10\"}]"
-
-  // reset the variables
-  memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
-  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
-  count_test = 0;
-
-  // write the start test message
-  color_print(TEST_OUTLINE,"blue");
-  printf("\033[1;34mcreate_json_data_from_database_document_array_test - Total test: %d\033[0m\n",create_json_data_from_database_document_array_TOTAL_TEST);
-  color_print(TEST_OUTLINE,"blue");
-  printf("\n");
-
-  // run the test
-  // create_json_data_from_database_document_array
-  int count;
-  int counter;
-  struct database_document_fields database_data;
 
   // initialize the database_document_fields struct 
   for (count = 0; count < 14; count++)
@@ -2220,7 +2233,6 @@ int create_json_data_from_database_document_array_test()
 
   // create_json_data_from_database_multiple_documents_array
   memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
-  struct database_multiple_documents_fields database_multiple_documents_fields;
 
   // initialize the database_multiple_documents_fields struct 
   for (count = 0; count < 2; count++)
@@ -2325,234 +2337,110 @@ int create_json_data_from_database_document_array_test()
     }
   }
 
-
-
-  // write the end test message
-  if (count_test == create_json_data_from_database_document_array_TOTAL_TEST)
-  {
-    printf("\n");
-    color_print(TEST_OUTLINE,"green");
-    printf("\033[1;32mstring_count test - Passed test: %d, Failed test: 0\033[0m\n",create_json_data_from_database_document_array_TOTAL_TEST);
-    color_print(TEST_OUTLINE,"green");
-    printf("\n\n");
-  }
-  else
-  {
-    printf("\n");
-    color_print(TEST_OUTLINE,"red");
-    printf("\033[1;31mcreate_json_data_from_database_document_array_test - Passed test: %d, Failed test: %d\033[0m\n",count_test,create_json_data_from_database_document_array_TOTAL_TEST-count_test);
-    color_print(TEST_OUTLINE,"red");
-    printf("\n\n");
-  } 
-  return count_test;
-
-  #undef create_json_data_from_database_document_array_TOTAL_TEST
-  #undef DATA1
-  #undef DATA2
-}
-
-
-
-/*
------------------------------------------------------------------------------------------------------------
-Name: string_count test
-Description: Test the string_count function
-Return: The number of passed string_count test
------------------------------------------------------------------------------------------------------------
-*/
-
-int string_count_test()
-{  
-  // define macros
-  #define STRING_COUNT_TOTAL_TEST 2
-
-  // reset the variables
   memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
-  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
-  count_test = 0;
-
-  // write the start test message
-  color_print(TEST_OUTLINE,"blue");
-  printf("\033[1;34mstring_count test - Total test: %d\033[0m\n",STRING_COUNT_TOTAL_TEST);
-  color_print(TEST_OUTLINE,"blue");
-  printf("\n");
-
-  // run the test
   memcpy(result_test,TEST_OUTLINE,strnlen(TEST_OUTLINE,BUFFER_SIZE));
 
-  // test for counting a byte in a string
-  if (string_count(result_test,"-") == strnlen(TEST_OUTLINE,BUFFER_SIZE))  
+  // test for counting occurences of a substring in a string
+  if (string_count(result_test,"-") == strnlen(TEST_OUTLINE,BUFFER_SIZE) && string_count(result_test,"--") == strnlen(TEST_OUTLINE,BUFFER_SIZE)/2)  
   {
-    color_print("PASSED! Test for using string_count to count occurences of a byte in a string","green");
+    color_print("PASSED! Test for counting occurences of a substring in a string","green");
     count_test++;
   }
   else
   {
-    color_print("FAILED! Test for using string_count to count occurences of a byte in a string","red");
+    color_print("FAILED! Test for counting occurences of a substring in a string","red");
   }
 
-  // test for counting multiple bytes in a string
-  if (string_count(result_test,"--") == strnlen(TEST_OUTLINE,BUFFER_SIZE)/2)  
-  {
-    color_print("PASSED! Test for using string_count to count occurences of multiple bytes in a string","green");
-    count_test++;
-  }
-  else
-  { 
-    color_print("FAILED! Test for using string_count to count occurences of multiple bytes a string","red");
-  }
-
-
-
-  // write the end test message
-  if (count_test == STRING_COUNT_TOTAL_TEST)
-  {
-    printf("\n");
-    color_print(TEST_OUTLINE,"green");
-    printf("\033[1;32mstring_count test - Passed test: %d, Failed test: 0\033[0m\n",STRING_COUNT_TOTAL_TEST);
-    color_print(TEST_OUTLINE,"green");
-    printf("\n\n");
-  }
-  else
-  {
-    printf("\n");
-    color_print(TEST_OUTLINE,"red");
-    printf("\033[1;31mstring_count test - Passed test: %d, Failed test: %d\033[0m\n",count_test,STRING_COUNT_TOTAL_TEST-count_test);
-    color_print(TEST_OUTLINE,"red");
-    printf("\n\n");
-  } 
-  return count_test;
-
-  #undef STRING_COUNT_TOTAL_TEST
-}
-
-
-
-/*
------------------------------------------------------------------------------------------------------------
-Name: string_replace_test
-Description: Test the string_replace function
-Return: The number of passed string_replace test
------------------------------------------------------------------------------------------------------------
-*/
-
-int string_replace_test()
-{  
-  // define macros
-  #define STRING_REPLACE_TOTAL_TEST 4
-
-  // reset the variables
+  // test for string replace
   memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
-  memset(data_test,0,strnlen(data_test,BUFFER_SIZE));
-  count_test = 0;
-
-  // write the start test message
-  color_print(TEST_OUTLINE,"blue");
-  printf("\033[1;34mstring_replace test - Total test: %d\033[0m\n",STRING_REPLACE_TOTAL_TEST);
-  color_print(TEST_OUTLINE,"blue");
-  printf("\n");
-
-  // run the test
+  append_string(result_test,"{\r\n \"message_settings\": \"string_replace_test\",\r\n}");
+  if (string_replace(result_test,"string_replace_test","string_replace") == 1 && strncmp(result_test,"{\r\n \"message_settings\": \"string_replace\",\r\n}",BUFFER_SIZE) == 0)
+  {
+    memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
+    append_string(result_test,"{\r\n \"message_settings\": \"string_replace_test\",\r\n}");
+     if (string_replace(result_test,"\"","\\\"") == 1 && strncmp(result_test,"{\r\n \\\"message_settings\\\": \\\"string_replace_test\\\",\r\n}",BUFFER_SIZE) == 0)
+     {
+       memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
+       append_string(result_test,"{\r\n \"message_settings\": \"string_replace_test\",\r\n}");
+       if (string_replace(result_test,"_test","") == 1 && strncmp(result_test,"{\r\n \"message_settings\": \"string_replace\",\r\n}",BUFFER_SIZE) == 0)
+       {
+         memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
+         append_string(result_test,"{\r\n \"message_settings\": \"string_replace\",\r\n}");
+         if (string_replace(result_test,"string_replace_test","") == 0 && strncmp(result_test,"{\r\n \"message_settings\": \"string_replace\",\r\n}",BUFFER_SIZE) == 0)
+         {    
+           color_print("PASSED! Test for string replace","green");
+           count_test++;
+         }
+         else
+         {
+           color_print("FAILED! Test for string replace","red");
+         }
+       }
+       else
+       {
+         color_print("FAILED! Test for string replace","red");
+       }
+     }
+     else
+     {
+       color_print("FAILED! Test for string replace","red");
+     }
+  }
+  else
+  {
+    color_print("FAILED! Test for string replace","red");
+  }
  
-  // test for using string_replace to replace a string
-  append_string(result_test,"{\r\n \"message_settings\": \"string_replace_test\",\r\n}");
-  if (string_replace(result_test,"string_replace_test","string_replace") == 1)
-  {
-    if (strncmp(result_test,"{\r\n \"message_settings\": \"string_replace\",\r\n}",BUFFER_SIZE) == 0)
-    {
-      color_print("PASSED! Test for using string_replace to replace a string","green");
-      count_test++;
-    }
-    else
-    {
-      color_print("FAILED! Test for using string_replace to replace a string","red");
-    }
-  }
-  else
-  {
-    color_print("FAILED! Test for using string_replace to replace a string","red");
-  }
-
-  // test for using string_replace to replace a string with a string that has the substring of str1 in it
-  memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
-  append_string(result_test,"{\r\n \"message_settings\": \"string_replace_test\",\r\n}");
-  if (string_replace(result_test,"\"","\\\"") == 1)
-  {
-    if (strncmp(result_test,"{\r\n \\\"message_settings\\\": \\\"string_replace_test\\\",\r\n}",BUFFER_SIZE) == 0)
-    {
-      color_print("PASSED! Test for using string_replace to replace a string with a string that has the substring of str1 in it","green");
-      count_test++;
-    }
-    else
-    {
-      color_print("FAILED! Test for using string_replace to replace a string with a string that has the substring of str1 in it","red");
-    }
-  }
-  else
-  {
-    color_print("FAILED! Test for using string_replace to replace a string with a string that has the substring of str1 in it","red");
-  }
-
-  // test for using string_replace to remove a string
-  memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
-  append_string(result_test,"{\r\n \"message_settings\": \"string_replace_test\",\r\n}");
-  if (string_replace(result_test,"_test","") == 1)
-  {
-    if (strncmp(result_test,"{\r\n \"message_settings\": \"string_replace\",\r\n}",BUFFER_SIZE) == 0)
-    {
-      color_print("PASSED! Test for using string_replace to remove a string","green");
-      count_test++;
-    }
-    else
-    {
-      color_print("FAILED! Test for using string_replace to remove a string","red");
-    }
-  }
-  else
-  {
-    color_print("FAILED! Test for using string_replace to remove a string","red");
-  }
-
-  // test for using string_replace to replace a string that is not in the string
-  memset(result_test,0,strnlen(result_test,BUFFER_SIZE));
-  append_string(result_test,"{\r\n \"message_settings\": \"string_replace\",\r\n}");
-  if (string_replace(result_test,"string_replace_test","") == 1)
-  {    
-    color_print("FAILED! Test for using string_replace to replace a string that is not in the string","red");
-  }
-  else
-  {
-    if (strncmp(result_test,"{\r\n \"message_settings\": \"string_replace\",\r\n}",BUFFER_SIZE) == 0)
-    {
-      color_print("PASSED! Test for using string_replace to replace a string that is not in the string","green");
-      count_test++;
-    }
-    else
-    {
-      color_print("FAILED! Test for using string_replace to replace a string that is not in the string","red");
-    }    
-  }
-
-
-
   // write the end test message
-  if (count_test == STRING_REPLACE_TOTAL_TEST)
+  if (count_test == STRING_FUNCTIONS_TOTAL_TEST)
   {
-    printf("\n");
+    printf("\n\n");
     color_print(TEST_OUTLINE,"green");
-    printf("\033[1;32mstring_replace test - Passed test: %d, Failed test: 0\033[0m\n",STRING_REPLACE_TOTAL_TEST);
+    printf("\033[1;32mstring functions test - Passed test: %d, Failed test: 0\033[0m\n",STRING_FUNCTIONS_TOTAL_TEST);
     color_print(TEST_OUTLINE,"green");
     printf("\n\n");
   }
   else
   {
-    printf("\n");
+    printf("\n\n");
     color_print(TEST_OUTLINE,"red");
-    printf("\033[1;31mstring_replace test - Passed test: %d, Failed test: %d\033[0m\n",count_test,STRING_REPLACE_TOTAL_TEST-count_test);
+    printf("\033[1;31mstring functions test - Passed test: %d, Failed test: %d\033[0m\n",count_test,STRING_FUNCTIONS_TOTAL_TEST-count_test);
     color_print(TEST_OUTLINE,"red");
     printf("\n\n");
-  } 
+  }
   return count_test;
 
-  #undef STRING_REPLACE_TOTAL_TEST
+  #undef STRING_FUNCTIONS_TOTAL_TEST
+  #undef DATA1
+  #undef DATA2
+  #undef SIGN_RPC_CALL_TEST_DATA
+  #undef VERIFY_RPC_CALL_TEST_DATA
+  #undef GET_BLOCK_TEMPLATE_RPC_CALL_TEST_DATA
+  #undef CONSENSUS_NODE_TO_NODE_RECEIVE_CURRENT_CONSENSUS_NODE_IP_ADDRESS
+  #undef NODE_TO_CONSENSUS_NODE_SEND_CURRENT_CONSENSUS_NODE_IP_ADDRESS
+  #undef CONSENSUS_NODE_TO_NODE_RECEIVE_UPDATED_NODE_LIST
+  #undef NODE_TO_CONSENSUS_NODE_SEND_UPDATED_NODE_LIST
+  #undef CONSENSUS_NODE_TO_NODES_MAIN_NODE_PUBLIC_ADDRESS
+  #undef NODES_TO_CONSENSUS_NODE_MAIN_NODE_SOCKET_TIMEOUT_ROUND_CHANGE
+  #undef CONSENSUS_NODE_TO_MAIN_NODE_START_PART_OF_ROUND
+  #undef MAIN_NODES_TO_NODES_PART_1_OF_ROUND
+  #undef MAIN_NODES_TO_NODES_PART_2_OF_ROUND
+  #undef MAIN_NODES_TO_NODES_PART_3_OF_ROUND
+  #undef MAIN_NODES_TO_NODES_PART_4_OF_ROUND
+  #undef NODES_TO_NODES_VOTE_RESULTS
+  #undef NODES_TO_CONSENSUS_NODE_VOTE_RESULTS
+  #undef CONSENSUS_NODE_TO_NODES_LIST_OF_ENABLED_NODES
+  #undef CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_ROUND_CHANGE
+  #undef CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CHANGE
+  #undef CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_CONSENSUS_NODE_CREATE_NEW_BLOCK_MESSAGE
+  #undef CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_RECEIVE_XCASH_PROOF_OF_STAKE_SETTINGS
+  #undef BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS
+  #undef CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK
+  #undef BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CONSENSUS_NODE_CREATE_NEW_BLOCK
+  #undef CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEW_PART_OF_ROUND
+  #undef CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_NEXT_ROUND
+  #undef CONSENSUS_NODE_TO_BLOCK_VALIDATION_NODE_CREATE_NEW_BLOCK
+  #undef BLOCK_VALIDATION_NODE_TO_CONSENSUS_NODE_CREATE_NEW_BLOCK
+  #undef CONSENSUS_NODE_TO_NODES_AND_MAIN_NODES_RECALCULATING_VOTES
+  #undef VOTING_WEBSITE_API_PROGRAM_TO_BLOCK_VALIDATION_NODE_SEND_XCASH_PROOF_OF_STAKE_SETTINGS
 }
